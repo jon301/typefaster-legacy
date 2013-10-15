@@ -1,0 +1,22 @@
+{
+  "name": "typefaster",
+  "version": "0.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-compass": "~0.5.0",
+    "grunt-contrib-jst": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-watch": "~0.5.2",
+    "grunt-concurrent": "~0.3.0",
+    "grunt-shell": "~0.5.0",
+    "matchdep": "~0.1.1",
+    "load-grunt-tasks": "~0.1.0",
+    "time-grunt": "~0.1.1"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+}

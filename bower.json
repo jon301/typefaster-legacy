@@ -1,0 +1,16 @@
+{
+  "name": "typefaster",
+  "version": "0.0.0",
+  "dependencies": {
+    "modernizr": "~2.6.2",
+    "jquery": "~1.10.2",
+    "requirejs": "~2.1.8",
+    "jed": "~0.5.4",
+    "sass-bootstrap": "~3.0.0",
+    "underscore": "~1.5.2",
+    "jquery.cookie": "~1.4.0",
+    "moment": "~2.3.1",
+    "numeral": "~1.5.0",
+    "store.js": "~1.3.14"
+  }
+}

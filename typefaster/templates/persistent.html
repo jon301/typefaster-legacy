@@ -1,0 +1,20 @@
+{% extends "_base.html" %}
+
+{% block title %}
+    {{ super() }} - Persistent game
+{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <h1>{{ g.lang_code }}</h1>
+    {% trans %}This is the persistent page : {{ game }}{% endtrans %}
+
+    <p><a href="{{ url_for('.home') }}">{% trans %}Go to home page{% endtrans %}</a></p>
+
+    {% for lang_code in config.ACCEPT_LANGUAGES %}
+        {% if lang_code != g.lang_code %}
+            <p><a href="{{ url_for(request.endpoint, lang_code=lang_code, game=game) }}">Switch lang : {{ lang_code }}</a></p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

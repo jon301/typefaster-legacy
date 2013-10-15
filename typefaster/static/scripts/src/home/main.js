@@ -1,0 +1,1 @@
+(function(){require(["../common"],function(){return require(["jquery","underscore","templates"],function(a,b,c){var d;return d=c["typefaster/static/scripts/templates/test.ejs"],console.log(a._("home main")),console.log(d({my_var:"bonjour"}))})})}).call(this);

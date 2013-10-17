@@ -4,15 +4,38 @@
     {{ super() }} - Home
 {% endblock %}
 
-{% block extra_css %}{% endblock %}
+{% block extra_css %}
+    <style>
+        .pull-left {
+            float: left;
+        }
+        #type-container {
+            border: 2px solid black;
+            position: relative;
+        }
+        #type-inner{
+            width: 100%;
+            height: 70px;
+            overflow: hidden;
+        }
+        .word {
+            font-size: 25px;
+            line-height: 35px;
+            white-space: nowrap;
+        }
+        .hl {
+            background: red;
+        }
+    </style>
+{% endblock %}
 
-{% block extra_js %}
-<script data-main="{{ url_for('static', filename='scripts/src/home/main.js') }}" src="{{ url_for('static', filename='bower_components/requirejs/require.js') }}"></script>
-<script>
+{% block extra_js %}{% endblock %}
+
+{% block js_main %}
     define('globals', {
         titi: 'tata'
     });
-</script>
+    require(['src/home/main']);
 {% endblock %}
 
 {% block content %}
@@ -26,4 +49,49 @@
             <p><a href="{{ url_for('.home', lang_code=lang_code) }}">Switch lang : {{ lang_code }}</a></p>
         {% endif %}
     {% endfor %}
+
+
+    <div id="type-container">
+        <div id="type-inner">
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div id="titi" class="hl word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div id="toto" class="hl word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="word pull-left"><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span><span>s</span></div>
+            <div class="word pull-left"><span>&nbsp;</span></div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
 {% endblock %}

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 DEBUG = False
-
 TESTING = False
 
+# i18n
 ACCEPT_LANGUAGES = {
-    'fr': 'Français',
-    'en': 'English'
+    'fr': u'Français',
+    'en': u'English'
 }
 BABEL_DEFAULT_LOCALE = 'en'
 BABEL_DEFAULT_TIMEZONE = 'UTC'

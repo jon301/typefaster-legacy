@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from typefaster import app
 from flask import Blueprint, g, render_template, request, abort
 

@@ -3,18 +3,20 @@ requirejs.config
     paths:
         templates: 'src/templates',
         jquery: '../bower_components/jquery/jquery.min'
-        underscore: '../bower_components/underscore/underscore-min'
+        backbone: '../bower_components/backbone/backbone-min'
+        underscore: '../bower_components/lodash/dist/lodash.min'
+        marionette: '../bower_components/marionette/lib/backbone.marionette.min'
         jed: '../bower_components/jed/jed'
     shim:
+        backbone:
+            deps: ['jquery', 'underscore']
+            exports: 'Backbone'
         underscore:
             exports: '_'
+        marionette:
+            deps: ['jquery', 'underscore', 'backbone']
+            exports: 'Marionette'
 
 # Initialize the app
-require ['jquery', 'jed'], ($, Jed) ->
-    $.i18n = new Jed(
-        if typeof json_locale_data isnt "undefined" and json_locale_data isnt null
-            locale_data: json_locale_data
-            domain: 'messages'
-        else {}
-    )
-    $._ = $.proxy $.i18n.gettext, $.i18n # Helper
+require ['src/app'], (app) ->
+    app.start()

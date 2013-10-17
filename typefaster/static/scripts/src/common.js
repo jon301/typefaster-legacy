@@ -1,1 +1,31 @@
-(function(){requirejs.config({baseUrl:"../static/scripts",paths:{templates:"src/templates",jquery:"../bower_components/jquery/jquery.min",underscore:"../bower_components/underscore/underscore-min",jed:"../bower_components/jed/jed"},shim:{underscore:{exports:"_"}}}),require(["jquery","jed"],function(a,b){return a.i18n=new b("undefined"!=typeof json_locale_data&&null!==json_locale_data?{locale_data:json_locale_data,domain:"messages"}:{}),a._=a.proxy(a.i18n.gettext,a.i18n)})}).call(this);
+(function() {
+  requirejs.config({
+    baseUrl: '../static/scripts',
+    paths: {
+      templates: 'src/templates',
+      jquery: '../bower_components/jquery/jquery.min',
+      backbone: '../bower_components/backbone/backbone-min',
+      underscore: '../bower_components/lodash/dist/lodash.min',
+      marionette: '../bower_components/marionette/lib/backbone.marionette.min',
+      jed: '../bower_components/jed/jed'
+    },
+    shim: {
+      backbone: {
+        deps: ['jquery', 'underscore'],
+        exports: 'Backbone'
+      },
+      underscore: {
+        exports: '_'
+      },
+      marionette: {
+        deps: ['jquery', 'underscore', 'backbone'],
+        exports: 'Marionette'
+      }
+    }
+  });
+
+  require(['src/app'], function(app) {
+    return app.start();
+  });
+
+}).call(this);

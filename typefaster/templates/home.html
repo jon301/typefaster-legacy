@@ -32,10 +32,12 @@
 {% block extra_js %}{% endblock %}
 
 {% block js_main %}
+function() {
     define('globals', {
         titi: 'tata'
     });
     require(['src/home/main']);
+}
 {% endblock %}
 
 {% block content %}

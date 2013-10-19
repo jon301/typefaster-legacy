@@ -10,6 +10,7 @@
 @import "sass-bootstrap/lib/variables";
 @import "bootswatch-scss/readable/variables";
 
+$grid-float-breakpoint: $screen-md;
 $font-size-base: 30px;
 // !! Override bootstrap variables below !!
 
@@ -19,6 +20,7 @@ $font-size-base: 30px;
 // Type Faster
 @import "lib/footer";
 @import "lib/navbar";
+@import "lib/typezone";
 @import "home";
 
 html, body {

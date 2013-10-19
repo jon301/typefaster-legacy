@@ -33,7 +33,7 @@
     $(window).resize(function() { $('#type-inner').scrollTop($('#type-inner').scrollTop() + $('#titi').position().top); });
 ###
 #global define
-define ["jquery", "marionette"], ($, Marionette) ->
+define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
     "use strict"
 
     ENTRY_CORRECT = 1
@@ -48,6 +48,7 @@ define ["jquery", "marionette"], ($, Marionette) ->
 
         # Internal variables
         entriesMapStatus: []
+        logs: []
 
         initialize: (options) ->
             @reset()
@@ -58,10 +59,11 @@ define ["jquery", "marionette"], ($, Marionette) ->
             @listen()
 
         listen: ->
-            @listenTo @, 'entry:typed', (entry) =>
+            @listenTo @, 'entry:typed', (evt, entry) =>
                 @start()
                 if entry == @entries[@currentIndex]
                     console.log 'entry:is_correct', entry, @entries[@currentIndex]
+                    @logs.push evt.timeStamp
                     @correctEntries++
                     @fixedMistakes++ if @entriesMapStatus[@currentIndex] == ENTRY_TO_BE_FIXED
                     @entriesMapStatus[@currentIndex] = ENTRY_CORRECT
@@ -75,7 +77,7 @@ define ["jquery", "marionette"], ($, Marionette) ->
                     @trigger 'entry:is_incorrect', @currentIndex
                     @currentIndex++
 
-            @listenTo @, 'entry:deleted', =>
+            @listenTo @, 'entry:deleted', (evt) =>
                 if @currentIndex > 0
                     @currentIndex--
                     console.log 'entry:is_reset', @entries[@currentIndex]
@@ -101,7 +103,20 @@ define ["jquery", "marionette"], ($, Marionette) ->
             @stopTime = new Date().getTime()
             clearInterval(@interval)
             @stopListening()
-            console.log @stats()
+
+            stats = @stats()
+            console.log stats
+
+            logs = $.makeArray @logs
+            logs = $.map logs, (val, i) ->
+                return null  if i is 0
+                val - logs[i - 1]
+            percent = parseInt _.uniq(logs).length / stats.totalEntries * 100, 10
+            if percent < 20
+                console.log 'You are a cheater'
+            else
+                console.log 'You are not a cheater'
+
 
         stats: ->
             elapsedTime = Math.ceil (@stopTime - @startTime) / 1000 # Seconds
@@ -119,6 +134,7 @@ define ["jquery", "marionette"], ($, Marionette) ->
             keySpeed: totalEntries / timerMinutes
             speed: rawSpeed - errorRate
             accuracy: (@correctEntries / totalEntries) * 100
+            logs: @logs
 
         reset: ->
             @currentIndex = 0

@@ -8,3 +8,17 @@
         border-bottom-color: #000 !important;
     }
 }
+
+.navbar-toggle {
+    border-color: #ddd;
+    outline: 0;
+    &:hover {
+        background-color: #ddd;
+        .icon-bar {
+            background-color: #fff;
+        }
+    }
+    .icon-bar {
+        background-color: #ccc;
+    }
+}

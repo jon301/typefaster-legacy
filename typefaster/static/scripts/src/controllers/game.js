@@ -38,7 +38,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "marionette"], function($, Marionette) {
+  define(["jquery", "underscore", "marionette"], function($, _, Marionette) {
     "use strict";
     var ENTRY_CORRECT, ENTRY_INCORRECT, ENTRY_TO_BE_FIXED, GameController, _ref;
     ENTRY_CORRECT = 1;
@@ -58,6 +58,8 @@
 
       GameController.prototype.entriesMapStatus = [];
 
+      GameController.prototype.logs = [];
+
       GameController.prototype.initialize = function(options) {
         this.reset();
         this.timer(options.timer);
@@ -68,10 +70,11 @@
 
       GameController.prototype.listen = function() {
         var _this = this;
-        this.listenTo(this, 'entry:typed', function(entry) {
+        this.listenTo(this, 'entry:typed', function(evt, entry) {
           _this.start();
           if (entry === _this.entries[_this.currentIndex]) {
             console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
+            _this.logs.push(evt.timeStamp);
             _this.correctEntries++;
             if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
               _this.fixedMistakes++;
@@ -90,7 +93,7 @@
             return _this.currentIndex++;
           }
         });
-        return this.listenTo(this, 'entry:deleted', function() {
+        return this.listenTo(this, 'entry:deleted', function(evt) {
           if (_this.currentIndex > 0) {
             _this.currentIndex--;
             console.log('entry:is_reset', _this.entries[_this.currentIndex]);
@@ -121,12 +124,27 @@
       };
 
       GameController.prototype.stop = function() {
+        var logs, percent, stats;
         console.log('Game stopped');
         this.running = false;
         this.stopTime = new Date().getTime();
         clearInterval(this.interval);
         this.stopListening();
-        return console.log(this.stats());
+        stats = this.stats();
+        console.log(stats);
+        logs = $.makeArray(this.logs);
+        logs = $.map(logs, function(val, i) {
+          if (i === 0) {
+            return null;
+          }
+          return val - logs[i - 1];
+        });
+        percent = parseInt(_.uniq(logs).length / stats.totalEntries * 100, 10);
+        if (percent < 20) {
+          return console.log('You are a cheater');
+        } else {
+          return console.log('You are not a cheater');
+        }
       };
 
       GameController.prototype.stats = function() {
@@ -145,7 +163,8 @@
           rawSpeed: rawSpeed,
           keySpeed: totalEntries / timerMinutes,
           speed: rawSpeed - errorRate,
-          accuracy: (this.correctEntries / totalEntries) * 100
+          accuracy: (this.correctEntries / totalEntries) * 100,
+          logs: this.logs
         };
       };
 

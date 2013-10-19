@@ -1,20 +1,38 @@
 {% extends "_base.html" %}
 
 {% block title %}
-    {{ super() }} - Persistent game
+    {{ super() }} - Random game
 {% endblock %}
 
 {% block extra_css %}{% endblock %}
 
+{% block js_main %}
+function() {
+    define('globals', {
+        game: {{ game|tojson|safe }}
+    });
+    require(['src/apps/random']);
+}
+{% endblock %}
+
 {% block content %}
-    <h1>{{ g.lang_code }}</h1>
-    {% trans %}This is the random page : {{ game }}{% endtrans %}
+    <h3>Random <small>{{ game }}</small></h3>
 
-    <p><a href="{{ url_for('.home') }}">{% trans %}Go to home page{% endtrans %}</a></p>
+    {% if game == 'standard' %}
+        <p>{% trans %}Short words, no caps, easy peasy.{% endtrans %}</p>
+    {% elif game == 'advanced' %}
+        <p>{% trans %}Longer words, some caps and punctuation marks.{% endtrans %}</p>
+    {% elif game == 'digits' %}
+        <p>{% trans %}Don't forget the numeric keypad.{% endtrans %}</p>
+    {% elif game == 'disorder' %}
+        <p>{% trans %}Letters, numbers &amp; a bit of insanity.{% endtrans %}</p>
+    {% endif %}
 
-    {% for lang_code in config.ACCEPT_LANGUAGES %}
-        {% if lang_code != g.lang_code %}
-            <p><a href="{{ url_for(request.endpoint, lang_code=lang_code, game=game) }}">Switch lang : {{ lang_code }}</a></p>
-        {% endif %}
-    {% endfor %}
+    <hr />
+
+    <div id="typezone-container" class="panel panel-default">
+        <div class="panel-body">
+            <div id="typezone-inner"></div>
+        </div>
+    </div>
 {% endblock %}

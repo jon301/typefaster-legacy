@@ -1,5 +1,5 @@
 requirejs.config
-    baseUrl: '../static/scripts'
+    baseUrl: '/static/scripts'
     paths:
         templates: 'src/templates',
         jquery: '../bower_components/jquery/jquery.min'
@@ -7,6 +7,7 @@ requirejs.config
         underscore: '../bower_components/lodash/dist/lodash.min'
         marionette: '../bower_components/marionette/lib/backbone.marionette.min'
         jed: '../bower_components/jed/jed'
+        bootstrap: '../bower_components/sass-bootstrap/dist/js/bootstrap.min'
     shim:
         backbone:
             deps: ['jquery', 'underscore']
@@ -16,6 +17,8 @@ requirejs.config
         marionette:
             deps: ['jquery', 'underscore', 'backbone']
             exports: 'Marionette'
+        bootstrap:
+            deps: ['jquery']
 
 # Initialize the app
 require ['src/app'], (app) ->

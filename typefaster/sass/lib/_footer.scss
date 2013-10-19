@@ -1,0 +1,8 @@
+$footer-height: 150px;
+
+@include sticky-footer($footer-height, "#wrapper", "#push-footer", "#footer");
+
+#footer {
+    height: $footer-height;
+    padding-top: 75px;
+}

@@ -1,6 +1,26 @@
+// Compass
 @import "compass/support";
 @import "compass/utilities";
 @import "compass/css3";
 @import "compass/layout";
 @import "compass/typography";
-@import "compass/reset";
+//@import "compass/reset";
+
+// Bootstrap
+@import "sass-bootstrap/lib/variables";
+@import "bootswatch-scss/readable/variables";
+
+$font-size-base: 30px;
+// !! Override bootstrap variables below !!
+
+@import "sass-bootstrap/lib/bootstrap";
+@import "bootswatch-scss/readable/bootswatch";
+
+// Type Faster
+@import "lib/footer";
+@import "lib/navbar";
+@import "home";
+
+html, body {
+    min-width: $screen-xs;
+}

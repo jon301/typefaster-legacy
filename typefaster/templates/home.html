@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 
 {% block title %}
-    {{ super() }} - Home
+    {{ super() }} - {% trans %}Because speed matters{% endtrans %}
 {% endblock %}
 
 {% block extra_css %}
@@ -40,7 +40,71 @@ function() {
 }
 {% endblock %}
 
+{% block nav %}
+<nav></nav>
+{% endblock %}
+
 {% block content %}
+
+    <div class="page-header">
+        <h1>TypeFaster <small>{% trans %}because speed matters.{% endtrans %}</small></h1>
+
+    </div>
+
+    <p>{% trans %}Get your keyboard ready and choose a game already.{% endtrans %}</p>
+
+    <div class="games row text-center">
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>{% trans %}Random{% endtrans %}</h3>
+                    <small>{% trans %}Because you master any combination of words and letters{% endtrans %}</small>
+                    <hr />
+                    <div class="row">
+                        <p class="col-lg-12 col-md-3"><a href="{{ url_for('.random', game='standard') }}">{% trans %}Standard{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-3"><a href="{{ url_for('.random', game='advanced') }}">{% trans %}Advanced{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-3"><a href="{{ url_for('.random', game='digits') }}">{% trans %}Digits{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-3"><a href="{{ url_for('.random', game='disorder') }}">{% trans %}Disorder{% endtrans %}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>{% trans %}Persistent{% endtrans %}</h3>
+                    <small>{% trans %}Because the classics do not scare you.{% endtrans %}</small>
+                    <hr />
+                    <div class="row">
+                        <p class="col-lg-12 col-md-2"><a href="{{ url_for('.persistent', game='text') }}">{% trans %}Text{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-2"><a href="{{ url_for('.persistent', game='alphabet') }}">{% trans %}Alphabet{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-4"><a href="{{ url_for('.persistent', game='alphabet-backwards') }}">{% trans %}Alphabet backwards{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-2"><a href="{{ url_for('.persistent', game='pi-digits') }}">{% trans %}Pi digits{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-2"><a href="{{ url_for('.persistent', game='e-digits') }}">{% trans %}E digits{% endtrans %}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>Multiplayer</h3>
+                    <small>{% trans %}Because you just want to be the fastest.{% endtrans %}</small>
+                    <hr />
+                    <div class="row">
+                        <p class="col-lg-12 col-md-4"><a href="#">{% trans %}Lobby{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-4"><a href="#">{% trans %}Join game{% endtrans %}</a></p>
+                        <p class="col-lg-12 col-md-4"><a href="#">{% trans %}Create game{% endtrans %}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {#
     <h1>{{ g.lang_code }}</h1>
     {% trans %}This is the home page{% endtrans %}
 
@@ -96,4 +160,5 @@ function() {
             <div class="clearfix"></div>
         </div>
     </div>
+    #}
 {% endblock %}

@@ -30,9 +30,77 @@
         <![endif]-->
 
         <!-- Add your site or application content here -->
-        {{ request.view_args }}
-        {{ request.endpoint }}
-        {% block content %}{% endblock %}
+
+        <div id="wrapper">
+            {% block nav %}
+                <nav class="navbar navbar-defaulti navbar-static-top" role="navigation">
+                    <div class="container">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="{{ url_for('frontend.home') }}">TypeFaster</a>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Random{% endtrans %} <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{{ url_for('frontend.random', game='standard') }}">{% trans %}Standard{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.random', game='advanced') }}">{% trans %}Advanced{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.random', game='digits') }}">{% trans %}Digits{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.random', game='disorder') }}">{% trans %}Disorder{% endtrans %}</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Persistent{% endtrans %} <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{{ url_for('frontend.persistent', game='text') }}">{% trans %}Text{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.persistent', game='alphabet') }}">{% trans %}Alphabet{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.persistent', game='alphabet-backwards') }}">{% trans %}Alphabet backwards{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.persistent', game='pi-digits') }}">{% trans %}Pi digits{% endtrans %}</a></li>
+                                        <li><a href="{{ url_for('frontend.persistent', game='e-digits') }}">{% trans %}E digits{% endtrans %}</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Multiplayer{% endtrans %} <b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">{% trans %}Lobby{% endtrans %}</a></li>
+                                        <li><a href="#">{% trans %}Join game{% endtrans %}</a></li>
+                                        <li><a href="#">{% trans %}Create game{% endtrans %}</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <ul class="nav navbar-nav navbar-right">
+                                <li><a href="#">{% trans %}Log in{% endtrans %}</a></li>
+                                <li><a href="#">{% trans %}Register{% endtrans %}</a></li>
+                            </ul>
+                        </div><!-- /.navbar-collapse -->
+                    </div>
+                </nav>
+            {% endblock %}
+
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+            <div id="push-footer"></div>
+        </div>
+        <footer id="footer" class="text-center">
+            <small>&copy; {{ utcnow|format_date('%Y') }} TypeFaster</small>
+            {% if request.endpoint and g.get('lang_code') %}
+                {% for lang_code in config.ACCEPT_LANGUAGES %}
+                    {% if lang_code != g.lang_code %}
+                        <a href="{{ url_for(request.endpoint, lang_code=lang_code, **request.view_args) }}">{{ lang_code }}</a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </footer>
 
         <script src="{{ url_for('static', filename='scripts/src/console.js') }}"></script>
         {% if g.get('lang_code') and g.lang_code != config.BABEL_DEFAULT_LOCALE %}

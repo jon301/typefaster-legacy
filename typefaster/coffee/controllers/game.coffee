@@ -104,21 +104,17 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
                         @correctEntries++
                         @fixedMistakes++ if @entriesMapStatus[@currentIndex] is ENTRY_TO_BE_FIXED
                         @entriesMapStatus[@currentIndex] = ENTRY_CORRECT
+                        @pushEntryLog ENTRY_CORRECT
                         @trigger 'entry:is_correct', @currentIndex
                         @currentIndex++
-                        @entriesLogs.push
-                            ts: new Date().getTime()
-                            v: ENTRY_CORRECT
                         @stop() if @entries.length is @currentIndex
                     else
                         console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
                         @incorrectEntries++
                         @entriesMapStatus[@currentIndex] = ENTRY_INCORRECT
+                        @pushEntryLog ENTRY_INCORRECT
                         @trigger 'entry:is_incorrect', @currentIndex
                         @currentIndex++
-                        @entriesLogs.push
-                            ts: new Date().getTime()
-                            v: ENTRY_INCORRECT
 
                 @listenTo @, 'entry:deleted', () =>
                     if @currentIndex > 0
@@ -128,10 +124,8 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
                             @entriesMapStatus[@currentIndex] = ENTRY_TO_BE_FIXED
                         else
                             @entriesMapStatus[@currentIndex] = ENTRY_DELETED
+                        @pushEntryLog ENTRY_DELETED
                         @trigger 'entry:is_reset', @currentIndex
-                        @entriesLogs.push
-                            ts: new Date().getTime()
-                            v: ENTRY_DELETED
 
         start: ->
             if not @running and @listening
@@ -157,11 +151,13 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
                 @running = false
                 @listening = false
 
-                console.log @stats()
                 if @cheating()
                     console.log 'You are a cheater'
                 else
                     console.log 'You are not a cheater'
+
+                console.log JSON.stringify @stats()
+                console.log JSON.stringify @entriesLogs
 
         stats: ->
             if @stopTime
@@ -187,10 +183,11 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
             accuracy: (if totalEntries then (@correctEntries / totalEntries) * 100 else 0)
 
         cheating: ->
-            logs = _.pluck @entriesLogs, 'ts'
+            logs = _.pluck @entriesLogs, 'i'
             logs = $.map logs, (val, i) ->
                 return null  if i is 0
                 val - logs[i - 1]
+            console.log logs
             logs = _.uniq(logs)
 
             if logs.length
@@ -224,3 +221,9 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
             unless @running
                 @timer = timer if timer
                 console.log 'You have ' + @timer + ' seconds to type :' + @entries
+
+        pushEntryLog: (entryStatus) ->
+            if @running and @listening
+                @entriesLogs.push
+                    i: new Date().getTime() - @startTime # Interval
+                    s: entryStatus # Entry status

@@ -114,12 +114,9 @@
                 _this.fixedMistakes++;
               }
               _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
+              _this.pushEntryLog(ENTRY_CORRECT);
               _this.trigger('entry:is_correct', _this.currentIndex);
               _this.currentIndex++;
-              _this.entriesLogs.push({
-                ts: new Date().getTime(),
-                v: ENTRY_CORRECT
-              });
               if (_this.entries.length === _this.currentIndex) {
                 return _this.stop();
               }
@@ -127,12 +124,9 @@
               console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
               _this.incorrectEntries++;
               _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
+              _this.pushEntryLog(ENTRY_INCORRECT);
               _this.trigger('entry:is_incorrect', _this.currentIndex);
-              _this.currentIndex++;
-              return _this.entriesLogs.push({
-                ts: new Date().getTime(),
-                v: ENTRY_INCORRECT
-              });
+              return _this.currentIndex++;
             }
           });
           return this.listenTo(this, 'entry:deleted', function() {
@@ -144,11 +138,8 @@
               } else {
                 _this.entriesMapStatus[_this.currentIndex] = ENTRY_DELETED;
               }
-              _this.trigger('entry:is_reset', _this.currentIndex);
-              return _this.entriesLogs.push({
-                ts: new Date().getTime(),
-                v: ENTRY_DELETED
-              });
+              _this.pushEntryLog(ENTRY_DELETED);
+              return _this.trigger('entry:is_reset', _this.currentIndex);
             }
           });
         }
@@ -182,12 +173,13 @@
           this.stopListening();
           this.running = false;
           this.listening = false;
-          console.log(this.stats());
           if (this.cheating()) {
-            return console.log('You are a cheater');
+            console.log('You are a cheater');
           } else {
-            return console.log('You are not a cheater');
+            console.log('You are not a cheater');
           }
+          console.log(JSON.stringify(this.stats()));
+          return console.log(JSON.stringify(this.entriesLogs));
         }
       };
 
@@ -219,13 +211,14 @@
 
       GameController.prototype.cheating = function() {
         var averageInterval, equalPercent, logs, sumIntervals, totalKeystrokes;
-        logs = _.pluck(this.entriesLogs, 'ts');
+        logs = _.pluck(this.entriesLogs, 'i');
         logs = $.map(logs, function(val, i) {
           if (i === 0) {
             return null;
           }
           return val - logs[i - 1];
         });
+        console.log(logs);
         logs = _.uniq(logs);
         if (logs.length) {
           totalKeystrokes = this.correctEntries + this.incorrectEntries;
@@ -258,6 +251,15 @@
             this.timer = timer;
           }
           return console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+        }
+      };
+
+      GameController.prototype.pushEntryLog = function(entryStatus) {
+        if (this.running && this.listening) {
+          return this.entriesLogs.push({
+            i: new Date().getTime() - this.startTime,
+            s: entryStatus
+          });
         }
       };
 

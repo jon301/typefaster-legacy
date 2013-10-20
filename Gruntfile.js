@@ -94,6 +94,13 @@ module.exports = function (grunt) {
                     stderr: true
                 }
             },
+            server2: {
+                command: './run.sh',
+                options: {
+                    stdout: true,
+                    stderr: true
+                }
+            },
             babel: {
                 command: 'bin/babel.sh all',
                 options: {
@@ -111,6 +118,15 @@ module.exports = function (grunt) {
                 tasks: [
                     'watch',
                     'shell:server'
+                ],
+                options: {
+                    logConcurrentOutput: true
+                }
+            },
+            server2: {
+                tasks: [
+                    'watch',
+                    'shell:server2'
                 ],
                 options: {
                     logConcurrentOutput: true
@@ -134,6 +150,14 @@ module.exports = function (grunt) {
         'concurrent:server'
     ]);
 
+    grunt.registerTask('server2', [
+        'clean',
+        'concurrent:compile',
+        'createDefaultTemplate',
+        'jst',
+        'uglify',
+        'concurrent:server2'
+    ]);
 
     grunt.registerTask('default', [
         'clean',

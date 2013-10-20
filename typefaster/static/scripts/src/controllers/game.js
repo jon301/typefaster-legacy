@@ -34,16 +34,43 @@
 */
 
 
+/*
+    To begin a new game :
+        gameController = new GameController(
+            entries: "hello world"
+            timer: 60
+        )
+
+    Make game listening for keyboard events
+        gameController.listen();
+
+    Optionally start the game manually
+        gameController.start();
+
+    Game will automatically stop when timer is over or everything has been typed
+    Or you can stop it manually :
+        gameController.stop();
+
+    Optionally change game settings
+        gameController.setTimer(30);
+        gameController.setEntries('hello sick world');
+
+    Start over
+        gameController.listen();
+*/
+
+
 (function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define(["jquery", "underscore", "marionette"], function($, _, Marionette) {
     "use strict";
-    var ENTRY_CORRECT, ENTRY_INCORRECT, ENTRY_TO_BE_FIXED, GameController, _ref;
+    var ENTRY_CORRECT, ENTRY_DELETED, ENTRY_INCORRECT, ENTRY_TO_BE_FIXED, GameController, _ref;
     ENTRY_CORRECT = 1;
     ENTRY_INCORRECT = -1;
     ENTRY_TO_BE_FIXED = 0;
+    ENTRY_DELETED = 2;
     return GameController = (function(_super) {
       __extends(GameController, _super);
 
@@ -56,138 +83,182 @@
 
       GameController.prototype.timer = 60;
 
-      GameController.prototype.entriesMapStatus = [];
-
-      GameController.prototype.logs = [];
+      GameController.prototype.reset = function() {
+        this.correctEntries = 0;
+        this.incorrectEntries = 0;
+        this.fixedMistakes = 0;
+        this.currentIndex = 0;
+        this.startTime = null;
+        this.stopTime = null;
+        this.entriesMapStatus = [];
+        return this.entriesLogs = [];
+      };
 
       GameController.prototype.initialize = function(options) {
-        this.reset();
-        this.timer(options.timer);
-        this.entries(options.entries);
-        console.log('You have ' + this.timer + ' to type :' + this.entries);
-        return this.listen();
+        this.timer = options.timer;
+        return this.entries = options.entries;
       };
 
       GameController.prototype.listen = function() {
         var _this = this;
-        this.listenTo(this, 'entry:typed', function(evt, entry) {
-          _this.start();
-          if (entry === _this.entries[_this.currentIndex]) {
-            console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
-            _this.logs.push(evt.timeStamp);
-            _this.correctEntries++;
-            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
-              _this.fixedMistakes++;
+        if (!this.listening) {
+          this.reset();
+          this.listening = true;
+          console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          this.listenTo(this, 'entry:typed', function(entry) {
+            _this.start();
+            if (entry === _this.entries[_this.currentIndex]) {
+              console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
+              _this.correctEntries++;
+              if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
+                _this.fixedMistakes++;
+              }
+              _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
+              _this.trigger('entry:is_correct', _this.currentIndex);
+              _this.currentIndex++;
+              _this.entriesLogs.push({
+                ts: new Date().getTime(),
+                v: ENTRY_CORRECT
+              });
+              if (_this.entries.length === _this.currentIndex) {
+                return _this.stop();
+              }
+            } else {
+              console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
+              _this.incorrectEntries++;
+              _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
+              _this.trigger('entry:is_incorrect', _this.currentIndex);
+              _this.currentIndex++;
+              return _this.entriesLogs.push({
+                ts: new Date().getTime(),
+                v: ENTRY_INCORRECT
+              });
             }
-            _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
-            _this.trigger('entry:is_correct', _this.currentIndex);
-            _this.currentIndex++;
-            if (_this.entries.length === _this.currentIndex) {
-              return _this.stop();
+          });
+          return this.listenTo(this, 'entry:deleted', function() {
+            if (_this.currentIndex > 0) {
+              _this.currentIndex--;
+              console.log('entry:is_reset', _this.entries[_this.currentIndex]);
+              if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_INCORRECT) {
+                _this.entriesMapStatus[_this.currentIndex] = ENTRY_TO_BE_FIXED;
+              } else {
+                _this.entriesMapStatus[_this.currentIndex] = ENTRY_DELETED;
+              }
+              _this.trigger('entry:is_reset', _this.currentIndex);
+              return _this.entriesLogs.push({
+                ts: new Date().getTime(),
+                v: ENTRY_DELETED
+              });
             }
-          } else {
-            console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
-            _this.incorrectEntries++;
-            _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
-            _this.trigger('entry:is_incorrect', _this.currentIndex);
-            return _this.currentIndex++;
-          }
-        });
-        return this.listenTo(this, 'entry:deleted', function(evt) {
-          if (_this.currentIndex > 0) {
-            _this.currentIndex--;
-            console.log('entry:is_reset', _this.entries[_this.currentIndex]);
-            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_INCORRECT) {
-              _this.entriesMapStatus[_this.currentIndex] = ENTRY_TO_BE_FIXED;
-            }
-            return _this.trigger('entry:is_reset', _this.currentIndex);
-          }
-        });
+          });
+        }
       };
 
       GameController.prototype.start = function() {
         var timer,
           _this = this;
-        if (!this.running) {
+        if (!this.running && this.listening) {
           console.log('Game started');
           this.running = true;
           this.startTime = new Date().getTime();
           timer = this.timer;
+          timer--;
           return this.interval = setInterval(function() {
             if (timer > 0) {
-              return timer--;
+              timer--;
             } else {
-              return _this.stop();
+              _this.stop();
             }
+            return _this.trigger('game:stats', _this.stats());
           }, 1000);
         }
       };
 
       GameController.prototype.stop = function() {
-        var logs, percent, stats;
-        console.log('Game stopped');
-        this.running = false;
-        this.stopTime = new Date().getTime();
-        clearInterval(this.interval);
-        this.stopListening();
-        stats = this.stats();
-        console.log(stats);
-        logs = $.makeArray(this.logs);
-        logs = $.map(logs, function(val, i) {
-          if (i === 0) {
-            return null;
+        if (this.running) {
+          console.log('Game stopped');
+          this.stopTime = new Date().getTime();
+          clearInterval(this.interval);
+          this.stopListening();
+          this.running = false;
+          this.listening = false;
+          console.log(this.stats());
+          if (this.cheating()) {
+            return console.log('You are a cheater');
+          } else {
+            return console.log('You are not a cheater');
           }
-          return val - logs[i - 1];
-        });
-        percent = parseInt(_.uniq(logs).length / stats.totalEntries * 100, 10);
-        if (percent < 20) {
-          return console.log('You are a cheater');
-        } else {
-          return console.log('You are not a cheater');
         }
       };
 
       GameController.prototype.stats = function() {
-        var elapsedTime, errorRate, rawSpeed, timerMinutes, totalEntries;
-        elapsedTime = Math.ceil((this.stopTime - this.startTime) / 1000);
-        timerMinutes = elapsedTime / 60;
+        var currentTime, elapsedTime, elapsedTimeMinutes, errorRate, rawSpeed, totalEntries;
+        if (this.stopTime) {
+          currentTime = this.stopTime;
+        } else {
+          currentTime = (new Date).getTime();
+        }
+        elapsedTime = this.startTime ? (currentTime - this.startTime) / 1000 : 0;
+        elapsedTimeMinutes = (Math.ceil(elapsedTime)) / 60;
         totalEntries = this.correctEntries + this.incorrectEntries;
-        errorRate = (this.incorrectEntries - this.fixedMistakes) / timerMinutes;
-        rawSpeed = (totalEntries / timerMinutes) / 5;
+        errorRate = (this.incorrectEntries - this.fixedMistakes) / elapsedTimeMinutes;
+        rawSpeed = (totalEntries / elapsedTimeMinutes) / 5;
         return {
+          elapsedTime: elapsedTime,
           correctEntries: this.correctEntries,
           incorrectEntries: this.incorrectEntries,
           fixedMistakes: this.fixedMistakes,
           totalEntries: totalEntries,
           errorRate: errorRate,
           rawSpeed: rawSpeed,
-          keySpeed: totalEntries / timerMinutes,
+          keySpeed: totalEntries / elapsedTimeMinutes,
           speed: rawSpeed - errorRate,
-          accuracy: (this.correctEntries / totalEntries) * 100,
-          logs: this.logs
+          accuracy: (totalEntries ? (this.correctEntries / totalEntries) * 100 : 0)
         };
       };
 
-      GameController.prototype.reset = function() {
-        this.currentIndex = 0;
-        this.correctEntries = 0;
-        this.incorrectEntries = 0;
-        this.fixedMistakes = 0;
-        return this.entriesMapStatus = [];
+      GameController.prototype.cheating = function() {
+        var averageInterval, equalPercent, logs, sumIntervals, totalKeystrokes;
+        logs = _.pluck(this.entriesLogs, 'ts');
+        logs = $.map(logs, function(val, i) {
+          if (i === 0) {
+            return null;
+          }
+          return val - logs[i - 1];
+        });
+        logs = _.uniq(logs);
+        if (logs.length) {
+          totalKeystrokes = this.correctEntries + this.incorrectEntries;
+          equalPercent = 100 - (parseInt(logs.length / totalKeystrokes * 100, 10));
+          sumIntervals = _.reduce(logs, function(memo, num) {
+            return memo + num;
+          });
+          averageInterval = parseInt(sumIntervals / logs.length, 10);
+          console.log('Intervals equal percentage: ' + equalPercent);
+          console.log('Average interval : ' + averageInterval + 'ms');
+        } else {
+          equalPercent = 0;
+          averageInterval = NaN;
+        }
+        return equalPercent > 70 || averageInterval < 30;
       };
 
-      GameController.prototype.entries = function(entries) {
-        if (entries) {
-          this.entries = entries;
+      GameController.prototype.setEntries = function(entries) {
+        if (!this.running) {
+          if (entries) {
+            this.entries = entries;
+          }
+          return console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
         }
-        return this.entries;
       };
 
-      GameController.prototype.timer = function(timer) {
-        if (timer) {
-          this.timer = timer;
+      GameController.prototype.setTimer = function(timer) {
+        if (!this.running) {
+          if (timer) {
+            this.timer = timer;
+          }
+          return console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
         }
-        return this.timer;
       };
 
       return GameController;

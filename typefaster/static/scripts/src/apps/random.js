@@ -12,34 +12,37 @@
         entries: "bonjour les amis comment allez vous moi je pense que je vais bien",
         timer: 60
       });
+      gameController.listen();
+      window.gameController = gameController;
       $(document).on('keydown', function(evt) {
         var keyCode;
         if (evt.originalEvent !== undefined) {
           keyCode = evt.which;
           if (keyCode === 8) {
-            gameController.trigger('entry:deleted', evt);
+            gameController.trigger('entry:deleted');
             return evt.preventDefault();
           }
         }
       });
-      $(document).on('keypress', function(evt) {
+      return $(document).on('keypress', function(evt) {
         var entry, keyCode;
         if (evt.originalEvent !== undefined) {
           keyCode = evt.which;
           entry = String.fromCharCode(keyCode);
           if (entry) {
-            return gameController.trigger('entry:typed', evt, entry);
+            return gameController.trigger('entry:typed', entry);
           }
         }
       });
-      $(window).focus(function() {
-        return console.log('focus');
-      });
-      return $(window).blur(function() {
-        return console.log('blur');
-      });
     });
   });
+
+  /*        $(window).focus () ->
+              console.log 'focus'
+          $(window).blur () ->
+              console.log 'blur'
+  */
+
 
   /*
           $(window).resize () ->

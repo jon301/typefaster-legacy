@@ -90,42 +90,51 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
             @timer = options.timer
             @entries = options.entries
 
+            $(window).focus () =>
+                console.log 'focus : bind listen events'
+                @bindEvents();
+            $(window).blur () =>
+                console.log 'blur : unbind listen events'
+                @stopListening();
+
+        bindEvents: ->
+            @listenTo @, 'entry:typed', (entry) =>
+                @start()
+                if entry is @entries[@currentIndex]
+                    console.log 'entry:is_correct', entry, @entries[@currentIndex]
+                    @correctEntries++
+                    @fixedMistakes++ if @entriesMapStatus[@currentIndex] is ENTRY_TO_BE_FIXED
+                    @entriesMapStatus[@currentIndex] = ENTRY_CORRECT
+                    @pushEntryLog ENTRY_CORRECT
+                    @trigger 'entry:is_correct', @currentIndex
+                    @currentIndex++
+                    @stop() if @entries.length is @currentIndex
+                else
+                    console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
+                    @incorrectEntries++
+                    @entriesMapStatus[@currentIndex] = ENTRY_INCORRECT
+                    @pushEntryLog ENTRY_INCORRECT
+                    @trigger 'entry:is_incorrect', @currentIndex
+                    @currentIndex++
+
+            @listenTo @, 'entry:deleted', () =>
+                if @currentIndex > 0
+                    @currentIndex--
+                    console.log 'entry:is_reset', @entries[@currentIndex]
+                    if @entriesMapStatus[@currentIndex] is ENTRY_INCORRECT
+                        @entriesMapStatus[@currentIndex] = ENTRY_TO_BE_FIXED
+                    else
+                        @entriesMapStatus[@currentIndex] = ENTRY_DELETED
+                    @pushEntryLog ENTRY_DELETED
+                    @trigger 'entry:is_reset', @currentIndex
+
         listen: ->
             unless @listening
                 @reset()
                 @listening = true
 
                 console.log 'You have ' + @timer + ' seconds to type :' + @entries
-
-                @listenTo @, 'entry:typed', (entry) =>
-                    @start()
-                    if entry is @entries[@currentIndex]
-                        console.log 'entry:is_correct', entry, @entries[@currentIndex]
-                        @correctEntries++
-                        @fixedMistakes++ if @entriesMapStatus[@currentIndex] is ENTRY_TO_BE_FIXED
-                        @entriesMapStatus[@currentIndex] = ENTRY_CORRECT
-                        @pushEntryLog ENTRY_CORRECT
-                        @trigger 'entry:is_correct', @currentIndex
-                        @currentIndex++
-                        @stop() if @entries.length is @currentIndex
-                    else
-                        console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
-                        @incorrectEntries++
-                        @entriesMapStatus[@currentIndex] = ENTRY_INCORRECT
-                        @pushEntryLog ENTRY_INCORRECT
-                        @trigger 'entry:is_incorrect', @currentIndex
-                        @currentIndex++
-
-                @listenTo @, 'entry:deleted', () =>
-                    if @currentIndex > 0
-                        @currentIndex--
-                        console.log 'entry:is_reset', @entries[@currentIndex]
-                        if @entriesMapStatus[@currentIndex] is ENTRY_INCORRECT
-                            @entriesMapStatus[@currentIndex] = ENTRY_TO_BE_FIXED
-                        else
-                            @entriesMapStatus[@currentIndex] = ENTRY_DELETED
-                        @pushEntryLog ENTRY_DELETED
-                        @trigger 'entry:is_reset', @currentIndex
+                @bindEvents()
 
         start: ->
             if not @running and @listening

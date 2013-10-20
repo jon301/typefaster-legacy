@@ -95,53 +95,66 @@
       };
 
       GameController.prototype.initialize = function(options) {
+        var _this = this;
         this.timer = options.timer;
-        return this.entries = options.entries;
+        this.entries = options.entries;
+        $(window).focus(function() {
+          console.log('focus : bind listen events');
+          return _this.bindEvents();
+        });
+        return $(window).blur(function() {
+          console.log('blur : unbind listen events');
+          return _this.stopListening();
+        });
+      };
+
+      GameController.prototype.bindEvents = function() {
+        var _this = this;
+        this.listenTo(this, 'entry:typed', function(entry) {
+          _this.start();
+          if (entry === _this.entries[_this.currentIndex]) {
+            console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
+            _this.correctEntries++;
+            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
+              _this.fixedMistakes++;
+            }
+            _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
+            _this.pushEntryLog(ENTRY_CORRECT);
+            _this.trigger('entry:is_correct', _this.currentIndex);
+            _this.currentIndex++;
+            if (_this.entries.length === _this.currentIndex) {
+              return _this.stop();
+            }
+          } else {
+            console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
+            _this.incorrectEntries++;
+            _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
+            _this.pushEntryLog(ENTRY_INCORRECT);
+            _this.trigger('entry:is_incorrect', _this.currentIndex);
+            return _this.currentIndex++;
+          }
+        });
+        return this.listenTo(this, 'entry:deleted', function() {
+          if (_this.currentIndex > 0) {
+            _this.currentIndex--;
+            console.log('entry:is_reset', _this.entries[_this.currentIndex]);
+            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_INCORRECT) {
+              _this.entriesMapStatus[_this.currentIndex] = ENTRY_TO_BE_FIXED;
+            } else {
+              _this.entriesMapStatus[_this.currentIndex] = ENTRY_DELETED;
+            }
+            _this.pushEntryLog(ENTRY_DELETED);
+            return _this.trigger('entry:is_reset', _this.currentIndex);
+          }
+        });
       };
 
       GameController.prototype.listen = function() {
-        var _this = this;
         if (!this.listening) {
           this.reset();
           this.listening = true;
           console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
-          this.listenTo(this, 'entry:typed', function(entry) {
-            _this.start();
-            if (entry === _this.entries[_this.currentIndex]) {
-              console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
-              _this.correctEntries++;
-              if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
-                _this.fixedMistakes++;
-              }
-              _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
-              _this.pushEntryLog(ENTRY_CORRECT);
-              _this.trigger('entry:is_correct', _this.currentIndex);
-              _this.currentIndex++;
-              if (_this.entries.length === _this.currentIndex) {
-                return _this.stop();
-              }
-            } else {
-              console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
-              _this.incorrectEntries++;
-              _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
-              _this.pushEntryLog(ENTRY_INCORRECT);
-              _this.trigger('entry:is_incorrect', _this.currentIndex);
-              return _this.currentIndex++;
-            }
-          });
-          return this.listenTo(this, 'entry:deleted', function() {
-            if (_this.currentIndex > 0) {
-              _this.currentIndex--;
-              console.log('entry:is_reset', _this.entries[_this.currentIndex]);
-              if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_INCORRECT) {
-                _this.entriesMapStatus[_this.currentIndex] = ENTRY_TO_BE_FIXED;
-              } else {
-                _this.entriesMapStatus[_this.currentIndex] = ENTRY_DELETED;
-              }
-              _this.pushEntryLog(ENTRY_DELETED);
-              return _this.trigger('entry:is_reset', _this.currentIndex);
-            }
-          });
+          return this.bindEvents();
         }
       };
 

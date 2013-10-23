@@ -91,7 +91,7 @@
         this.startTime = null;
         this.stopTime = null;
         this.entriesMapStatus = [];
-        return this.entriesLogs = [];
+        return this.entriesLogs = {};
       };
 
       GameController.prototype.initialize = function(options) {
@@ -224,7 +224,7 @@
 
       GameController.prototype.cheating = function() {
         var averageInterval, equalPercent, logs, sumIntervals, totalKeystrokes;
-        logs = _.pluck(this.entriesLogs, 'i');
+        logs = _.keys(this.entriesLogs);
         logs = $.map(logs, function(val, i) {
           if (i === 0) {
             return null;
@@ -268,11 +268,10 @@
       };
 
       GameController.prototype.pushEntryLog = function(entryStatus) {
+        var i;
         if (this.running && this.listening) {
-          return this.entriesLogs.push({
-            i: new Date().getTime() - this.startTime,
-            s: entryStatus
-          });
+          i = new Date().getTime() - this.startTime;
+          return this.entriesLogs[i] = entryStatus;
         }
       };
 

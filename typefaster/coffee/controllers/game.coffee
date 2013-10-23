@@ -84,7 +84,7 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
             @startTime = null
             @stopTime = null
             @entriesMapStatus = [] # For computing stats
-            @entriesLogs = [] # For ghost
+            @entriesLogs = {} # For ghost
 
         initialize: (options) ->
             @timer = options.timer
@@ -192,7 +192,7 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
             accuracy: (if totalEntries then (@correctEntries / totalEntries) * 100 else 0)
 
         cheating: ->
-            logs = _.pluck @entriesLogs, 'i'
+            logs = _.keys @entriesLogs
             logs = $.map logs, (val, i) ->
                 return null  if i is 0
                 val - logs[i - 1]
@@ -233,6 +233,5 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
 
         pushEntryLog: (entryStatus) ->
             if @running and @listening
-                @entriesLogs.push
-                    i: new Date().getTime() - @startTime # Interval
-                    s: entryStatus # Entry status
+                i = new Date().getTime() - @startTime
+                @entriesLogs[i] = entryStatus

@@ -64,7 +64,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "marionette"], function($, _, Marionette) {
+  define(["jquery", "underscore", "marionette", "backbone", "models/player", "models/ghost", "controllers/timer"], function($, _, Marionette, Backbone, PlayerModel, GhostModel, TimerController) {
     "use strict";
     var ENTRY_CORRECT, ENTRY_DELETED, ENTRY_INCORRECT, ENTRY_TO_BE_FIXED, GameController, _ref;
     ENTRY_CORRECT = 1;
@@ -84,76 +84,48 @@
       GameController.prototype.timer = 60;
 
       GameController.prototype.reset = function() {
-        this.correctEntries = 0;
-        this.incorrectEntries = 0;
-        this.fixedMistakes = 0;
-        this.currentIndex = 0;
-        this.startTime = null;
-        this.stopTime = null;
-        this.entriesMapStatus = [];
-        return this.entriesLogs = {};
+        return this.timerController.reset();
       };
 
       GameController.prototype.initialize = function(options) {
         var _this = this;
         this.timer = options.timer;
         this.entries = options.entries;
+        this.player = new PlayerModel({
+          entries: options.entries
+        });
+        this.ghostCollection = new Backbone.Collection();
+        window.ghostCollection = this.ghostCollection;
+        this.timerController = new TimerController();
         $(window).focus(function() {
           console.log('focus : bind listen events');
           return _this.bindEvents();
         });
         return $(window).blur(function() {
           console.log('blur : unbind listen events');
-          return _this.stopListening();
+          return _this.off();
         });
       };
 
       GameController.prototype.bindEvents = function() {
         var _this = this;
-        this.listenTo(this, 'entry:typed', function(entry) {
-          _this.start();
-          if (entry === _this.entries[_this.currentIndex]) {
-            console.log('entry:is_correct', entry, _this.entries[_this.currentIndex]);
-            _this.correctEntries++;
-            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_TO_BE_FIXED) {
-              _this.fixedMistakes++;
-            }
-            _this.entriesMapStatus[_this.currentIndex] = ENTRY_CORRECT;
-            _this.pushEntryLog(ENTRY_CORRECT);
-            _this.trigger('entry:is_correct', _this.currentIndex);
-            _this.currentIndex++;
-            if (_this.entries.length === _this.currentIndex) {
-              return _this.stop();
-            }
-          } else {
-            console.log('entry:is_incorrect', entry, _this.entries[_this.currentIndex]);
-            _this.incorrectEntries++;
-            _this.entriesMapStatus[_this.currentIndex] = ENTRY_INCORRECT;
-            _this.pushEntryLog(ENTRY_INCORRECT);
-            _this.trigger('entry:is_incorrect', _this.currentIndex);
-            return _this.currentIndex++;
-          }
+        this.on('entry:typed', function(entry) {
+          return _this.player.typeEntry(entry, _this.timerController.getElapsedTime());
         });
-        return this.listenTo(this, 'entry:deleted', function() {
-          if (_this.currentIndex > 0) {
-            _this.currentIndex--;
-            console.log('entry:is_reset', _this.entries[_this.currentIndex]);
-            if (_this.entriesMapStatus[_this.currentIndex] === ENTRY_INCORRECT) {
-              _this.entriesMapStatus[_this.currentIndex] = ENTRY_TO_BE_FIXED;
-            } else {
-              _this.entriesMapStatus[_this.currentIndex] = ENTRY_DELETED;
-            }
-            _this.pushEntryLog(ENTRY_DELETED);
-            return _this.trigger('entry:is_reset', _this.currentIndex);
-          }
+        this.on('entry:deleted', function() {
+          return _this.player.deleteEntry(_this.timerController.getElapsedTime());
+        });
+        return this.player.on('game:finished', function() {
+          return _this.stop();
         });
       };
 
       GameController.prototype.listen = function() {
         if (!this.listening) {
-          this.reset();
           this.listening = true;
-          console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          if (this.timer) {
+            console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          }
           return this.bindEvents();
         }
       };
@@ -161,19 +133,23 @@
       GameController.prototype.start = function() {
         var timer,
           _this = this;
-        if (!this.running && this.listening) {
+        if (!this.running) {
           console.log('Game started');
           this.running = true;
-          this.startTime = new Date().getTime();
-          timer = this.timer;
-          timer--;
+          this.timerController.start();
+          this.ghostCollection.invoke('run');
+          if (this.timer) {
+            timer = this.timer - 1;
+          }
           return this.interval = setInterval(function() {
-            if (timer > 0) {
-              timer--;
-            } else {
-              _this.stop();
+            if (_this.timer) {
+              if (timer > 0) {
+                timer--;
+              } else {
+                _this.stop();
+              }
             }
-            return _this.trigger('game:stats', _this.stats());
+            return _this.trigger('game:stats', _this.player.getStats(_this.timerController.getElapsedTime()));
           }, 1000);
         }
       };
@@ -181,72 +157,19 @@
       GameController.prototype.stop = function() {
         if (this.running) {
           console.log('Game stopped');
-          this.stopTime = new Date().getTime();
+          this.timerController.stop();
           clearInterval(this.interval);
-          this.stopListening();
+          this.off();
           this.running = false;
           this.listening = false;
-          if (this.cheating()) {
+          if (this.player.isCheating()) {
             console.log('You are a cheater');
           } else {
             console.log('You are not a cheater');
           }
-          console.log(JSON.stringify(this.stats()));
-          return console.log(JSON.stringify(this.entriesLogs));
+          console.log(JSON.stringify(this.player.getStats(this.timerController.getElapsedTime())));
+          return console.log(JSON.stringify(this.player.getRecords()));
         }
-      };
-
-      GameController.prototype.stats = function() {
-        var currentTime, elapsedTime, elapsedTimeMinutes, errorRate, rawSpeed, totalEntries;
-        if (this.stopTime) {
-          currentTime = this.stopTime;
-        } else {
-          currentTime = (new Date).getTime();
-        }
-        elapsedTime = this.startTime ? (currentTime - this.startTime) / 1000 : 0;
-        elapsedTimeMinutes = (Math.ceil(elapsedTime)) / 60;
-        totalEntries = this.correctEntries + this.incorrectEntries;
-        errorRate = (this.incorrectEntries - this.fixedMistakes) / elapsedTimeMinutes;
-        rawSpeed = (totalEntries / elapsedTimeMinutes) / 5;
-        return {
-          elapsedTime: elapsedTime,
-          correctEntries: this.correctEntries,
-          incorrectEntries: this.incorrectEntries,
-          fixedMistakes: this.fixedMistakes,
-          totalEntries: totalEntries,
-          errorRate: errorRate,
-          rawSpeed: rawSpeed,
-          keySpeed: totalEntries / elapsedTimeMinutes,
-          speed: rawSpeed - errorRate,
-          accuracy: (totalEntries ? (this.correctEntries / totalEntries) * 100 : 0)
-        };
-      };
-
-      GameController.prototype.cheating = function() {
-        var averageInterval, equalPercent, logs, sumIntervals, totalKeystrokes;
-        logs = _.keys(this.entriesLogs);
-        logs = $.map(logs, function(val, i) {
-          if (i === 0) {
-            return null;
-          }
-          return val - logs[i - 1];
-        });
-        console.log(logs);
-        logs = _.uniq(logs);
-        if (logs.length) {
-          totalKeystrokes = this.correctEntries + this.incorrectEntries;
-          equalPercent = 100 - (parseInt(logs.length / totalKeystrokes * 100, 10));
-          sumIntervals = _.reduce(logs, function(memo, num) {
-            return memo + num;
-          });
-          averageInterval = parseInt(sumIntervals / logs.length, 10);
-          console.log('Intervals equal percentage: ' + equalPercent);
-          console.log('Average interval : ' + averageInterval + 'ms');
-        } else {
-          equalPercent = 0;
-          averageInterval = NaN;
-        }
-        return equalPercent > 70 || averageInterval < 30;
       };
 
       GameController.prototype.setEntries = function(entries) {
@@ -267,12 +190,11 @@
         }
       };
 
-      GameController.prototype.pushEntryLog = function(entryStatus) {
-        var i;
-        if (this.running && this.listening) {
-          i = new Date().getTime() - this.startTime;
-          return this.entriesLogs[i] = entryStatus;
-        }
+      GameController.prototype.addGhost = function(entriesLogs) {
+        return this.ghostCollection.add(new GhostModel({
+          entries: this.entries,
+          entriesLogs: entriesLogs
+        }));
       };
 
       return GameController;

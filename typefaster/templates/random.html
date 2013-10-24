@@ -11,7 +11,7 @@ function() {
     define('globals', {
         game: {{ game|tojson|safe }}
     });
-    require(['src/apps/random']);
+    require(['apps/random']);
 }
 {% endblock %}
 

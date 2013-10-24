@@ -62,7 +62,7 @@
 ###
 
 #global define
-define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
+define ["jquery", "underscore", "marionette", "backbone", "models/player", "models/ghost", "controllers/timer"], ($, _, Marionette, Backbone, PlayerModel, GhostModel, TimerController) ->
     "use strict"
 
     ENTRY_CORRECT = 1
@@ -77,149 +77,87 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
         timer: 60 # Seconds
 
         reset: ->
-            @correctEntries = 0
-            @incorrectEntries = 0
-            @fixedMistakes = 0
-            @currentIndex = 0
-            @startTime = null
-            @stopTime = null
-            @entriesMapStatus = [] # For computing stats
-            @entriesLogs = {} # For ghost
+            @timerController.reset()
 
         initialize: (options) ->
             @timer = options.timer
             @entries = options.entries
+
+            @player = new PlayerModel({ entries : options.entries })
+            @ghostCollection = new Backbone.Collection()
+            window.ghostCollection = @ghostCollection
+
+            @timerController = new TimerController()
 
             $(window).focus () =>
                 console.log 'focus : bind listen events'
                 @bindEvents();
             $(window).blur () =>
                 console.log 'blur : unbind listen events'
-                @stopListening();
+                @off();
 
         bindEvents: ->
-            @listenTo @, 'entry:typed', (entry) =>
-                @start()
-                if entry is @entries[@currentIndex]
-                    console.log 'entry:is_correct', entry, @entries[@currentIndex]
-                    @correctEntries++
-                    @fixedMistakes++ if @entriesMapStatus[@currentIndex] is ENTRY_TO_BE_FIXED
-                    @entriesMapStatus[@currentIndex] = ENTRY_CORRECT
-                    @pushEntryLog ENTRY_CORRECT
-                    @trigger 'entry:is_correct', @currentIndex
-                    @currentIndex++
-                    @stop() if @entries.length is @currentIndex
-                else
-                    console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
-                    @incorrectEntries++
-                    @entriesMapStatus[@currentIndex] = ENTRY_INCORRECT
-                    @pushEntryLog ENTRY_INCORRECT
-                    @trigger 'entry:is_incorrect', @currentIndex
-                    @currentIndex++
+            @.on 'entry:typed', (entry) =>
+                @player.typeEntry(entry, @timerController.getElapsedTime())
 
-            @listenTo @, 'entry:deleted', () =>
-                if @currentIndex > 0
-                    @currentIndex--
-                    console.log 'entry:is_reset', @entries[@currentIndex]
-                    if @entriesMapStatus[@currentIndex] is ENTRY_INCORRECT
-                        @entriesMapStatus[@currentIndex] = ENTRY_TO_BE_FIXED
-                    else
-                        @entriesMapStatus[@currentIndex] = ENTRY_DELETED
-                    @pushEntryLog ENTRY_DELETED
-                    @trigger 'entry:is_reset', @currentIndex
+            @.on 'entry:deleted', =>
+                @player.deleteEntry(@timerController.getElapsedTime())
+
+            @player.on 'game:finished', =>
+                @stop()
 
         listen: ->
             unless @listening
-                @reset()
                 @listening = true
 
-                console.log 'You have ' + @timer + ' seconds to type :' + @entries
+                if @timer
+                    console.log 'You have ' + @timer + ' seconds to type :' + @entries
+
                 @bindEvents()
 
         start: ->
-            if not @running and @listening
+            unless @running
                 console.log 'Game started'
                 @running = true
-                @startTime = new Date().getTime()
-                timer = @timer
-                timer--;
+
+                @timerController.start()
+
+                @ghostCollection.invoke 'run'
+
+                timer = @timer - 1 if @timer
                 @interval = setInterval(=>
-                    if timer > 0
-                        timer--
-                    else @stop()
+                    if @timer
+                        if timer > 0
+                            timer--
+                        else
+                            @stop()
+
                     # Publish stats every seconds
-                    @trigger 'game:stats', @stats()
+                    @trigger 'game:stats', @player.getStats(@timerController.getElapsedTime())
                 , 1000)
 
         stop: ->
             if @running
                 console.log 'Game stopped'
-                @stopTime = new Date().getTime()
+                @timerController.stop()
+
                 clearInterval(@interval)
-                @stopListening()
+                @off()
+
                 @running = false
                 @listening = false
 
-                if @cheating()
+                if @player.isCheating()
                     console.log 'You are a cheater'
                 else
                     console.log 'You are not a cheater'
 
-                console.log JSON.stringify @stats()
-                console.log JSON.stringify @entriesLogs
-
-        stats: ->
-            if @stopTime
-                currentTime = @stopTime
-            else
-                currentTime = (new Date).getTime()
-
-            elapsedTime = if @startTime then (currentTime - @startTime) / 1000 else 0 # Seconds
-            elapsedTimeMinutes =  (Math.ceil elapsedTime) / 60
-            totalEntries = @correctEntries + @incorrectEntries
-            errorRate = (@incorrectEntries - @fixedMistakes) / elapsedTimeMinutes
-            rawSpeed = (totalEntries / elapsedTimeMinutes) / 5
-
-            elapsedTime: elapsedTime
-            correctEntries: @correctEntries
-            incorrectEntries: @incorrectEntries
-            fixedMistakes: @fixedMistakes
-            totalEntries: totalEntries
-            errorRate: errorRate
-            rawSpeed: rawSpeed
-            keySpeed: totalEntries / elapsedTimeMinutes
-            speed: rawSpeed - errorRate
-            accuracy: (if totalEntries then (@correctEntries / totalEntries) * 100 else 0)
-
-        cheating: ->
-            logs = _.keys @entriesLogs
-            logs = $.map logs, (val, i) ->
-                return null  if i is 0
-                val - logs[i - 1]
-            console.log logs
-            logs = _.uniq(logs)
-
-            if logs.length
-
-                # Check if intervals between each keystrokes are the same
-                totalKeystrokes = @correctEntries + @incorrectEntries
-                equalPercent = 100 - (parseInt logs.length / totalKeystrokes * 100, 10)
-
-                # Check if the average interval between all keystrokes is not too insane
-                sumIntervals = _.reduce logs, (memo, num) ->
-                    return memo + num
-                averageInterval  = parseInt sumIntervals / logs.length, 10
-
-                console.log 'Intervals equal percentage: ' + equalPercent
-                console.log 'Average interval : ' + averageInterval + 'ms'
-
-            else
-                equalPercent = 0
-                averageInterval = NaN
-
-            equalPercent > 70 or averageInterval < 30
+                console.log JSON.stringify @player.getStats(@timerController.getElapsedTime())
+                console.log JSON.stringify @player.getRecords()
 
         # Setters
+        # Milliseconds
+
         # TODO : Check parameter type
         setEntries: (entries) ->
             unless @running
@@ -231,7 +169,5 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
                 @timer = timer if timer
                 console.log 'You have ' + @timer + ' seconds to type :' + @entries
 
-        pushEntryLog: (entryStatus) ->
-            if @running and @listening
-                i = new Date().getTime() - @startTime
-                @entriesLogs[i] = entryStatus
+        addGhost: (entriesLogs) ->
+            @ghostCollection.add new GhostModel({ entries: @entries, entriesLogs: entriesLogs })

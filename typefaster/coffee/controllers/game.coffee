@@ -39,7 +39,7 @@
     To begin a new game :
         gameController = new GameController(
             entries: "hello world"
-            timer: 60
+            duration: 60
         )
 
     Make game listening for keyboard events
@@ -48,7 +48,7 @@
     Optionally start the game manually
         gameController.start();
 
-    Game will automatically stop when timer is over or everything has been typed
+    Game will automatically stop when time is over or everything has been typed
     Or you can stop it manually :
         gameController.stop();
 
@@ -62,112 +62,89 @@
 ###
 
 #global define
-define ["jquery", "underscore", "marionette", "backbone", "models/player", "models/ghost", "controllers/timer"], ($, _, Marionette, Backbone, PlayerModel, GhostModel, TimerController) ->
+define ["jquery", "underscore", "marionette", "backbone", "controllers/timer", "models/player_human", "models/player_ghost"], ($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) ->
     "use strict"
-
-    ENTRY_CORRECT = 1
-    ENTRY_INCORRECT = -1
-    ENTRY_TO_BE_FIXED = 0
-    ENTRY_DELETED = 2
 
     class GameController extends Marionette.Controller
 
         # Defaults
         entries: '' # String
-        timer: 60 # Seconds
-
-        reset: ->
-            @timerController.reset()
+        duration: 60 # Seconds
 
         initialize: (options) ->
-            @timer = options.timer
+            @duration = options.duration
             @entries = options.entries
 
-            @player = new PlayerModel({ entries : options.entries })
-            @ghostCollection = new Backbone.Collection()
-            window.ghostCollection = @ghostCollection
+            @humanPlayer = new PlayerHumanModel({ entries : options.entries })
+            @ghostPlayers = new Backbone.Collection()
 
-            @timerController = new TimerController()
+            @timer = new TimerController()
 
             $(window).focus () =>
                 console.log 'focus : bind listen events'
-                @bindEvents();
+                @startListening();
             $(window).blur () =>
                 console.log 'blur : unbind listen events'
-                @off();
+                @stopListening();
 
-        bindEvents: ->
-            @.on 'entry:typed', (entry) =>
-                @player.typeEntry(entry, @timerController.getElapsedTime())
-
-            @.on 'entry:deleted', =>
-                @player.deleteEntry(@timerController.getElapsedTime())
-
-            @player.on 'game:finished', =>
-                @stop()
-
-        listen: ->
+        startListening: ->
             unless @listening
                 @listening = true
 
-                if @timer
-                    console.log 'You have ' + @timer + ' seconds to type :' + @entries
+                @.listenTo @, 'entry:typed', (entry) =>
+                    @humanPlayer.typeEntry(entry)
 
-                @bindEvents()
+                @.listenTo @, 'entry:deleted', =>
+                    @humanPlayer.deleteEntry()
+
+                @.listenTo @humanPlayer, 'human:stop', =>
+                    @stop()
+
+                if @duration
+                    console.log 'You have ' + @duration + ' seconds to type :' + @entries
+                else
+                    console.log 'You have unlimited time to type : ' + @ entries
 
         start: ->
             unless @running
                 console.log 'Game started'
                 @running = true
 
-                @timerController.start()
+                @humanPlayer.play()
+                @ghostPlayers.invoke 'play'
 
-                @ghostCollection.invoke 'run'
+                if @duration
+                    @timer.start()
 
-                timer = @timer - 1 if @timer
-                @interval = setInterval(=>
-                    if @timer
-                        if timer > 0
-                            timer--
-                        else
+                    @interval = setInterval(=>
+                        if @timer.getElapsedTime() >= @duration * 1000
+                            @timer.stop()
                             @stop()
-
-                    # Publish stats every seconds
-                    @trigger 'game:stats', @player.getStats(@timerController.getElapsedTime())
-                , 1000)
+                        # Publish stats every seconds
+                        @trigger 'human:stats', @humanPlayer.getStats()
+                    , 1000)
 
         stop: ->
             if @running
                 console.log 'Game stopped'
-                @timerController.stop()
 
                 clearInterval(@interval)
-                @off()
+                @stopListening()
 
                 @running = false
                 @listening = false
 
-                if @player.isCheating()
-                    console.log 'You are a cheater'
-                else
-                    console.log 'You are not a cheater'
-
-                console.log JSON.stringify @player.getStats(@timerController.getElapsedTime())
-                console.log JSON.stringify @player.getRecords()
-
         # Setters
-        # Milliseconds
-
-        # TODO : Check parameter type
         setEntries: (entries) ->
             unless @running
                 @entries = entries if entries
-                console.log 'You have ' + @timer + ' seconds to type :' + @entries
+                console.log 'You have ' + @duration + ' seconds to type :' + @entries
 
-        setTimer: (timer) ->
+        setDuration: (duration) ->
             unless @running
-                @timer = timer if timer
-                console.log 'You have ' + @timer + ' seconds to type :' + @entries
+                @duration = duration if duration
+                console.log 'You have ' + @duration + ' seconds to type :' + @entries
 
-        addGhost: (entriesLogs) ->
-            @ghostCollection.add new GhostModel({ entries: @entries, entriesLogs: entriesLogs })
+        addGhost: (replayLogs) ->
+            unless @running
+                @ghostPlayers.add new PlayerGhostModel({ entries: @entries, replayLogs: replayLogs })

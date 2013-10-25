@@ -38,7 +38,7 @@
     To begin a new game :
         gameController = new GameController(
             entries: "hello world"
-            timer: 60
+            duration: 60
         )
 
     Make game listening for keyboard events
@@ -47,7 +47,7 @@
     Optionally start the game manually
         gameController.start();
 
-    Game will automatically stop when timer is over or everything has been typed
+    Game will automatically stop when time is over or everything has been typed
     Or you can stop it manually :
         gameController.stop();
 
@@ -64,13 +64,9 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "marionette", "backbone", "models/player", "models/ghost", "controllers/timer"], function($, _, Marionette, Backbone, PlayerModel, GhostModel, TimerController) {
+  define(["jquery", "underscore", "marionette", "backbone", "controllers/timer", "models/player_human", "models/player_ghost"], function($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) {
     "use strict";
-    var ENTRY_CORRECT, ENTRY_DELETED, ENTRY_INCORRECT, ENTRY_TO_BE_FIXED, GameController, _ref;
-    ENTRY_CORRECT = 1;
-    ENTRY_INCORRECT = -1;
-    ENTRY_TO_BE_FIXED = 0;
-    ENTRY_DELETED = 2;
+    var GameController, _ref;
     return GameController = (function(_super) {
       __extends(GameController, _super);
 
@@ -81,94 +77,75 @@
 
       GameController.prototype.entries = '';
 
-      GameController.prototype.timer = 60;
-
-      GameController.prototype.reset = function() {
-        return this.timerController.reset();
-      };
+      GameController.prototype.duration = 60;
 
       GameController.prototype.initialize = function(options) {
         var _this = this;
-        this.timer = options.timer;
+        this.duration = options.duration;
         this.entries = options.entries;
-        this.player = new PlayerModel({
+        this.humanPlayer = new PlayerHumanModel({
           entries: options.entries
         });
-        this.ghostCollection = new Backbone.Collection();
-        window.ghostCollection = this.ghostCollection;
-        this.timerController = new TimerController();
+        this.ghostPlayers = new Backbone.Collection();
+        this.timer = new TimerController();
         $(window).focus(function() {
           console.log('focus : bind listen events');
-          return _this.bindEvents();
+          return _this.startListening();
         });
         return $(window).blur(function() {
           console.log('blur : unbind listen events');
-          return _this.off();
+          return _this.stopListening();
         });
       };
 
-      GameController.prototype.bindEvents = function() {
+      GameController.prototype.startListening = function() {
         var _this = this;
-        this.on('entry:typed', function(entry) {
-          return _this.player.typeEntry(entry, _this.timerController.getElapsedTime());
-        });
-        this.on('entry:deleted', function() {
-          return _this.player.deleteEntry(_this.timerController.getElapsedTime());
-        });
-        return this.player.on('game:finished', function() {
-          return _this.stop();
-        });
-      };
-
-      GameController.prototype.listen = function() {
         if (!this.listening) {
           this.listening = true;
-          if (this.timer) {
-            console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          this.listenTo(this, 'entry:typed', function(entry) {
+            return _this.humanPlayer.typeEntry(entry);
+          });
+          this.listenTo(this, 'entry:deleted', function() {
+            return _this.humanPlayer.deleteEntry();
+          });
+          this.listenTo(this.humanPlayer, 'human:stop', function() {
+            return _this.stop();
+          });
+          if (this.duration) {
+            return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
+          } else {
+            return console.log('You have unlimited time to type : ' + this(entries));
           }
-          return this.bindEvents();
         }
       };
 
       GameController.prototype.start = function() {
-        var timer,
-          _this = this;
+        var _this = this;
         if (!this.running) {
           console.log('Game started');
           this.running = true;
-          this.timerController.start();
-          this.ghostCollection.invoke('run');
-          if (this.timer) {
-            timer = this.timer - 1;
-          }
-          return this.interval = setInterval(function() {
-            if (_this.timer) {
-              if (timer > 0) {
-                timer--;
-              } else {
+          this.humanPlayer.play();
+          this.ghostPlayers.invoke('play');
+          if (this.duration) {
+            this.timer.start();
+            return this.interval = setInterval(function() {
+              if (_this.timer.getElapsedTime() >= _this.duration * 1000) {
+                _this.timer.stop();
                 _this.stop();
               }
-            }
-            return _this.trigger('game:stats', _this.player.getStats(_this.timerController.getElapsedTime()));
-          }, 1000);
+              return _this.trigger('human:stats', _this.humanPlayer.getStats());
+            }, 1000);
+          }
         }
       };
 
       GameController.prototype.stop = function() {
         if (this.running) {
           console.log('Game stopped');
-          this.timerController.stop();
           clearInterval(this.interval);
-          this.off();
+          this.stopListening();
           this.running = false;
-          this.listening = false;
-          if (this.player.isCheating()) {
-            console.log('You are a cheater');
-          } else {
-            console.log('You are not a cheater');
-          }
-          console.log(JSON.stringify(this.player.getStats(this.timerController.getElapsedTime())));
-          return console.log(JSON.stringify(this.player.getRecords()));
+          return this.listening = false;
         }
       };
 
@@ -177,24 +154,26 @@
           if (entries) {
             this.entries = entries;
           }
-          return console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
         }
       };
 
-      GameController.prototype.setTimer = function(timer) {
+      GameController.prototype.setDuration = function(duration) {
         if (!this.running) {
-          if (timer) {
-            this.timer = timer;
+          if (duration) {
+            this.duration = duration;
           }
-          return console.log('You have ' + this.timer + ' seconds to type :' + this.entries);
+          return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
         }
       };
 
-      GameController.prototype.addGhost = function(entriesLogs) {
-        return this.ghostCollection.add(new GhostModel({
-          entries: this.entries,
-          entriesLogs: entriesLogs
-        }));
+      GameController.prototype.addGhost = function(replayLogs) {
+        if (!this.running) {
+          return this.ghostPlayers.add(new PlayerGhostModel({
+            entries: this.entries,
+            replayLogs: replayLogs
+          }));
+        }
       };
 
       return GameController;

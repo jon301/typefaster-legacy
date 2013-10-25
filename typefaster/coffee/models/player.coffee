@@ -1,6 +1,6 @@
 
 #global define
-define ["jquery", "underscore", "backbone"], ($, _, Backbone) ->
+define ["jquery", "underscore", "backbone", "controllers/timer"], ($, _, Backbone, TimerController) ->
     "use strict"
 
     class PlayerModel extends Backbone.Model
@@ -18,42 +18,52 @@ define ["jquery", "underscore", "backbone"], ($, _, Backbone) ->
         fixedMistakes: 0
 
         currentIndex: 0
-        entriesMapStatus: [] # For computing stats
-        entriesLogs: [] # For ghost
+        entriesMap: [] # For computing stats
 
         initialize: (options) ->
             @entries = options.entries
+            @timer = new TimerController()
 
-        typeEntry: (entry, elapsedTime) ->
-            @entriesLogs.push { t: elapsedTime, v: entry }
+        play: () ->
+            @timer.start()
 
+        stop: () ->
+            @timer.stop()
+            if @.hasCheated()
+                console.log 'You are a cheater'
+            else
+                console.log 'You are not a cheater'
+            console.log JSON.stringify @.getStats()
+
+        typeEntry: (entry) ->
             if entry is @entries[@currentIndex]
                 console.log 'entry:is_correct', entry, @entries[@currentIndex]
                 @correctEntries++
-                @fixedMistakes++ if @entriesMapStatus[@currentIndex] is @ENTRY_TO_BE_FIXED
-                @entriesMapStatus[@currentIndex] = @ENTRY_CORRECT
+                @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
+                @entriesMap[@currentIndex] = @ENTRY_CORRECT
                 @trigger 'entry:is_correct', @currentIndex
-                @currentIndex++
-                @trigger 'game:finished' if @entries.length is @currentIndex
             else
                 console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
                 @incorrectEntries++
-                @entriesMapStatus[@currentIndex] = @ENTRY_INCORRECT
+                @entriesMap[@currentIndex] = @ENTRY_INCORRECT
                 @trigger 'entry:is_incorrect', @currentIndex
-                @currentIndex++
+            @currentIndex++
+            @stop() if @entries.length is @currentIndex
 
-        deleteEntry: (elapsedTime) ->
+        deleteEntry: () ->
             if @currentIndex > 0
-                @entriesLogs.push { t: elapsedTime, v: -1 }
                 @currentIndex--
                 console.log 'entry:is_reset', @entries[@currentIndex]
-                if @entriesMapStatus[@currentIndex] is @ENTRY_INCORRECT
-                    @entriesMapStatus[@currentIndex] = @ENTRY_TO_BE_FIXED
+                if @entriesMap[@currentIndex] is @ENTRY_INCORRECT
+                    @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else
-                    @entriesMapStatus[@currentIndex] = @ENTRY_DELETED
+                    @entriesMap[@currentIndex] = @ENTRY_DELETED
                 @trigger 'entry:is_reset', @currentIndex
+                return true
+            return false
 
-        getStats: (elapsedTime) ->
+        getStats: () ->
+            elapsedTime = @timer.getElapsedTime()
             elapsedTimeMinutes =  elapsedTime / 60000
             totalEntries = @correctEntries + @incorrectEntries
             errorRate = (@incorrectEntries - @fixedMistakes) / elapsedTimeMinutes
@@ -70,33 +80,31 @@ define ["jquery", "underscore", "backbone"], ($, _, Backbone) ->
             speed: rawSpeed - errorRate
             accuracy: (if totalEntries then (@correctEntries / totalEntries) * 100 else 0)
 
-        getRecords: ->
-            @entriesLogs
+        hasCheated: ->
+            if @replayLogs
+                intervals = _.pluck @replayLogs, 't'
+                intervals = $.map intervals, (val, i) ->
+                    return null  if i is 0 # Skip first keypress (no interval)
+                    val - intervals[i - 1]
+                console.log intervals
+                intervals = _.uniq(intervals)
 
-        isCheating: ->
-            logs = _.pluck @entriesLogs, 't'
-            logs = $.map logs, (val, i) ->
-                return null  if i is 0
-                val - logs[i - 1]
-            console.log logs
-            logs = _.uniq(logs)
+                if intervals.length
 
-            if logs.length
+                    # Check if intervals between each keystrokes are the same
+                    totalKeystrokes = @correctEntries + @incorrectEntries
+                    equalPercent = 100 - (parseInt intervals.length / totalKeystrokes * 100, 10)
 
-                # Check if intervals between each keystrokes are the same
-                totalKeystrokes = @correctEntries + @incorrectEntries
-                equalPercent = 100 - (parseInt logs.length / totalKeystrokes * 100, 10)
+                    # Check if the average interval between all keystrokes is not too insane
+                    sumIntervals = _.reduce intervals, (memo, num) ->
+                        return memo + num
+                    averageInterval  = parseInt sumIntervals / intervals.length, 10
 
-                # Check if the average interval between all keystrokes is not too insane
-                sumIntervals = _.reduce logs, (memo, num) ->
-                    return memo + num
-                averageInterval  = parseInt sumIntervals / logs.length, 10
+                    console.log 'Intervals equal percentage: ' + equalPercent
+                    console.log 'Average interval : ' + averageInterval + 'ms'
 
-                console.log 'Intervals equal percentage: ' + equalPercent
-                console.log 'Average interval : ' + averageInterval + 'ms'
+                else
+                    equalPercent = 0
+                    averageInterval = NaN
 
-            else
-                equalPercent = 0
-                averageInterval = NaN
-
-            equalPercent > 70 or averageInterval < 30
+                equalPercent > 70 or averageInterval < 40

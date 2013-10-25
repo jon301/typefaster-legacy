@@ -33,15 +33,12 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
 
         start: ->
             @reset()
-            console.log 'timer start'
             @startTime = @now()
 
         stop: ->
             if @stopTime is 0
-                console.log 'timer stop'
                 @stopTime = @now()
                 @elapsedTime = @stopTime - @startTime
-                console.log @elapsedTime
 
         # Milliseconds
         getElapsedTime: ->

@@ -42,16 +42,13 @@
 
       TimerController.prototype.start = function() {
         this.reset();
-        console.log('timer start');
         return this.startTime = this.now();
       };
 
       TimerController.prototype.stop = function() {
         if (this.stopTime === 0) {
-          console.log('timer stop');
           this.stopTime = this.now();
-          this.elapsedTime = this.stopTime - this.startTime;
-          return console.log(this.elapsedTime);
+          return this.elapsedTime = this.stopTime - this.startTime;
         }
       };
 

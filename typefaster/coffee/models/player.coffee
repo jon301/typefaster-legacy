@@ -1,7 +1,7 @@
 
 #global define
-define ["jquery", "underscore", "backbone", "controllers/timer"], ($, _, Backbone, TimerController) ->
-    "use strict"
+define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbone, TimerController) ->
+    'use strict'
 
     class PlayerModel extends Backbone.Model
 

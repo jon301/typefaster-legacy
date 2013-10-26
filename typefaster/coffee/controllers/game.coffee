@@ -38,7 +38,7 @@
 ###
     To begin a new game :
         gameController = new GameController(
-            entries: "hello world"
+            entries: 'hello world'
             duration: 60
         )
 
@@ -62,8 +62,8 @@
 ###
 
 #global define
-define ["jquery", "underscore", "marionette", "backbone", "controllers/timer", "models/player_human", "models/player_ghost"], ($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) ->
-    "use strict"
+define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', 'models/player_human', 'models/player_ghost'], ($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) ->
+    'use strict'
 
     class GameController extends Marionette.Controller
 

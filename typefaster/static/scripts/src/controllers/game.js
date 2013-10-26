@@ -37,7 +37,7 @@
 /*
     To begin a new game :
         gameController = new GameController(
-            entries: "hello world"
+            entries: 'hello world'
             duration: 60
         )
 
@@ -64,8 +64,8 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(["jquery", "underscore", "marionette", "backbone", "controllers/timer", "models/player_human", "models/player_ghost"], function($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) {
-    "use strict";
+  define(['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', 'models/player_human', 'models/player_ghost'], function($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) {
+    'use strict';
     var GameController, _ref;
     return GameController = (function(_super) {
       __extends(GameController, _super);

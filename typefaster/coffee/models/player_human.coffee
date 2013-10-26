@@ -1,6 +1,6 @@
 #global define
-define ["jquery", "underscore", "models/player"], ($, _, PlayerModel) ->
-    "use strict"
+define ['jquery', 'underscore', 'models/player'], ($, _, PlayerModel) ->
+    'use strict'
 
     class PlayerHumanModel extends PlayerModel
 

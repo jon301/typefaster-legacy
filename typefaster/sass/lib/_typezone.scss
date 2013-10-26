@@ -1,14 +1,14 @@
 $word-line-height: 42px;
-$lines-visible: 7;
+$lines-visible: 3;
 
 #typezone-container {
     position: relative;
-    #typezone-inner {
+    #typezone-view {
         height: $word-line-height * $lines-visible;
         overflow: hidden;
     }
     .word {
         line-height: $word-line-height;
-        white-space: nowrap;
+        // white-space: nowrap;
     }
 }

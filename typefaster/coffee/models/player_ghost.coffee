@@ -1,6 +1,6 @@
 #global define
-define ["jquery", "underscore", "models/player", "controllers/timer"], ($, _, PlayerModel, TimerController) ->
-    "use strict"
+define ['jquery', 'underscore', 'models/player', 'controllers/timer'], ($, _, PlayerModel, TimerController) ->
+    'use strict'
 
     class PlayerGhostModel extends PlayerModel
 

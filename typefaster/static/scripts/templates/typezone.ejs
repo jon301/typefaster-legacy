@@ -1,0 +1,8 @@
+<% var wordsArray = entries.split(' ') %>
+
+<% _.each(wordsArray, function(word) { %>
+    <% var entriesArray = word.split('') %>
+    <span class="word">
+        <% _.each(entriesArray, function(entry) { %><span><%- entry %></span><% }) %>
+    </span>
+<% }) %>

@@ -62,7 +62,15 @@
 ###
 
 #global define
-define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', 'models/player_human', 'models/player_ghost'], ($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) ->
+define [
+    'jquery',
+    'underscore',
+    'backbone',
+    'marionette',
+    'controllers/timer',
+    'models/player_human',
+    'models/player_ghost'
+    ], ($, _, Backbone, Marionette, TimerController, PlayerHumanModel, PlayerGhostModel) ->
     'use strict'
 
     class GameController extends Marionette.Controller
@@ -75,7 +83,7 @@ define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', '
             @duration = options.duration
             @entries = options.entries
 
-            @humanPlayer = new PlayerHumanModel({ entries : options.entries })
+            @humanPlayer = new PlayerHumanModel({ entries : options.entries, gameController: @ })
             @ghostPlayers = new Backbone.Collection()
 
             @timer = new TimerController()
@@ -85,6 +93,7 @@ define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', '
                 @startListening();
             $(window).blur () =>
                 console.log 'blur : unbind listen events'
+                @listening = false
                 @stopListening();
 
         startListening: ->
@@ -131,8 +140,13 @@ define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', '
                 clearInterval(@interval)
                 @stopListening()
 
-                @running = false
-                @listening = false
+                #@running = false
+                #@listening = false
+
+        reset: ->
+            #@running = false
+            #@listening = false
+
 
         # Setters
         setEntries: (entries) ->
@@ -147,4 +161,4 @@ define ['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', '
 
         addGhost: (replayLogs) ->
             unless @running
-                @ghostPlayers.add new PlayerGhostModel({ entries: @entries, replayLogs: replayLogs })
+                @ghostPlayers.add new PlayerGhostModel({ entries: @entries, replayLogs: replayLogs, gameController: @ })

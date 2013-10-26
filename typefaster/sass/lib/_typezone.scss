@@ -1,15 +1,31 @@
 $word-line-height: 42px;
-$lines-visible: 3;
+$lines-visible: 2;
 
 #typezone-container {
     @include user-select(none);
-    position: relative;
     #typezone-view {
+        font-family: 'Inconsolata', sans-serif;
         height: $word-line-height * $lines-visible;
         overflow: hidden;
+        position: relative;
     }
     .word {
-        line-height: $word-line-height;
-        // white-space: nowrap;
+        white-space: nowrap;
+        height: $word-line-height;
+        span {
+
+            &.focus {
+                background: black;
+                color: white;
+            }
+            &.correct {
+                color: green;
+            }
+            &.incorrect {
+                background: red;
+                color: white;
+            }
+
+        }
     }
 }

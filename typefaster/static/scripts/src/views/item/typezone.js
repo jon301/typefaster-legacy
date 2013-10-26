@@ -17,47 +17,106 @@
 
       TypeZoneView.prototype.template = JST['typefaster/static/scripts/templates/typezone.ejs'];
 
+      TypeZoneView.prototype.ui = {
+        entries: '.entry'
+      };
+
       TypeZoneView.prototype.initialize = function(options) {
-        var _this = this;
         this.entries = options.entries;
+        return this.gameController = options.gameController;
+      };
+
+      TypeZoneView.prototype.onRender = function() {
+        var _this = this;
+        this.focus();
         this.$el.on('click', $.proxy(this.focus, this));
         $(document).on('keydown', function(evt) {
           var keyCode;
-          if (evt.originalEvent !== undefined) {
+          if (_this.focused && evt.originalEvent !== undefined) {
             keyCode = evt.which;
             if (keyCode === 8) {
-              _this.trigger('entry:deleted');
+              _this.gameController.trigger('entry:deleted');
               return evt.preventDefault();
             }
           }
         });
-        return $(document).on('keypress', function(evt) {
+        $(document).on('keypress', function(evt) {
           var entry, keyCode;
-          if (evt.originalEvent !== undefined) {
+          if (_this.focused && evt.originalEvent !== undefined) {
             keyCode = evt.which;
             entry = String.fromCharCode(keyCode);
             if (entry) {
-              _this.trigger('entry:typed', entry);
+              if (!_this.gameController.running) {
+                _this.gameController.start();
+              }
+              _this.gameController.trigger('entry:typed', entry);
             }
             return evt.preventDefault();
           }
         });
+        $(window).resize(function() {
+          return _this.$el.scrollTop(_this.$el.scrollTop() + $('.current').parent().position().top);
+        });
+        this.listenTo(this.gameController, 'entry:is_correct', function(index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          $entry.removeClass('current focus').addClass('correct');
+          if ($nextEntry) {
+            $nextEntry.addClass('current focus');
+            return _this.scrollToEntry($nextEntry);
+          }
+        });
+        this.listenTo(this.gameController, 'entry:is_incorrect', function(index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          $entry.removeClass('current focus').addClass('incorrect');
+          if ($nextEntry) {
+            $nextEntry.addClass('current focus');
+            return _this.scrollToEntry($nextEntry);
+          }
+        });
+        return this.listenTo(this.gameController, 'entry:is_reset', function(index) {
+          var $entry, $prevEntry;
+          $entry = _this.ui.entries.eq(index);
+          $prevEntry = _this.ui.entries.eq(index - 1);
+          _this.ui.entries.removeClass('current focus');
+          $entry.removeClass('correct incorrect').addClass('current focus');
+          return _this.scrollToEntry($prevEntry);
+        });
       };
 
-      TypeZoneView.prototype.focus = function(e) {
+      TypeZoneView.prototype.scrollToEntry = function($entry) {
+        var _this = this;
+        if ($entry.length && $entry.parent().position().top !== 0 && !this.animating) {
+          this.animating = true;
+          return this.$el.stop(true).animate({
+            scrollTop: this.$el.scrollTop() + $entry.parent().position().top
+          }, function() {
+            return _this.animating = false;
+          });
+        }
+      };
+
+      TypeZoneView.prototype.focus = function(evt) {
         if (!this.focused) {
-          this.focused = true;
           console.log('focus typezone');
+          this.focused = true;
+          this.$('.current').addClass('focus');
           $('body').on('click', $.proxy(this.blur, this));
         }
-        e.preventDefault();
-        return e.stopPropagation();
+        if (evt) {
+          evt.preventDefault();
+          return evt.stopPropagation();
+        }
       };
 
       TypeZoneView.prototype.blur = function(e) {
         if (this.focused) {
-          this.focused = false;
           console.log('blur typezone');
+          this.focused = false;
+          this.$('.current').removeClass('focus');
           return $('body').off('click', $.proxy(this.blur, this));
         }
       };

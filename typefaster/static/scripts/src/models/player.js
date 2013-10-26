@@ -35,6 +35,7 @@
 
       PlayerModel.prototype.initialize = function(options) {
         this.entries = options.entries;
+        this.gameController = options.gameController;
         return this.timer = new TimerController();
       };
 
@@ -60,14 +61,15 @@
             this.fixedMistakes++;
           }
           this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
-          this.trigger('entry:is_correct', this.currentIndex);
+          this.gameController.trigger('entry:is_correct', this.currentIndex);
         } else {
           console.log('entry:is_incorrect', entry, this.entries[this.currentIndex]);
           this.incorrectEntries++;
           this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
-          this.trigger('entry:is_incorrect', this.currentIndex);
+          this.gameController.trigger('entry:is_incorrect', this.currentIndex);
         }
         this.currentIndex++;
+        console.log(this.entries.length, this.currentIndex);
         if (this.entries.length === this.currentIndex) {
           return this.stop();
         }
@@ -82,7 +84,7 @@
           } else {
             this.entriesMap[this.currentIndex] = this.ENTRY_DELETED;
           }
-          this.trigger('entry:is_reset', this.currentIndex);
+          this.gameController.trigger('entry:is_reset', this.currentIndex);
           return true;
         }
         return false;
@@ -134,7 +136,7 @@
             equalPercent = 0;
             averageInterval = NaN;
           }
-          return equalPercent > 70 || averageInterval < 40;
+          return equalPercent > 70 || averageInterval < 50;
         }
       };
 

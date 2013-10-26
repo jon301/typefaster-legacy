@@ -22,6 +22,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbon
 
         initialize: (options) ->
             @entries = options.entries
+            @gameController = options.gameController
             @timer = new TimerController()
 
         play: () ->
@@ -41,12 +42,12 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbon
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
-                @trigger 'entry:is_correct', @currentIndex
+                @gameController.trigger 'entry:is_correct', @currentIndex
             else
                 console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
-                @trigger 'entry:is_incorrect', @currentIndex
+                @gameController.trigger 'entry:is_incorrect', @currentIndex
             @currentIndex++
             @stop() if @entries.length is @currentIndex
 
@@ -58,7 +59,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbon
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else
                     @entriesMap[@currentIndex] = @ENTRY_DELETED
-                @trigger 'entry:is_reset', @currentIndex
+                @gameController.trigger 'entry:is_reset', @currentIndex
                 return true
             return false
 
@@ -107,4 +108,4 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbon
                     equalPercent = 0
                     averageInterval = NaN
 
-                equalPercent > 70 or averageInterval < 40
+                equalPercent > 70 or averageInterval < 50

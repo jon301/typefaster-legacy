@@ -64,7 +64,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'marionette', 'backbone', 'controllers/timer', 'models/player_human', 'models/player_ghost'], function($, _, Marionette, Backbone, TimerController, PlayerHumanModel, PlayerGhostModel) {
+  define(['jquery', 'underscore', 'backbone', 'marionette', 'controllers/timer', 'models/player_human', 'models/player_ghost'], function($, _, Backbone, Marionette, TimerController, PlayerHumanModel, PlayerGhostModel) {
     'use strict';
     var GameController, _ref;
     return GameController = (function(_super) {
@@ -84,7 +84,8 @@
         this.duration = options.duration;
         this.entries = options.entries;
         this.humanPlayer = new PlayerHumanModel({
-          entries: options.entries
+          entries: options.entries,
+          gameController: this
         });
         this.ghostPlayers = new Backbone.Collection();
         this.timer = new TimerController();
@@ -94,6 +95,7 @@
         });
         return $(window).blur(function() {
           console.log('blur : unbind listen events');
+          _this.listening = false;
           return _this.stopListening();
         });
       };
@@ -143,11 +145,11 @@
         if (this.running) {
           console.log('Game stopped');
           clearInterval(this.interval);
-          this.stopListening();
-          this.running = false;
-          return this.listening = false;
+          return this.stopListening();
         }
       };
+
+      GameController.prototype.reset = function() {};
 
       GameController.prototype.setEntries = function(entries) {
         if (!this.running) {
@@ -171,7 +173,8 @@
         if (!this.running) {
           return this.ghostPlayers.add(new PlayerGhostModel({
             entries: this.entries,
-            replayLogs: replayLogs
+            replayLogs: replayLogs,
+            gameController: this
           }));
         }
       };

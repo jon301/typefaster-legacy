@@ -23,7 +23,8 @@
       typeZoneView.on('entry:deleted', function() {
         return gameController.trigger('entry:deleted');
       });
-      return typeZoneView.render();
+      typeZoneView.render();
+      return window.typeZoneView = typeZoneView;
     });
   });
 

@@ -2,6 +2,7 @@ $word-line-height: 42px;
 $lines-visible: 3;
 
 #typezone-container {
+    @include user-select(none);
     position: relative;
     #typezone-view {
         height: $word-line-height * $lines-visible;

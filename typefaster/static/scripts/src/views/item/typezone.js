@@ -20,6 +20,7 @@
       TypeZoneView.prototype.initialize = function(options) {
         var _this = this;
         this.entries = options.entries;
+        this.$el.on('click', $.proxy(this.focus, this));
         $(document).on('keydown', function(evt) {
           var keyCode;
           if (evt.originalEvent !== undefined) {
@@ -41,6 +42,24 @@
             return evt.preventDefault();
           }
         });
+      };
+
+      TypeZoneView.prototype.focus = function(e) {
+        if (!this.focused) {
+          this.focused = true;
+          console.log('focus typezone');
+          $('body').on('click', $.proxy(this.blur, this));
+        }
+        e.preventDefault();
+        return e.stopPropagation();
+      };
+
+      TypeZoneView.prototype.blur = function(e) {
+        if (this.focused) {
+          this.focused = false;
+          console.log('blur typezone');
+          return $('body').off('click', $.proxy(this.blur, this));
+        }
       };
 
       TypeZoneView.prototype.serializeData = function() {

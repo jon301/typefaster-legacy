@@ -35,3 +35,4 @@ require [
             gameController.trigger 'entry:deleted'
 
         typeZoneView.render()
+        window.typeZoneView = typeZoneView

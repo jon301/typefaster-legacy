@@ -9,6 +9,8 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
         initialize: (options) ->
             @entries = options.entries
 
+            @.$el.on 'click', $.proxy(@focus, @)
+
             $(document).on 'keydown', (evt) =>
                 if evt.originalEvent isnt `undefined`
                     keyCode = evt.which
@@ -24,6 +26,19 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                         @.trigger 'entry:typed', entry
                     evt.preventDefault()
 
+        focus: (e) ->
+            unless @focused
+                @focused = true
+                console.log 'focus typezone'
+                $('body').on 'click', $.proxy(@blur, @)
+            e.preventDefault()
+            e.stopPropagation()
+
+        blur: (e) ->
+            if @focused
+                @focused = false
+                console.log 'blur typezone'
+                $('body').off 'click', $.proxy(@blur, @)
 
         serializeData: () ->
             'entries': @entries

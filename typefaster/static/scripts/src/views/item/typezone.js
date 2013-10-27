@@ -29,7 +29,7 @@
       TypeZoneView.prototype.onRender = function() {
         var _this = this;
         this.focus();
-        this.$el.on('click', $.proxy(this.focus, this));
+        $('#typezone-container').on('click', $.proxy(this.focus, this));
         $(document).on('keydown', function(evt) {
           var keyCode;
           if (_this.focused && evt.originalEvent !== undefined) {
@@ -55,7 +55,14 @@
           }
         });
         $(window).resize(function() {
-          return _this.$el.scrollTop(_this.$el.scrollTop() + $('.current').parent().position().top);
+          return _this.scrollToEntry($('.current'));
+        });
+        $(window).focus(function() {
+          return _this.gameController.startListen();
+        });
+        $(window).blur(function() {
+          _this.blur();
+          return _this.gameController.stopListen();
         });
         this.listenTo(this.gameController, 'entry:is_correct', function(index) {
           var $entry, $nextEntry;
@@ -77,14 +84,20 @@
             return _this.scrollToEntry($nextEntry);
           }
         });
-        return this.listenTo(this.gameController, 'entry:is_reset', function(index) {
+        this.listenTo(this.gameController, 'entry:is_reset', function(index) {
           var $entry, $prevEntry;
           $entry = _this.ui.entries.eq(index);
-          $prevEntry = _this.ui.entries.eq(index - 1);
           _this.ui.entries.removeClass('current focus');
           $entry.removeClass('correct incorrect').addClass('current focus');
-          return _this.scrollToEntry($prevEntry);
+          if (index !== 0) {
+            $prevEntry = _this.ui.entries.eq(index - 1);
+            return _this.scrollToEntry($prevEntry);
+          }
         });
+        this.listenTo(this.gameController, 'human:stop', function() {
+          return _this.blur();
+        });
+        return this.listenTo(this.gameController, 'window:');
       };
 
       TypeZoneView.prototype.scrollToEntry = function($entry) {
@@ -104,6 +117,7 @@
           console.log('focus typezone');
           this.focused = true;
           this.$('.current').addClass('focus');
+          $('#typezone-container').addClass('focus');
           $('body').on('click', $.proxy(this.blur, this));
         }
         if (evt) {
@@ -117,6 +131,7 @@
           console.log('blur typezone');
           this.focused = false;
           this.$('.current').removeClass('focus');
+          $('#typezone-container').removeClass('focus');
           return $('body').off('click', $.proxy(this.blur, this));
         }
       };

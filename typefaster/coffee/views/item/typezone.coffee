@@ -16,7 +16,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
         onRender: () ->
             @.focus()
 
-            @.$el.on 'click', $.proxy(@focus, @)
+            $('#typezone-container').on 'click', $.proxy(@focus, @)
 
             $(document).on 'keydown', (evt) =>
                 if @focused and evt.originalEvent isnt `undefined`
@@ -35,7 +35,15 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                     evt.preventDefault()
 
             $(window).resize () =>
-                @.$el.scrollTop(@.$el.scrollTop() + $('.current').parent().position().top)
+                @scrollToEntry $('.current')
+
+
+            $(window).focus () =>
+                @gameController.startListen()
+
+            $(window).blur () =>
+                @blur()
+                @gameController.stopListen()
 
             @.listenTo @gameController, 'entry:is_correct', (index) =>
                 $entry = @.ui.entries.eq(index)
@@ -55,10 +63,16 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
 
             @.listenTo @gameController, 'entry:is_reset', (index) =>
                 $entry = @.ui.entries.eq(index)
-                $prevEntry = @.ui.entries.eq(index - 1)
                 @.ui.entries.removeClass('current focus')
                 $entry.removeClass('correct incorrect').addClass('current focus')
-                @scrollToEntry $prevEntry
+                if index isnt 0
+                    $prevEntry = @.ui.entries.eq(index - 1)
+                    @scrollToEntry $prevEntry
+
+            @.listenTo @gameController, 'human:stop', () =>
+                @blur()
+
+            @.listenTo @gameController, 'window:'
 
         scrollToEntry: ($entry) ->
             if $entry.length and $entry.parent().position().top != 0 and not @animating
@@ -72,6 +86,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                 console.log 'focus typezone'
                 @focused = true
                 @.$('.current').addClass 'focus'
+                $('#typezone-container').addClass 'focus'
                 $('body').on 'click', $.proxy(@blur, @)
 
             if evt
@@ -83,6 +98,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                 console.log 'blur typezone'
                 @focused = false
                 @.$('.current').removeClass 'focus'
+                $('#typezone-container').removeClass 'focus'
                 $('body').off 'click', $.proxy(@blur, @)
 
         serializeData: () ->

@@ -28,35 +28,6 @@
 
     Total Time : Total time of round in minutes
         Time in minutes = Time in seconds / 60
-
-    http://jsfiddle.net/v7GN3/
-    $(window).resize(function() { $('#type-inner').scrollTop($('#type-inner').scrollTop() + $('#titi').position().top); });
-*/
-
-
-/*
-    To begin a new game :
-        gameController = new GameController(
-            entries: 'hello world'
-            duration: 60
-        )
-
-    Make game listening for keyboard events
-        gameController.listen();
-
-    Optionally start the game manually
-        gameController.start();
-
-    Game will automatically stop when time is over or everything has been typed
-    Or you can stop it manually :
-        gameController.stop();
-
-    Optionally change game settings
-        gameController.setTimer(30);
-        gameController.setEntries('hello sick world');
-
-    Start over
-        gameController.listen();
 */
 
 
@@ -80,7 +51,6 @@
       GameController.prototype.duration = 60;
 
       GameController.prototype.initialize = function(options) {
-        var _this = this;
         this.duration = options.duration;
         this.entries = options.entries;
         this.humanPlayer = new PlayerHumanModel({
@@ -88,21 +58,13 @@
           gameController: this
         });
         this.ghostPlayers = new Backbone.Collection();
-        this.timer = new TimerController();
-        $(window).focus(function() {
-          console.log('focus : bind listen events');
-          return _this.startListening();
-        });
-        return $(window).blur(function() {
-          console.log('blur : unbind listen events');
-          _this.listening = false;
-          return _this.stopListening();
-        });
+        return this.timer = new TimerController();
       };
 
-      GameController.prototype.startListening = function() {
+      GameController.prototype.startListen = function() {
         var _this = this;
         if (!this.listening) {
+          console.log('game: bind listen events');
           this.listening = true;
           this.listenTo(this, 'entry:typed', function(entry) {
             return _this.humanPlayer.typeEntry(entry);
@@ -110,15 +72,16 @@
           this.listenTo(this, 'entry:deleted', function() {
             return _this.humanPlayer.deleteEntry();
           });
-          this.listenTo(this.humanPlayer, 'human:stop', function() {
+          return this.listenTo(this.humanPlayer, 'human:stop', function() {
             return _this.stop();
           });
-          if (this.duration) {
-            return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
-          } else {
-            return console.log('You have unlimited time to type : ' + this(entries));
-          }
         }
+      };
+
+      GameController.prototype.stopListen = function() {
+        console.log('game: unbind listen events');
+        this.listening = false;
+        return this.stopListening();
       };
 
       GameController.prototype.start = function() {

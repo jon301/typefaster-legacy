@@ -28,37 +28,6 @@
 
     Total Time : Total time of round in minutes
         Time in minutes = Time in seconds / 60
-
-    http://jsfiddle.net/v7GN3/
-    $(window).resize(function() { $('#type-inner').scrollTop($('#type-inner').scrollTop() + $('#titi').position().top); });
-
-
-###
-
-###
-    To begin a new game :
-        gameController = new GameController(
-            entries: 'hello world'
-            duration: 60
-        )
-
-    Make game listening for keyboard events
-        gameController.listen();
-
-    Optionally start the game manually
-        gameController.start();
-
-    Game will automatically stop when time is over or everything has been typed
-    Or you can stop it manually :
-        gameController.stop();
-
-    Optionally change game settings
-        gameController.setTimer(30);
-        gameController.setEntries('hello sick world');
-
-    Start over
-        gameController.listen();
-
 ###
 
 #global define
@@ -88,16 +57,9 @@ define [
 
             @timer = new TimerController()
 
-            $(window).focus () =>
-                console.log 'focus : bind listen events'
-                @startListening();
-            $(window).blur () =>
-                console.log 'blur : unbind listen events'
-                @listening = false
-                @stopListening();
-
-        startListening: ->
+        startListen: ->
             unless @listening
+                console.log 'game: bind listen events'
                 @listening = true
 
                 @.listenTo @, 'entry:typed', (entry) =>
@@ -109,10 +71,10 @@ define [
                 @.listenTo @humanPlayer, 'human:stop', =>
                     @stop()
 
-                if @duration
-                    console.log 'You have ' + @duration + ' seconds to type :' + @entries
-                else
-                    console.log 'You have unlimited time to type : ' + @ entries
+        stopListen: ->
+            console.log 'game: unbind listen events'
+            @listening = false
+            @stopListening();
 
         start: ->
             unless @running

@@ -69,7 +69,6 @@
           this.gameController.trigger('entry:is_incorrect', this.currentIndex);
         }
         this.currentIndex++;
-        console.log(this.entries.length, this.currentIndex);
         if (this.entries.length === this.currentIndex) {
           return this.stop();
         }

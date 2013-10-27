@@ -1,7 +1,7 @@
 (function() {
-  require(['jquery', 'underscore', 'templates', 'globals', 'app', 'views/item/typezone', 'controllers/game'], function($, _, JST, globals, app, TypeZoneView, GameController) {
+  require(['jquery', 'underscore', 'templates', 'globals', 'app', 'views/item/typezone', 'views/item/statschart', 'controllers/game'], function($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) {
     return app.addInitializer(function() {
-      var entries, gameController, typeZoneView;
+      var entries, gameController, statsChartView, typeZoneView;
       entries = 'abcdefghijklmnopqrstuvwxyz';
       entries = 'abcdefghijklmnopqrstuvwxyz zyxwvutsrqponmlkjihgfedcba';
       entries = 'bonjour les amis comment allez vous moi je pense que je vais bien';
@@ -16,7 +16,11 @@
         entries: entries,
         gameController: gameController
       });
-      return typeZoneView.render();
+      typeZoneView.render();
+      statsChartView = new StatsChartView({
+        gameController: gameController
+      });
+      return statsChartView.render();
     });
   });
 

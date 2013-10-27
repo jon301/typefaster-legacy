@@ -7,6 +7,7 @@ requirejs.config
         marionette: '../../bower_components/marionette/lib/backbone.marionette.min'
         jed: '../../bower_components/jed/jed'
         bootstrap: '../../bower_components/sass-bootstrap/dist/js/bootstrap.min'
+        highcharts: '../../bower_components/highcharts.com/js/highcharts.src'
     shim:
         backbone:
             deps: ['jquery', 'underscore']

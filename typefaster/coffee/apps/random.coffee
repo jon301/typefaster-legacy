@@ -5,8 +5,9 @@ require [
     'globals',
     'app',
     'views/item/typezone'
+    'views/item/statschart'
     'controllers/game'
-    ], ($, _, JST, globals, app, TypeZoneView, GameController) ->
+    ], ($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) ->
 
     app.addInitializer () ->
 
@@ -29,3 +30,9 @@ require [
             gameController: gameController
         )
         typeZoneView.render()
+
+        statsChartView = new StatsChartView(
+            gameController: gameController
+        )
+        statsChartView.render()
+

@@ -7,7 +7,8 @@
       underscore: '../../bower_components/lodash/dist/lodash.min',
       marionette: '../../bower_components/marionette/lib/backbone.marionette.min',
       jed: '../../bower_components/jed/jed',
-      bootstrap: '../../bower_components/sass-bootstrap/dist/js/bootstrap.min'
+      bootstrap: '../../bower_components/sass-bootstrap/dist/js/bootstrap.min',
+      highcharts: '../../bower_components/highcharts.com/js/highcharts.src'
     },
     shim: {
       backbone: {

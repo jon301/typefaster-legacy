@@ -55,7 +55,10 @@
           }
         });
         $(window).resize(function() {
-          return _this.scrollToEntry($('.current'));
+          clearTimeout(_this.resizingTimeout);
+          return _this.resizingTimeout = setTimeout(function() {
+            return _this.scrollToEntry($('.current'));
+          }, 200);
         });
         $(window).focus(function() {
           return _this.gameController.startListen();

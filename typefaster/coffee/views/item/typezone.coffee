@@ -35,8 +35,11 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                     evt.preventDefault()
 
             $(window).resize () =>
-                @scrollToEntry $('.current')
+                clearTimeout @resizingTimeout
 
+                @resizingTimeout = setTimeout () =>
+                    @scrollToEntry $('.current')
+                , 200
 
             $(window).focus () =>
                 @gameController.startListen()

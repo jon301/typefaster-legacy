@@ -18,7 +18,7 @@
       PlayerHumanModel.prototype.stop = function() {
         PlayerHumanModel.__super__.stop.call(this);
         console.log(JSON.stringify(this.replayLogs));
-        return this.trigger('human:stop');
+        return this.gameController.trigger('human:stop');
       };
 
       PlayerHumanModel.prototype.typeEntry = function(entry) {

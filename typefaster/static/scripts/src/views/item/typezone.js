@@ -94,10 +94,9 @@
             return _this.scrollToEntry($prevEntry);
           }
         });
-        this.listenTo(this.gameController, 'human:stop', function() {
-          return _this.blur();
+        return this.listenTo(this.gameController, 'human:stop', function() {
+          return _this.disable();
         });
-        return this.listenTo(this.gameController, 'window:');
       };
 
       TypeZoneView.prototype.scrollToEntry = function($entry) {
@@ -112,8 +111,13 @@
         }
       };
 
+      TypeZoneView.prototype.disable = function() {
+        this.disabled = true;
+        return this.blur();
+      };
+
       TypeZoneView.prototype.focus = function(evt) {
-        if (!this.focused) {
+        if (!(this.focused || this.disabled)) {
           console.log('focus typezone');
           this.focused = true;
           this.$('.current').addClass('focus');

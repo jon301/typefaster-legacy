@@ -72,7 +72,7 @@
           this.listenTo(this, 'entry:deleted', function() {
             return _this.humanPlayer.deleteEntry();
           });
-          return this.listenTo(this.humanPlayer, 'human:stop', function() {
+          return this.listenTo(this, 'human:stop', function() {
             return _this.stop();
           });
         }
@@ -108,7 +108,8 @@
         if (this.running) {
           console.log('Game stopped');
           clearInterval(this.interval);
-          return this.stopListening();
+          this.stopListening();
+          return this.humanPlayer.stop();
         }
       };
 

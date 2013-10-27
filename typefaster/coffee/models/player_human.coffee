@@ -9,7 +9,7 @@ define ['jquery', 'underscore', 'models/player'], ($, _, PlayerModel) ->
         stop: () ->
             super()
             console.log JSON.stringify @replayLogs
-            @.trigger 'human:stop'
+            @gameController.trigger 'human:stop'
 
         typeEntry: (entry) ->
             super entry

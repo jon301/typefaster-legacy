@@ -68,7 +68,7 @@ define [
                 @.listenTo @, 'entry:deleted', =>
                     @humanPlayer.deleteEntry()
 
-                @.listenTo @humanPlayer, 'human:stop', =>
+                @.listenTo @, 'human:stop', =>
                     @stop()
 
         stopListen: ->
@@ -101,6 +101,8 @@ define [
 
                 clearInterval(@interval)
                 @stopListening()
+
+                @humanPlayer.stop()
 
                 #@running = false
                 #@listening = false

@@ -70,9 +70,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                     @scrollToEntry $prevEntry
 
             @.listenTo @gameController, 'human:stop', () =>
-                @blur()
-
-            @.listenTo @gameController, 'window:'
+                @disable()
 
         scrollToEntry: ($entry) ->
             if $entry.length and $entry.parent().position().top != 0 and not @animating
@@ -81,8 +79,12 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                     @animating = false
                 )
 
+        disable: () ->
+            @disabled = true
+            @blur()
+
         focus: (evt) ->
-            unless @focused
+            unless @focused or @disabled
                 console.log 'focus typezone'
                 @focused = true
                 @.$('.current').addClass 'focus'

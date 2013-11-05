@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-14 20:35+0200\n"
+"POT-Creation-Date: 2013-11-05 23:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,29 +17,130 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
+#: typefaster/templates/_base.html:11
+msgid ""
+"keyboard, typefaster, type faster, fast type, fast typing, faster, typing"
+" speed, dactylography"
+msgstr ""
+
+#: typefaster/templates/_base.html:53 typefaster/templates/home.html:28
+msgid "Random"
+msgstr ""
+
+#: typefaster/templates/_base.html:55 typefaster/templates/home.html:32
+msgid "Standard"
+msgstr ""
+
+#: typefaster/templates/_base.html:56 typefaster/templates/home.html:33
+msgid "Advanced"
+msgstr ""
+
+#: typefaster/templates/_base.html:57 typefaster/templates/home.html:34
+msgid "Digits"
+msgstr ""
+
+#: typefaster/templates/_base.html:58 typefaster/templates/home.html:35
+msgid "Disorder"
+msgstr ""
+
+#: typefaster/templates/_base.html:62 typefaster/templates/home.html:43
+msgid "Persistent"
+msgstr ""
+
+#: typefaster/templates/_base.html:64 typefaster/templates/home.html:47
+msgid "Text"
+msgstr ""
+
+#: typefaster/templates/_base.html:65 typefaster/templates/home.html:48
+msgid "Alphabet"
+msgstr ""
+
+#: typefaster/templates/_base.html:66 typefaster/templates/home.html:49
+msgid "Alphabet backwards"
+msgstr ""
+
+#: typefaster/templates/_base.html:67 typefaster/templates/home.html:50
+msgid "Pi digits"
+msgstr ""
+
+#: typefaster/templates/_base.html:68 typefaster/templates/home.html:51
+msgid "E digits"
+msgstr ""
+
+#: typefaster/templates/_base.html:72
+msgid "Multiplayer"
+msgstr ""
+
+#: typefaster/templates/_base.html:74 typefaster/templates/home.html:63
+msgid "Lobby"
+msgstr ""
+
+#: typefaster/templates/_base.html:75 typefaster/templates/home.html:64
+msgid "Join game"
+msgstr ""
+
+#: typefaster/templates/_base.html:76 typefaster/templates/home.html:65
+msgid "Create game"
+msgstr ""
+
+#: typefaster/templates/_base.html:81
+msgid "Log in"
+msgstr ""
+
+#: typefaster/templates/_base.html:82
+msgid "Register"
+msgstr ""
+
 #: typefaster/templates/about.html:11
 msgid "This is the about page"
 msgstr ""
 
-#: typefaster/templates/about.html:13
+#: typefaster/templates/about.html:13 typefaster/templates/persistent.html:13
 msgid "Go to home page"
 msgstr ""
 
-#: typefaster/templates/home.html:15
-msgid "This is the home page"
+#: typefaster/templates/home.html:4
+msgid "Because speed matters"
 msgstr ""
 
-#: typefaster/templates/home.html:17
-msgid "Go to about page"
+#: typefaster/templates/home.html:18
+msgid "because speed matters."
 msgstr ""
 
-#: typefaster/templates/errors/500.html:13
-msgid ""
-"We're sorry, but our service is momentarily interrupted, we'll be back "
-"soon."
+#: typefaster/templates/home.html:22
+msgid "Get your keyboard ready and choose a game already."
 msgstr ""
 
-#: typefaster/templates/errors/500.html:16
-msgid "Error 500"
+#: typefaster/templates/home.html:29
+msgid "Because you master any combination of words and letters"
+msgstr ""
+
+#: typefaster/templates/home.html:44
+msgid "Because the classics do not scare you."
+msgstr ""
+
+#: typefaster/templates/home.html:60
+msgid "Because you just want to be the fastest."
+msgstr ""
+
+#: typefaster/templates/persistent.html:11
+#, python-format
+msgid "This is the persistent page : %(game)s"
+msgstr ""
+
+#: typefaster/templates/random.html:22
+msgid "Short words, no caps, easy peasy."
+msgstr ""
+
+#: typefaster/templates/random.html:24
+msgid "Longer words, some caps and punctuation marks."
+msgstr ""
+
+#: typefaster/templates/random.html:26
+msgid "Don't forget the numeric keypad."
+msgstr ""
+
+#: typefaster/templates/random.html:28
+msgid "Letters, numbers &amp; a bit of insanity."
 msgstr ""
 

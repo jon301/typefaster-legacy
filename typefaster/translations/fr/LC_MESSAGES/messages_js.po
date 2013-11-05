@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-10-14 20:35+0200\n"
+"POT-Creation-Date: 2013-11-05 23:13+0100\n"
 "PO-Revision-Date: 2013-10-14 16:12+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -18,12 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: typefaster/static/scripts/src/home/main.js:1
-msgid "home main"
-msgstr "accueil principal"
-
 #: typefaster/static/scripts/templates/test.ejs:1
 #, python-format
 msgid "hello world : %s"
 msgstr "salut tout le monde : %s"
+
+#~ msgid "home main"
+#~ msgstr "accueil principal"
 

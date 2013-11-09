@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from flask import Flask, g, render_template, request, redirect, url_for
+from flask import Flask, g, render_template, request, redirect, url_for, send_from_directory
 from flask.ext.babel import Babel
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.config.from_object('typefaster.settings')
@@ -30,6 +31,11 @@ def server_error(error):
 @app.template_filter()
 def format_date(value, format='%Y-%m-%d'):
     return value.strftime(format)
+
+# JS Tests
+@app.route('/scripts/tests/')
+def js_tests():
+    return render_template('test_runner.html')
 
 # Blueprints
 from typefaster.views import bp

@@ -18,6 +18,8 @@
     "highcharts.com": "git@github.com:highslide-software/highcharts.com.git#~3.0.7",
     "String.prototype.at": "git@github.com:mathiasbynens/String.prototype.at",
     "String.fromCodePoint": "git@github.com:mathiasbynens/String.fromCodePoint",
-    "punycode": "~1.2.3"
+    "punycode": "~1.2.3",
+    "mocha": "~1.14.0",
+    "chai": "~1.8.1"
   }
 }

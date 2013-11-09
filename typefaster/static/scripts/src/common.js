@@ -28,7 +28,8 @@
       bootstrap: {
         deps: ['jquery']
       }
-    }
+    },
+    urlArgs: '_=' + (new Date().getTime())
   });
 
   require(['app'], function(app) {

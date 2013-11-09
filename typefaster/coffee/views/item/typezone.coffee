@@ -1,5 +1,5 @@
 #global define
-define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionette) ->
+define ['jquery', 'underscore', 'templates', 'marionette', 'punycode'], ($, _, JST, Marionette, punycode) ->
     'use strict'
 
     class TypeZoneView extends Marionette.ItemView
@@ -39,7 +39,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
             @.debugEvent(evt)
             if @focused and evt.originalEvent isnt `undefined`
                 keyCode = evt.which
-                entry = String.fromCharCode(keyCode);
+                entry = String.fromCodePoint(keyCode);
                 if entry
                     @gameController.start() unless @gameController.running
                     @gameController.trigger 'entry:typed', entry
@@ -118,8 +118,8 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
 
         disable: () ->
             @disabled = true
-            @blur()
             @.ui.input.prop 'disabled', true
+            @blur()
 
         focus: (evt) ->
             @.ui.input.focus()
@@ -145,3 +145,4 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
 
         serializeData: () ->
             'entries': @entries
+            'punycode': punycode

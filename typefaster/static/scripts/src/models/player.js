@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'controllers/timer'], function($, _, Backbone, TimerController) {
+  define(['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], function($, _, Backbone, TimerController, punycode) {
     'use strict';
     var PlayerModel, _ref;
     return PlayerModel = (function(_super) {
@@ -54,8 +54,8 @@
       };
 
       PlayerModel.prototype.typeEntry = function(entry) {
-        if (entry === this.entries[this.currentIndex]) {
-          console.log('entry:is_correct', entry, this.entries[this.currentIndex]);
+        if (entry === this.entries.at(this.currentIndex)) {
+          console.log('entry:is_correct', entry, this.entries.at(this.currentIndex));
           this.correctEntries++;
           if (this.entriesMap[this.currentIndex] === this.ENTRY_TO_BE_FIXED) {
             this.fixedMistakes++;
@@ -63,13 +63,13 @@
           this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
           this.gameController.trigger('entry:is_correct', this.currentIndex);
         } else {
-          console.log('entry:is_incorrect', entry, this.entries[this.currentIndex]);
+          console.log('entry:is_incorrect', entry, this.entries.at(this.currentIndex));
           this.incorrectEntries++;
           this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
           this.gameController.trigger('entry:is_incorrect', this.currentIndex);
         }
         this.currentIndex++;
-        if (this.entries.length === this.currentIndex) {
+        if (punycode.ucs2.decode(this.entries).length === this.currentIndex) {
           return this.stop();
         }
       };
@@ -77,7 +77,7 @@
       PlayerModel.prototype.deleteEntry = function() {
         if (this.currentIndex > 0) {
           this.currentIndex--;
-          console.log('entry:is_reset', this.entries[this.currentIndex]);
+          console.log('entry:is_reset', this.entries.at(this.currentIndex));
           if (this.entriesMap[this.currentIndex] === this.ENTRY_INCORRECT) {
             this.entriesMap[this.currentIndex] = this.ENTRY_TO_BE_FIXED;
           } else {

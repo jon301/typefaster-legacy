@@ -12,8 +12,8 @@ define ['jquery', 'underscore', 'models/player'], ($, _, PlayerModel) ->
             @gameController.trigger 'human:stop'
 
         typeEntry: (entry) ->
-            super entry
             @replayLogs.push { t: @timer.getElapsedTime(), v: entry }
+            super entry
 
         deleteEntry: () ->
             if super()

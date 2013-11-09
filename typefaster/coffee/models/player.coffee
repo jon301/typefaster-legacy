@@ -1,6 +1,6 @@
 
 #global define
-define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbone, TimerController) ->
+define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], ($, _, Backbone, TimerController, punycode) ->
     'use strict'
 
     class PlayerModel extends Backbone.Model
@@ -37,24 +37,24 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer'], ($, _, Backbon
             console.log JSON.stringify @.getStats()
 
         typeEntry: (entry) ->
-            if entry is @entries[@currentIndex]
-                console.log 'entry:is_correct', entry, @entries[@currentIndex]
+            if entry is @entries.at(@currentIndex)
+                console.log 'entry:is_correct', entry, @entries.at(@currentIndex)
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
                 @gameController.trigger 'entry:is_correct', @currentIndex
             else
-                console.log 'entry:is_incorrect', entry, @entries[@currentIndex]
+                console.log 'entry:is_incorrect', entry, @entries.at(@currentIndex)
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
                 @gameController.trigger 'entry:is_incorrect', @currentIndex
             @currentIndex++
-            @stop() if @entries.length is @currentIndex
+            @stop() if punycode.ucs2.decode(@entries).length is @currentIndex
 
         deleteEntry: () ->
             if @currentIndex > 0
                 @currentIndex--
-                console.log 'entry:is_reset', @entries[@currentIndex]
+                console.log 'entry:is_reset', @entries.at(@currentIndex)
                 if @entriesMap[@currentIndex] is @ENTRY_INCORRECT
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else

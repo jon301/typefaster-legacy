@@ -1,4 +1,4 @@
-define ['jquery', 'underscore', 'marionette', 'jed', 'bootstrap'], ($, _, Marionette, Jed) ->
+define ['jquery', 'underscore', 'marionette', 'jed', 'bootstrap', 'string_at', 'string_fromcodepoint'], ($, _, Marionette, Jed) ->
 
     app = null
 

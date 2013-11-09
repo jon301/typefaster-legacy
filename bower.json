@@ -15,6 +15,9 @@
     "backbone": "~1.1.0",
     "marionette": "~1.2.2",
     "bootswatch-scss": "~3.0.0",
-    "highcharts.com": "git@github.com:highslide-software/highcharts.com.git#~3.0.7"
+    "highcharts.com": "git@github.com:highslide-software/highcharts.com.git#~3.0.7",
+    "String.prototype.at": "git@github.com:mathiasbynens/String.prototype.at",
+    "String.fromCodePoint": "git@github.com:mathiasbynens/String.fromCodePoint",
+    "punycode": "~1.2.3"
   }
 }

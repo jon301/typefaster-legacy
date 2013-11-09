@@ -1,0 +1,26 @@
+{
+  "name": "punycode",
+  "version": "1.2.3",
+  "main": "punycode.js",
+  "ignore": [
+    "coverage",
+    "docs",
+    "tests",
+    ".*",
+    "component.json",
+    "Gruntfile.js",
+    "node_modules",
+    "package.json"
+  ],
+  "homepage": "https://github.com/bestiejs/punycode.js",
+  "_release": "1.2.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.2.3",
+    "commit": "6da7f7ee8dcb048b29b9152c07e561c028ffe7d0"
+  },
+  "_source": "git://github.com/bestiejs/punycode.js.git",
+  "_target": "~1.2.3",
+  "_originalSource": "punycode",
+  "_direct": true
+}

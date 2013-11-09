@@ -1,5 +1,5 @@
 (function() {
-  define(['jquery', 'underscore', 'marionette', 'jed', 'bootstrap'], function($, _, Marionette, Jed) {
+  define(['jquery', 'underscore', 'marionette', 'jed', 'bootstrap', 'string_at', 'string_fromcodepoint'], function($, _, Marionette, Jed) {
     var app;
     app = null;
     return (function() {

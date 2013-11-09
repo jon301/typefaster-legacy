@@ -39,18 +39,22 @@ __p += '<div class="typezone-text">\n    ';
  var wordsArray = entries.split(' ') ;
 __p += '\n    ';
  _.each(wordsArray, function(word, wordIndex) { ;
-__p += '\n        ';
- var entriesArray = word.split('') ;
 __p += '\n        <span class="word">\n            ';
- _.each(entriesArray, function(entry, entryIndex) { ;
+ var wordLength = punycode.ucs2.decode(word).length ;
+__p += '\n            ';
+ var entryIndex = 0 ;
+__p += '\n            ';
+ while (entryIndex < wordLength) { ;
 __p += '\n                <span class="entry';
  if (wordIndex === 0 && entryIndex === 0) { ;
 __p += ' current';
  } ;
 __p += '">' +
-__e( entry ) +
-'</span>\n            ';
- }) ;
+__e( word.at(entryIndex) ) +
+'</span>\n                ';
+ entryIndex++ ;
+__p += '\n            ';
+ } ;
 __p += '\n            ';
  if (wordIndex < wordsArray.length - 1) { ;
 __p += '\n                <span class="entry">&nbsp;</span>\n            ';

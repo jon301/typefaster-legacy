@@ -22,11 +22,11 @@
       };
 
       PlayerHumanModel.prototype.typeEntry = function(entry) {
-        PlayerHumanModel.__super__.typeEntry.call(this, entry);
-        return this.replayLogs.push({
+        this.replayLogs.push({
           t: this.timer.getElapsedTime(),
           v: entry
         });
+        return PlayerHumanModel.__super__.typeEntry.call(this, entry);
       };
 
       PlayerHumanModel.prototype.deleteEntry = function() {

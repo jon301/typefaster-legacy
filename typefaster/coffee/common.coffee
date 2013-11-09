@@ -8,6 +8,9 @@ requirejs.config
         jed: '../../bower_components/jed/jed'
         bootstrap: '../../bower_components/sass-bootstrap/dist/js/bootstrap.min'
         highcharts: '../../bower_components/highcharts.com/js/highcharts.src'
+        punycode: '../../bower_components/punycode/punycode.min'
+        string_at: '../../bower_components/String.prototype.at/at'
+        string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
     shim:
         backbone:
             deps: ['jquery', 'underscore']

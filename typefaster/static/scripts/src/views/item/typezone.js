@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'templates', 'marionette'], function($, _, JST, Marionette) {
+  define(['jquery', 'underscore', 'templates', 'marionette', 'punycode'], function($, _, JST, Marionette, punycode) {
     'use strict';
     var TypeZoneView, _ref;
     return TypeZoneView = (function(_super) {
@@ -59,7 +59,7 @@
         this.debugEvent(evt);
         if (this.focused && evt.originalEvent !== undefined) {
           keyCode = evt.which;
-          entry = String.fromCharCode(keyCode);
+          entry = String.fromCodePoint(keyCode);
           if (entry) {
             if (!this.gameController.running) {
               this.gameController.start();
@@ -161,8 +161,8 @@
 
       TypeZoneView.prototype.disable = function() {
         this.disabled = true;
-        this.blur();
-        return this.ui.input.prop('disabled', true);
+        this.ui.input.prop('disabled', true);
+        return this.blur();
       };
 
       TypeZoneView.prototype.focus = function(evt) {
@@ -193,7 +193,8 @@
 
       TypeZoneView.prototype.serializeData = function() {
         return {
-          'entries': this.entries
+          'entries': this.entries,
+          'punycode': punycode
         };
       };
 

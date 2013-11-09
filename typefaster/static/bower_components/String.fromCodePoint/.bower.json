@@ -1,0 +1,14 @@
+{
+  "name": "String.fromCodePoint",
+  "homepage": "https://github.com/mathiasbynens/String.fromCodePoint",
+  "version": "0.1.0",
+  "_release": "0.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.0",
+    "commit": "82b9e222df74ed57cec43cb186ba3c0bb9494902"
+  },
+  "_source": "git@github.com:mathiasbynens/String.fromCodePoint.git",
+  "_target": "*",
+  "_originalSource": "git@github.com:mathiasbynens/String.fromCodePoint"
+}

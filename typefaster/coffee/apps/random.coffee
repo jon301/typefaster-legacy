@@ -34,4 +34,3 @@ require [
             gameController: gameController
         )
         statsChartView.render()
-

@@ -1,3 +1,17 @@
-<% var wordsArray = entries.split(' ') %>
-<% _.each(wordsArray, function(word, wordIndex) { %><% var entriesArray = word.split('') %><span class="word pull-left"><% _.each(entriesArray, function(entry, entryIndex) { %><span class="entry<% if (wordIndex === 0 && entryIndex === 0) { %> current<% } %>"><%- entry %></span><% }) %><% if (wordIndex < wordsArray.length - 1) { %><span class="entry">&nbsp;</span><% } %></span><% }) %>
-<div class="clearfix"></div>
+<div class="typezone-text">
+    <% var wordsArray = entries.split(' ') %>
+    <% _.each(wordsArray, function(word, wordIndex) { %>
+        <% var entriesArray = word.split('') %>
+        <span class="word">
+            <% _.each(entriesArray, function(entry, entryIndex) { %>
+                <span class="entry<% if (wordIndex === 0 && entryIndex === 0) { %> current<% } %>"><%- entry %></span>
+            <% }) %>
+            <% if (wordIndex < wordsArray.length - 1) { %>
+                <span class="entry">&nbsp;</span>
+            <% } %>
+            <div class="clearfix"></div>
+        </span>
+    <% }) %>
+    <div class="clearfix"></div>
+</div>
+<input type="text" class="typezone-input" />

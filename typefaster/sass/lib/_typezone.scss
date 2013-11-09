@@ -1,27 +1,46 @@
 $word-line-height: 42px;
-$lines-visible: 2;
+// $lines-visible: 2;
+$lines-visible: 5;
 
 #typezone-container {
     @include transition(border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s);
     @include user-select(none);
+    position: relative;
+
     &.focus {
         border-color: #ccc;
         @include box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(170, 170, 170, 0.6));
     }
-    #typezone-view {
+    .typezone-text {
         font-family: 'Inconsolata', sans-serif;
         height: $word-line-height * $lines-visible;
         overflow: hidden;
         position: relative;
     }
+    .typezone-input {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        outline: 0;
+        width: 100px;
+        height: 20px;
+        border: 0;
+        font-size: 10px;
+    }
     .word {
+        @include float-left();
         white-space: nowrap;
         height: $word-line-height;
+
         span {
+            @include float-left();
 
             &.focus {
                 background: black;
                 color: white;
+                &.composition {
+                    @include opacity(0.5);
+                }
             }
             &.correct {
                 color: green;

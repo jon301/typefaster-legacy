@@ -8,31 +8,65 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
 
         ui:
             entries: '.entry'
+            textarea: '.typezone-text'
+            input: '.typezone-input'
+
+        events:
+            'keydown .typezone-input': 'onKeydown'
+            'keypress .typezone-input': 'onKeyPress'
+            'compositionstart .typezone-input': 'onCompositionStart'
+            'compositionend .typezone-input': 'onCompositionEnd'
+
+        debugEvent: (evt) ->
+            console.group(evt.type)
+            if evt.originalEvent.constructor.name == 'KeyboardEvent'
+                console.log 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')'
+                console.log 'charCode=' + evt.charCode+ ' (' + String.fromCharCode(evt.charCode) + ')'
+                console.log 'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')'
+                console.log 'keyIdentifier=' + evt.originalEvent.keyIdentifier
+            else if evt.originalEvent.constructor.name == 'CompositionEvent'
+                console.log 'data=' + (evt.data || evt.originalEvent.data)
+            console.groupEnd()
+
+        onKeydown: (evt) ->
+            @.debugEvent(evt)
+            if @focused and evt.originalEvent isnt `undefined`
+                keyCode = evt.which
+                if keyCode == 8
+                    @gameController.trigger 'entry:deleted'
+
+        onKeyPress: (evt) ->
+            @.debugEvent(evt)
+            if @focused and evt.originalEvent isnt `undefined`
+                keyCode = evt.which
+                entry = String.fromCharCode(keyCode);
+                if entry
+                    @gameController.start() unless @gameController.running
+                    @gameController.trigger 'entry:typed', entry
+
+
+        onCompositionStart: (evt) ->
+            @.debugEvent(evt)
+            @.ui.entries.filter('.focus').addClass('composition')
+
+        onCompositionEnd: (evt) ->
+            @.debugEvent(evt)
+            @.ui.entries.filter('.focus').removeClass('composition')
+            if @focused and evt.originalEvent isnt `undefined`
+                entry = evt.data || evt.originalEvent.data
+                if entry
+                    @gameController.start() unless @gameController.running
+                    @gameController.trigger 'entry:typed', entry
 
         initialize: (options) ->
             @entries = options.entries
             @gameController = options.gameController
 
         onRender: () ->
+            @.$el.show()
             @.focus()
 
             $('#typezone-container').on 'click', $.proxy(@focus, @)
-
-            $(document).on 'keydown', (evt) =>
-                if @focused and evt.originalEvent isnt `undefined`
-                    keyCode = evt.which
-                    if keyCode == 8
-                        @gameController.trigger 'entry:deleted'
-                        evt.preventDefault()
-
-            $(document).on 'keypress', (evt) =>
-                if @focused and evt.originalEvent isnt `undefined`
-                    keyCode = evt.which
-                    entry = String.fromCharCode(keyCode);
-                    if (entry)
-                        @gameController.start() unless @gameController.running
-                        @gameController.trigger 'entry:typed', entry
-                    evt.preventDefault()
 
             $(window).resize () =>
                 clearTimeout @resizingTimeout
@@ -78,15 +112,17 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
         scrollToEntry: ($entry) ->
             if $entry.length and $entry.parent().position().top != 0 and not @animating
                 @animating = true
-                @.$el.stop(true).animate({ scrollTop: @.$el.scrollTop() + $entry.parent().position().top }, () =>
+                @.ui.textarea.stop(true).animate({ scrollTop: @.ui.textarea.scrollTop() + $entry.parent().position().top }, () =>
                     @animating = false
                 )
 
         disable: () ->
             @disabled = true
             @blur()
+            @.ui.input.prop 'disabled', true
 
         focus: (evt) ->
+            @.ui.input.focus()
             unless @focused or @disabled
                 console.log 'focus typezone'
                 @focused = true
@@ -99,6 +135,7 @@ define ['jquery', 'underscore', 'templates', 'marionette'], ($, _, JST, Marionet
                 evt.stopPropagation()
 
         blur: (e) ->
+            @.ui.input.blur()
             if @focused
                 console.log 'blur typezone'
                 @focused = false

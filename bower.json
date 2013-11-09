@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "dependencies": {
     "modernizr": "~2.6.2",
-    "jquery": "~1.10.2",
+    "jquery": "~2.0.3",
     "requirejs": "~2.1.9",
     "jed": "~0.5.4",
-    "sass-bootstrap": "~3.0.0",
+    "sass-bootstrap": "~3.0.2",
     "jquery.cookie": "~1.4.0",
     "moment": "~2.4.0",
     "numeral": "~1.5.0",

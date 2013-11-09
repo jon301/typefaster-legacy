@@ -24,7 +24,7 @@ define [
             @gameController = options.gameController
 
             @listenTo @gameController, 'human:stats', (stats) =>
-                console.log 'human:stats', stats
+                # console.log 'human:stats', stats
                 @model.set('stats', stats)
 
         onRender: () ->

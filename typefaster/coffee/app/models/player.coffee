@@ -1,6 +1,6 @@
 
 #global define
-define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], ($, _, Backbone, TimerController, punycode) ->
+define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'string_at'], ($, _, Backbone, TimerController, punycode) ->
     'use strict'
 
     class PlayerModel extends Backbone.Model
@@ -26,6 +26,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], ($
             @timer = new TimerController()
 
         play: () ->
+            @reset()
             @timer.start()
 
         stop: () ->
@@ -35,6 +36,13 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], ($
             else
                 console.log 'You are not a cheater'
             console.log JSON.stringify @.getStats()
+
+        reset: () ->
+            @correctEntries = 0
+            @incorrectEntries = 0
+            @fixedMistakes = 0
+            @currentIndex = 0
+            @entriesMap = []
 
         typeEntry: (entry) ->
             if entry is @entries.at(@currentIndex)

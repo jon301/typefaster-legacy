@@ -1,5 +1,5 @@
 #global define
-define ['jquery', 'underscore', 'templates', 'marionette', 'punycode'], ($, _, JST, Marionette, punycode) ->
+define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_fromcodepoint'], ($, _, JST, Marionette, punycode) ->
     'use strict'
 
     class TypeZoneView extends Marionette.ItemView

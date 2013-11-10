@@ -79,8 +79,6 @@ define [
 
         start: ->
             unless @running
-                # TODO Reset here
-
                 console.log 'Game started'
                 @running = true
 
@@ -90,9 +88,8 @@ define [
                 if @duration
                     @timer.start()
 
-                    @interval = setTimeout(=>
+                    @interval = setInterval(=>
                         if @timer.getElapsedTime() >= @duration * 1000
-                            @timer.stop()
                             @stop()
                         # Publish stats every seconds
                         @trigger 'human:stats', @humanPlayer.getStats()
@@ -101,19 +98,13 @@ define [
         stop: ->
             if @running
                 console.log 'Game stopped'
+                @running = false
 
                 clearInterval(@interval)
-                @stopListening()
+                @stopListen()
 
+                @timer.stop()
                 @humanPlayer.stop()
-
-                @running = false
-                @listening = false
-
-        reset: ->
-            #@running = false
-            #@listening = false
-
 
         # Setters
         setEntries: (entries) ->

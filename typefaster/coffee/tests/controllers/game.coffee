@@ -4,54 +4,106 @@ define ['jquery', 'backbone', 'chai', 'controllers/game'], ($, Backbone, chai, G
     expect = chai.expect
     assert = chai.assert
 
-    gameController = null
+    gameController = undefined
+    timer = undefined
+    playSpy = undefined
+    stopSpy = undefined
+    typeEntrySpy = undefined
+    deleteEntrySpy = undefined
+
     describe 'GameController', ->
         before () ->
-
-        beforeEach () ->
             gameController = new GameController(
                 entries: 'Iñtërnâtiônàlizætiøn☃💩'
                 duration: null
             )
 
-        describe 'initialize', ->
-            # TODO
+        beforeEach () ->
+            timer = sinon.useFakeTimers()
+            playSpy = sinon.spy(gameController.humanPlayer, 'play')
+            stopSpy = sinon.spy(gameController.humanPlayer, 'stop')
+            typeEntrySpy = sinon.spy(gameController.humanPlayer, 'typeEntry')
+            deleteEntrySpy = sinon.spy(gameController.humanPlayer, 'deleteEntry')
 
         describe 'start', ->
             it 'can be called only once', () ->
-                play = sinon.spy()
-                gameController.humanPlayer.play = play
                 gameController.start()
                 gameController.start()
-                assert.isTrue play.calledOnce
+                assert.isTrue playSpy.calledOnce
 
         describe 'stop', ->
+            it 'can be called only if started', () ->
+                gameController.stop()
+                assert.isTrue stopSpy.notCalled
+
             it 'can be called only once', () ->
                 gameController.start()
-                stop = sinon.spy()
-                gameController.humanPlayer.stop = stop
                 gameController.stop()
                 gameController.stop()
-                assert.isTrue stop.calledOnce
+                assert.isTrue stopSpy.calledOnce
 
-            it 'can be called only if started', () ->
-                stop = sinon.spy()
-                gameController.humanPlayer.stop = stop
-                gameController.stop()
-                assert.isTrue stop.notCalled
-
-            it 'should be called after 1s', (done) ->
-                duration = 1
+            it 'should be called after `duration` second(s) : 1 second', () ->
+                duration = .001
                 gameController.setDuration(duration)
-                stop = sinon.spy()
-                gameController.humanPlayer.stop = stop
                 gameController.start()
-                assert.isTrue stop.notCalled
-                setTimeout () ->
-                    assert.isTrue stop.called
-                    done()
-                , 1000
+                timer.tick(999)
+                assert.isTrue stopSpy.notCalled, 'not called at 999ms'
+                timer.tick(1000)
+                assert.isTrue stopSpy.called, 'called at 1000ms'
+
+            it 'should stop event listening', () ->
+                gameController.startListen()
+                gameController.trigger('entry:typed', 'a')
+                gameController.stop()
+                gameController.trigger('entry:typed', 'a')
+                assert.isTrue typeEntrySpy.calledOnce
+
+        describe 'startListen', ->
+            beforeEach () ->
+                gameController.startListen()
+
+            describe 'entry:typed', ->
+                it 'should call `typeEntry` with the entry typed', () ->
+                    gameController.trigger('entry:typed', 'a')
+                    assert.isTrue typeEntrySpy.calledWith('a')
+
+                it 'should start the game on the first entry typed only', () ->
+                    gameController.trigger('entry:typed', 'a')
+                    gameController.trigger('entry:typed', 'a')
+                    assert.isTrue playSpy.calledOnce
+
+            describe 'entry:deleted', ->
+                it 'should call `deleteEntry` everytime', () ->
+                    gameController.trigger('entry:deleted')
+                    gameController.trigger('entry:deleted')
+                    assert.isTrue deleteEntrySpy.calledTwice
+
+            describe 'human:stop', ->
+                it 'should stop the game', () ->
+                    gameController.start()
+                    gameController.trigger('human:stop')
+                    assert.isTrue stopSpy.called
+
+        describe 'stopListen', ->
+            beforeEach () ->
+                gameController.startListen()
+
+            it 'should prevent all callbacks to be triggered', () ->
+                gameController.stopListen()
+                gameController.trigger('entry:typed', 'a')
+                gameController.trigger('entry:deleted')
+                gameController.trigger('human:stop')
+                assert.isTrue typeEntrySpy.notCalled
+                assert.isTrue deleteEntrySpy.notCalled
+                assert.isTrue stopSpy.notCalled
 
         afterEach () ->
             gameController.stop()
+            timer.restore()
+            playSpy.restore()
+            stopSpy.restore()
+            typeEntrySpy.restore()
+            deleteEntrySpy.restore()
+
+        after () ->
             gameController.close()

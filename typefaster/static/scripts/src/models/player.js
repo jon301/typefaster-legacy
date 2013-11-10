@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode'], function($, _, Backbone, TimerController, punycode) {
+  define(['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'string_at'], function($, _, Backbone, TimerController, punycode) {
     'use strict';
     var PlayerModel, _ref;
     return PlayerModel = (function(_super) {
@@ -40,6 +40,7 @@
       };
 
       PlayerModel.prototype.play = function() {
+        this.reset();
         return this.timer.start();
       };
 
@@ -51,6 +52,14 @@
           console.log('You are not a cheater');
         }
         return console.log(JSON.stringify(this.getStats()));
+      };
+
+      PlayerModel.prototype.reset = function() {
+        this.correctEntries = 0;
+        this.incorrectEntries = 0;
+        this.fixedMistakes = 0;
+        this.currentIndex = 0;
+        return this.entriesMap = [];
       };
 
       PlayerModel.prototype.typeEntry = function(entry) {

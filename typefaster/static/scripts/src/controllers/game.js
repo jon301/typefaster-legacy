@@ -96,9 +96,8 @@
           this.ghostPlayers.invoke('play');
           if (this.duration) {
             this.timer.start();
-            return this.interval = setTimeout(function() {
+            return this.interval = setInterval(function() {
               if (_this.timer.getElapsedTime() >= _this.duration * 1000) {
-                _this.timer.stop();
                 _this.stop();
               }
               return _this.trigger('human:stats', _this.humanPlayer.getStats());
@@ -110,15 +109,13 @@
       GameController.prototype.stop = function() {
         if (this.running) {
           console.log('Game stopped');
-          clearInterval(this.interval);
-          this.stopListening();
-          this.humanPlayer.stop();
           this.running = false;
-          return this.listening = false;
+          clearInterval(this.interval);
+          this.stopListen();
+          this.timer.stop();
+          return this.humanPlayer.stop();
         }
       };
-
-      GameController.prototype.reset = function() {};
 
       GameController.prototype.setEntries = function(entries) {
         if (!this.running) {

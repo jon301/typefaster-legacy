@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'templates', 'marionette', 'punycode'], function($, _, JST, Marionette, punycode) {
+  define(['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_fromcodepoint'], function($, _, JST, Marionette, punycode) {
     'use strict';
     var TypeZoneView, _ref;
     return TypeZoneView = (function(_super) {

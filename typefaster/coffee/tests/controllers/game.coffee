@@ -14,7 +14,7 @@ define ['jquery', 'backbone', 'chai', 'controllers/game'], ($, Backbone, chai, G
     describe 'GameController', ->
         before () ->
             gameController = new GameController(
-                entries: 'Iñtërnâtiônàlizætiøn☃💩'
+                entries: 'Hello World'
                 duration: null
             )
 

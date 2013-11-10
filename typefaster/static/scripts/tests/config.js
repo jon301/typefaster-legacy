@@ -34,7 +34,7 @@
     urlArgs: '_=' + (new Date().getTime())
   });
 
-  require(['tests/controllers/game'], function() {
+  require(['tests/controllers/game', 'tests/models/player_human'], function() {
     if (window.mochaPhantomJS) {
       return mochaPhantomJS.run();
     } else {

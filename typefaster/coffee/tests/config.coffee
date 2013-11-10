@@ -31,7 +31,8 @@ require.config
     urlArgs: '_=' + (new Date().getTime())
 
 require [
-    'tests/controllers/game'
+    'tests/controllers/game',
+    'tests/models/player_human'
     ], () ->
     if window.mochaPhantomJS
         mochaPhantomJS.run()

@@ -13,7 +13,7 @@
     return describe('GameController', function() {
       before(function() {
         return gameController = new GameController({
-          entries: 'Iñtërnâtiônàlizætiøn☃💩',
+          entries: 'Hello World',
           duration: null
         });
       });

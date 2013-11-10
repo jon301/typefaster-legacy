@@ -11,20 +11,20 @@ define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
         interval: null
 
         initialize: () ->
-            @performance = window.performance || {};
-
-            @performance.now =
-                performance.now ||
-                performance.webkitNow ||
-                performance.msNow ||
-                performance.oNow ||
-                performance.mozNow
+            if typeof window.performance != 'undefined'
+                @performance = window.performance
+                @performance.now =
+                    performance.now ||
+                    performance.webkitNow ||
+                    performance.msNow ||
+                    performance.oNow ||
+                    performance.mozNow
+            else
+                @performance = {}
+                @performance.now = Date.now
 
         now: () ->
-            if @performance.now
-                @performance.now()
-            else
-                new Date().getTime()
+            @performance.now()
 
         reset: ->
             @startTime = 0

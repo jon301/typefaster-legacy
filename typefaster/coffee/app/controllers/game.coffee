@@ -63,6 +63,7 @@ define [
                 @listening = true
 
                 @.listenTo @, 'entry:typed', (entry) =>
+                    @start() unless @running
                     @humanPlayer.typeEntry(entry)
 
                 @.listenTo @, 'entry:deleted', =>
@@ -78,6 +79,8 @@ define [
 
         start: ->
             unless @running
+                # TODO Reset here
+
                 console.log 'Game started'
                 @running = true
 
@@ -87,7 +90,7 @@ define [
                 if @duration
                     @timer.start()
 
-                    @interval = setInterval(=>
+                    @interval = setTimeout(=>
                         if @timer.getElapsedTime() >= @duration * 1000
                             @timer.stop()
                             @stop()
@@ -104,8 +107,8 @@ define [
 
                 @humanPlayer.stop()
 
-                #@running = false
-                #@listening = false
+                @running = false
+                @listening = false
 
         reset: ->
             #@running = false

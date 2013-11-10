@@ -41,7 +41,6 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode'], ($, _, J
                 keyCode = evt.which
                 entry = String.fromCodePoint(keyCode);
                 if entry
-                    @gameController.start() unless @gameController.running
                     @gameController.trigger 'entry:typed', entry
 
 
@@ -55,7 +54,6 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode'], ($, _, J
             if @focused and evt.originalEvent isnt `undefined`
                 entry = evt.data || evt.originalEvent.data
                 if entry
-                    @gameController.start() unless @gameController.running
                     @gameController.trigger 'entry:typed', entry
 
         initialize: (options) ->

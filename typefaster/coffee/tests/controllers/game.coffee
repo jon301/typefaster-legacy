@@ -43,7 +43,7 @@ define ['jquery', 'backbone', 'chai', 'controllers/game'], ($, Backbone, chai, G
                 assert.isTrue stopSpy.calledOnce
 
             it 'should be called after `duration` second(s) : 1 second', () ->
-                duration = .001
+                duration = .0001
                 gameController.setDuration(duration)
                 gameController.start()
                 timer.tick(999)

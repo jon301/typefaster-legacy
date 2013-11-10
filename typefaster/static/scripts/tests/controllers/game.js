@@ -44,7 +44,7 @@
         });
         it('should be called after `duration` second(s) : 1 second', function() {
           var duration;
-          duration = .001;
+          duration = .0001;
           gameController.setDuration(duration);
           gameController.start();
           timer.tick(999);

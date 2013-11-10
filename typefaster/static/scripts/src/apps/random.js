@@ -1,1 +1,26 @@
-(function(){require(["jquery","underscore","templates","globals","app","views/item/typezone","views/item/statschart","controllers/game"],function(a,b,c,d,e,f,g,h){return e.addInitializer(function(){var a,b,c,d;return a="abcdefghijklmnopqrstuvwxyz zyxwvutsrqponmlkjihgfedcba",a="ㅍㅊㅁㄷ러ㅐㅕ",a="La grande porte s'ouvrit lourdement en coulissant sur le côté gauche sans faire le moindre bruit. Derrière la porte, une nouvelle route, éclairée par de multiples projecteurs accrochés de chaque côtés, s'enfonçait dans les profondeurs de cet ouvrage. Cette route était faite de zigzag incessant, certainement pour empêcher le souffle d'une bombe atomique pensa David.",a="Iñtërnâtiônàlizætiøn☃💩",b=new h({entries:a,duration:60}),b.startListen(),d=new f({entries:a,gameController:b}),d.render(),c=new g({gameController:b}),c.render()})})}).call(this);
+(function() {
+  require(['jquery', 'underscore', 'templates', 'globals', 'app', 'views/item/typezone', 'views/item/statschart', 'controllers/game'], function($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) {
+    return app.addInitializer(function() {
+      var entries, gameController, statsChartView, typeZoneView;
+      entries = 'abcdefghijklmnopqrstuvwxyz zyxwvutsrqponmlkjihgfedcba';
+      entries = 'ㅍㅊㅁㄷ러ㅐㅕ';
+      entries = 'La grande porte s\'ouvrit lourdement en coulissant sur le côté gauche sans faire le moindre bruit. Derrière la porte, une nouvelle route, éclairée par de multiples projecteurs accrochés de chaque côtés, s\'enfonçait dans les profondeurs de cet ouvrage. Cette route était faite de zigzag incessant, certainement pour empêcher le souffle d\'une bombe atomique pensa David.';
+      entries = 'Iñtërnâtiônàlizætiøn☃💩';
+      gameController = new GameController({
+        entries: entries,
+        duration: 60
+      });
+      gameController.startListen();
+      typeZoneView = new TypeZoneView({
+        entries: entries,
+        gameController: gameController
+      });
+      typeZoneView.render();
+      statsChartView = new StatsChartView({
+        gameController: gameController
+      });
+      return statsChartView.render();
+    });
+  });
+
+}).call(this);

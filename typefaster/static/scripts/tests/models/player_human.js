@@ -47,7 +47,7 @@
           assert.isTrue(humanPlayer.correctEntries === 1);
           return assert.isTrue(triggerSpy.calledWith('entry:is_correct', 0));
         });
-        return it('should stop the game if all entries have been typed', function() {
+        it('should stop the game if all entries have been typed', function() {
           var i;
           i = 0;
           while (i < 22) {
@@ -55,6 +55,31 @@
             i++;
           }
           return assert.isTrue(triggerSpy.calledWith('human:stop'));
+        });
+        return it('should handle unicode characters', function() {
+          humanPlayer.typeEntry('I');
+          humanPlayer.typeEntry('ñ');
+          humanPlayer.typeEntry('t');
+          humanPlayer.typeEntry('ë');
+          humanPlayer.typeEntry('r');
+          humanPlayer.typeEntry('n');
+          humanPlayer.typeEntry('â');
+          humanPlayer.typeEntry('t');
+          humanPlayer.typeEntry('i');
+          humanPlayer.typeEntry('ô');
+          humanPlayer.typeEntry('n');
+          humanPlayer.typeEntry('à');
+          humanPlayer.typeEntry('l');
+          humanPlayer.typeEntry('i');
+          humanPlayer.typeEntry('z');
+          humanPlayer.typeEntry('æ');
+          humanPlayer.typeEntry('t');
+          humanPlayer.typeEntry('i');
+          humanPlayer.typeEntry('ø');
+          humanPlayer.typeEntry('n');
+          humanPlayer.typeEntry('☃');
+          humanPlayer.typeEntry('💩');
+          return assert.isTrue(humanPlayer.correctEntries === 22);
         });
       });
       describe('deleteEntry', function() {

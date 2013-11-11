@@ -63,6 +63,31 @@ define [
                     i++
                 assert.isTrue triggerSpy.calledWith 'human:stop'
 
+            it 'should handle unicode characters', ->
+                humanPlayer.typeEntry 'I'
+                humanPlayer.typeEntry 'ñ'
+                humanPlayer.typeEntry 't'
+                humanPlayer.typeEntry 'ë'
+                humanPlayer.typeEntry 'r'
+                humanPlayer.typeEntry 'n'
+                humanPlayer.typeEntry 'â'
+                humanPlayer.typeEntry 't'
+                humanPlayer.typeEntry 'i'
+                humanPlayer.typeEntry 'ô'
+                humanPlayer.typeEntry 'n'
+                humanPlayer.typeEntry 'à'
+                humanPlayer.typeEntry 'l'
+                humanPlayer.typeEntry 'i'
+                humanPlayer.typeEntry 'z'
+                humanPlayer.typeEntry 'æ'
+                humanPlayer.typeEntry 't'
+                humanPlayer.typeEntry 'i'
+                humanPlayer.typeEntry 'ø'
+                humanPlayer.typeEntry 'n'
+                humanPlayer.typeEntry '☃'
+                humanPlayer.typeEntry '💩'
+                assert.isTrue humanPlayer.correctEntries == 22
+
         describe 'deleteEntry', ->
             it 'should decrement current index', ->
                 humanPlayer.typeEntry 'a'

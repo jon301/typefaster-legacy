@@ -26,6 +26,11 @@
         return this.gameController.trigger('human:stop');
       };
 
+      PlayerHumanModel.prototype.reset = function() {
+        PlayerHumanModel.__super__.reset.call(this);
+        return this.replayLogs = [];
+      };
+
       PlayerHumanModel.prototype.typeEntry = function(entry) {
         this.replayLogs.push({
           t: this.timer.getElapsedTime(),

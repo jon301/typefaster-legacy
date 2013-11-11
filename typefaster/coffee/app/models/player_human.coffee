@@ -20,6 +20,10 @@ define [
             @logger.debug JSON.stringify @replayLogs
             @gameController.trigger 'human:stop'
 
+        reset: () ->
+            super()
+            @replayLogs = []
+
         typeEntry: (entry) ->
             @replayLogs.push { t: @timer.getElapsedTime(), v: entry }
             super entry

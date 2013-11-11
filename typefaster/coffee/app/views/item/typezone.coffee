@@ -1,5 +1,13 @@
 #global define
-define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_fromcodepoint'], ($, _, JST, Marionette, punycode) ->
+define [
+    'jquery',
+    'underscore',
+    'templates',
+    'marionette',
+    'js_logger',
+    'punycode',
+    'string_fromcodepoint'
+    ], ($, _, JST, Marionette, Logger, punycode) ->
     'use strict'
 
     class TypeZoneView extends Marionette.ItemView
@@ -18,15 +26,14 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_f
             'compositionend .typezone-input': 'onCompositionEnd'
 
         debugEvent: (evt) ->
-            console.group(evt.type)
+            @logger.debug evt.type
             if evt.originalEvent.constructor.name == 'KeyboardEvent'
-                console.log 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')'
-                console.log 'charCode=' + evt.charCode+ ' (' + String.fromCharCode(evt.charCode) + ')'
-                console.log 'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')'
-                console.log 'keyIdentifier=' + evt.originalEvent.keyIdentifier
+                @logger.debug 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')'
+                @logger.debug 'charCode=' + evt.charCode+ ' (' + String.fromCharCode(evt.charCode) + ')'
+                @logger.debug 'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')'
+                @logger.debug 'keyIdentifier=' + evt.originalEvent.keyIdentifier
             else if evt.originalEvent.constructor.name == 'CompositionEvent'
-                console.log 'data=' + (evt.data || evt.originalEvent.data)
-            console.groupEnd()
+                @logger.debug 'data=' + (evt.data || evt.originalEvent.data)
 
         onKeydown: (evt) ->
             @.debugEvent(evt)
@@ -57,6 +64,7 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_f
                     @gameController.trigger 'entry:typed', entry
 
         initialize: (options) ->
+            @logger = Logger.get 'TypeZoneView'
             @entries = options.entries
             @gameController = options.gameController
 
@@ -122,7 +130,7 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_f
         focus: (evt) ->
             @.ui.input.focus()
             unless @focused or @disabled
-                console.log 'focus typezone'
+                @logger.debug 'focus typezone'
                 @focused = true
                 @.$('.current').addClass 'focus'
                 $('#typezone-container').addClass 'focus'
@@ -135,7 +143,7 @@ define ['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_f
         blur: (e) ->
             @.ui.input.blur()
             if @focused
-                console.log 'blur typezone'
+                @logger.debug 'blur typezone'
                 @focused = false
                 @.$('.current').removeClass 'focus'
                 $('#typezone-container').removeClass 'focus'

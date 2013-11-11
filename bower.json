@@ -11,15 +11,16 @@
     "moment": "~2.4.0",
     "numeral": "~1.5.0",
     "store.js": "~1.3.14",
-    "lodash": "~2.2.1",
+    "lodash": "~2.3.0",
     "backbone": "~1.1.0",
     "marionette": "~1.2.2",
     "bootswatch-scss": "~3.0.0",
-    "highcharts.com": "git@github.com:highslide-software/highcharts.com.git#~3.0.7",
+    "highcharts.com": "git@github.com:highslide-software/highcharts.com.git",
     "String.prototype.at": "git@github.com:mathiasbynens/String.prototype.at",
     "String.fromCodePoint": "git@github.com:mathiasbynens/String.fromCodePoint",
     "punycode": "~1.2.3",
     "mocha": "~1.14.0",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "js-logger": "git@github.com:jonnyreeves/js-logger.git"
   }
 }

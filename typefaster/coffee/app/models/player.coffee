@@ -1,6 +1,13 @@
-
 #global define
-define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'string_at'], ($, _, Backbone, TimerController, punycode) ->
+define [
+    'jquery',
+    'underscore',
+    'backbone',
+    'js_logger',
+    'controllers/timer',
+    'punycode',
+    'string_at'
+    ], ($, _, Backbone, Logger, TimerController, punycode) ->
     'use strict'
 
     class PlayerModel extends Backbone.Model
@@ -21,6 +28,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
         entriesMap: [] # For computing stats
 
         initialize: (options) ->
+            @logger = Logger.get 'PlayerModel'
             @entries = options.entries
             @gameController = options.gameController
             @timer = new TimerController()
@@ -32,10 +40,10 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
         stop: () ->
             @timer.stop()
             if @.hasCheated()
-                console.log 'You are a cheater'
+                @logger.debug 'You are a cheater'
             else
-                console.log 'You are not a cheater'
-            console.log JSON.stringify @.getStats()
+                @logger.debug 'You are not a cheater'
+            @logger.debug JSON.stringify @.getStats()
 
         reset: () ->
             @correctEntries = 0
@@ -46,13 +54,13 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
 
         typeEntry: (entry) ->
             if entry is @entries.at(@currentIndex)
-                console.log 'entry:is_correct', entry, @entries.at(@currentIndex)
+                @logger.debug 'entry:is_correct', entry, @entries.at(@currentIndex)
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
                 @gameController.trigger 'entry:is_correct', @currentIndex
             else
-                console.log 'entry:is_incorrect', entry, @entries.at(@currentIndex)
+                @logger.debug 'entry:is_incorrect', entry, @entries.at(@currentIndex)
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
                 @gameController.trigger 'entry:is_incorrect', @currentIndex
@@ -62,7 +70,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
         deleteEntry: () ->
             if @currentIndex > 0
                 @currentIndex--
-                console.log 'entry:is_reset', @entries.at(@currentIndex)
+                @logger.debug 'entry:is_reset', @entries.at(@currentIndex)
                 if @entriesMap[@currentIndex] is @ENTRY_INCORRECT
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else
@@ -95,7 +103,7 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
                 intervals = $.map intervals, (val, i) ->
                     return null  if i is 0 # Skip first keypress (no interval)
                     val - intervals[i - 1]
-                console.log intervals
+                @logger.debug intervals
                 intervals = _.uniq(intervals)
 
                 if intervals.length
@@ -109,8 +117,8 @@ define ['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'st
                         return memo + num
                     averageInterval  = parseInt sumIntervals / intervals.length, 10
 
-                    console.log 'Intervals equal percentage: ' + equalPercent
-                    console.log 'Average interval : ' + averageInterval + 'ms'
+                    @logger.debug 'Intervals equal percentage: ' + equalPercent
+                    @logger.debug 'Average interval : ' + averageInterval + 'ms'
 
                 else
                     equalPercent = 0

@@ -11,7 +11,8 @@
       highcharts: '../../bower_components/highcharts.com/js/highcharts.src',
       punycode: '../../bower_components/punycode/punycode.min',
       string_at: '../../bower_components/String.prototype.at/at',
-      string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
+      string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint',
+      js_logger: '../../bower_components/js-logger/src/logger.min'
     },
     shim: {
       backbone: {
@@ -32,8 +33,10 @@
     urlArgs: '_=' + (new Date().getTime())
   });
 
-  require(['app'], function(app) {
-    return app.start();
+  require(['app', 'config'], function(app, config) {
+    return app.start({
+      config: config
+    });
   });
 
 }).call(this);

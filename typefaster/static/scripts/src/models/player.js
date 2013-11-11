@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'controllers/timer', 'punycode', 'string_at'], function($, _, Backbone, TimerController, punycode) {
+  define(['jquery', 'underscore', 'backbone', 'js_logger', 'controllers/timer', 'punycode', 'string_at'], function($, _, Backbone, Logger, TimerController, punycode) {
     'use strict';
     var PlayerModel, _ref;
     return PlayerModel = (function(_super) {
@@ -34,6 +34,7 @@
       PlayerModel.prototype.entriesMap = [];
 
       PlayerModel.prototype.initialize = function(options) {
+        this.logger = Logger.get('PlayerModel');
         this.entries = options.entries;
         this.gameController = options.gameController;
         return this.timer = new TimerController();
@@ -47,11 +48,11 @@
       PlayerModel.prototype.stop = function() {
         this.timer.stop();
         if (this.hasCheated()) {
-          console.log('You are a cheater');
+          this.logger.debug('You are a cheater');
         } else {
-          console.log('You are not a cheater');
+          this.logger.debug('You are not a cheater');
         }
-        return console.log(JSON.stringify(this.getStats()));
+        return this.logger.debug(JSON.stringify(this.getStats()));
       };
 
       PlayerModel.prototype.reset = function() {
@@ -64,7 +65,7 @@
 
       PlayerModel.prototype.typeEntry = function(entry) {
         if (entry === this.entries.at(this.currentIndex)) {
-          console.log('entry:is_correct', entry, this.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_correct', entry, this.entries.at(this.currentIndex));
           this.correctEntries++;
           if (this.entriesMap[this.currentIndex] === this.ENTRY_TO_BE_FIXED) {
             this.fixedMistakes++;
@@ -72,7 +73,7 @@
           this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
           this.gameController.trigger('entry:is_correct', this.currentIndex);
         } else {
-          console.log('entry:is_incorrect', entry, this.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_incorrect', entry, this.entries.at(this.currentIndex));
           this.incorrectEntries++;
           this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
           this.gameController.trigger('entry:is_incorrect', this.currentIndex);
@@ -86,7 +87,7 @@
       PlayerModel.prototype.deleteEntry = function() {
         if (this.currentIndex > 0) {
           this.currentIndex--;
-          console.log('entry:is_reset', this.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_reset', this.entries.at(this.currentIndex));
           if (this.entriesMap[this.currentIndex] === this.ENTRY_INCORRECT) {
             this.entriesMap[this.currentIndex] = this.ENTRY_TO_BE_FIXED;
           } else {
@@ -129,7 +130,7 @@
             }
             return val - intervals[i - 1];
           });
-          console.log(intervals);
+          this.logger.debug(intervals);
           intervals = _.uniq(intervals);
           if (intervals.length) {
             totalKeystrokes = this.correctEntries + this.incorrectEntries;
@@ -138,8 +139,8 @@
               return memo + num;
             });
             averageInterval = parseInt(sumIntervals / intervals.length, 10);
-            console.log('Intervals equal percentage: ' + equalPercent);
-            console.log('Average interval : ' + averageInterval + 'ms');
+            this.logger.debug('Intervals equal percentage: ' + equalPercent);
+            this.logger.debug('Average interval : ' + averageInterval + 'ms');
           } else {
             equalPercent = 0;
             averageInterval = NaN;

@@ -1,6 +1,6 @@
 #global define
-define ["jquery", "underscore", "marionette"], ($, _, Marionette) ->
-    "use strict"
+define ['jquery', 'underscore', 'marionette'], ($, _, Marionette) ->
+    'use strict'
 
     class TimerController extends Marionette.Controller
 

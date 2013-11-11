@@ -1,4 +1,10 @@
-define ['jquery', 'backbone', 'chai', 'controllers/game'], ($, Backbone, chai, GameController) ->
+#global define
+define [
+    'jquery',
+    'backbone',
+    'chai',
+    'controllers/game'
+    ], ($, Backbone, chai, GameController) ->
     'use strict'
 
     expect = chai.expect

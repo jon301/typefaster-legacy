@@ -1,4 +1,12 @@
-define ['jquery', 'underscore', 'marionette', 'jed', 'bootstrap', 'string_at', 'string_fromcodepoint'], ($, _, Marionette, Jed) ->
+#global define
+define [
+    'jquery',
+    'underscore',
+    'marionette',
+    'js_logger',
+    'jed',
+    'bootstrap'
+    ], ($, _, Marionette, Logger, Jed) ->
 
     app = null
 
@@ -15,6 +23,11 @@ define ['jquery', 'underscore', 'marionette', 'jed', 'bootstrap', 'string_at', '
                     else {}
                 )
                 $._ = $.proxy $.i18n.gettext, $.i18n # Helper
+
+            # Logger
+            app.addInitializer (options) ->
+                Logger.useDefaults()
+                Logger.setLevel(Logger[options.config.JSLOGGER_LEVEL])
 
         app
     )()

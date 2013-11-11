@@ -11,6 +11,7 @@ requirejs.config
         punycode: '../../bower_components/punycode/punycode.min'
         string_at: '../../bower_components/String.prototype.at/at'
         string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
+        js_logger: '../../bower_components/js-logger/src/logger.min'
     shim:
         backbone:
             deps: ['jquery', 'underscore']
@@ -25,5 +26,7 @@ requirejs.config
     urlArgs: '_=' + (new Date().getTime())
 
 # Initialize the app
-require ['app'], (app) ->
-    app.start()
+require ['app', 'config'], (app, config) ->
+    app.start(
+        config: config
+    )

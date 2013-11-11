@@ -35,7 +35,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'backbone', 'marionette', 'controllers/timer', 'models/player_human', 'models/player_ghost'], function($, _, Backbone, Marionette, TimerController, PlayerHumanModel, PlayerGhostModel) {
+  define(['jquery', 'underscore', 'backbone', 'marionette', 'js_logger', 'controllers/timer', 'models/player_human', 'models/player_ghost'], function($, _, Backbone, Marionette, Logger, TimerController, PlayerHumanModel, PlayerGhostModel) {
     'use strict';
     var GameController, _ref;
     return GameController = (function(_super) {
@@ -51,6 +51,7 @@
       GameController.prototype.duration = 60;
 
       GameController.prototype.initialize = function(options) {
+        this.logger = Logger.get('GameController');
         this.duration = options.duration;
         this.entries = options.entries;
         this.humanPlayer = new PlayerHumanModel({
@@ -64,7 +65,7 @@
       GameController.prototype.startListen = function() {
         var _this = this;
         if (!this.listening) {
-          console.log('game: bind listen events');
+          this.logger.debug('game: bind listen events');
           this.listening = true;
           this.listenTo(this, 'entry:typed', function(entry) {
             if (!_this.running) {
@@ -82,7 +83,7 @@
       };
 
       GameController.prototype.stopListen = function() {
-        console.log('game: unbind listen events');
+        this.logger.debug('game: unbind listen events');
         this.listening = false;
         return this.stopListening();
       };
@@ -90,7 +91,7 @@
       GameController.prototype.start = function() {
         var _this = this;
         if (!this.running) {
-          console.log('Game started');
+          this.logger.debug('Game started');
           this.running = true;
           this.humanPlayer.play();
           this.ghostPlayers.invoke('play');
@@ -108,7 +109,7 @@
 
       GameController.prototype.stop = function() {
         if (this.running) {
-          console.log('Game stopped');
+          this.logger.debug('Game stopped');
           this.running = false;
           clearInterval(this.interval);
           this.stopListen();
@@ -122,7 +123,7 @@
           if (entries) {
             this.entries = entries;
           }
-          return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
+          return this.logger.debug('You have ' + this.duration + ' seconds to type :' + this.entries);
         }
       };
 
@@ -131,7 +132,7 @@
           if (duration) {
             this.duration = duration;
           }
-          return console.log('You have ' + this.duration + ' seconds to type :' + this.entries);
+          return this.logger.debug('You have ' + this.duration + ' seconds to type :' + this.entries);
         }
       };
 

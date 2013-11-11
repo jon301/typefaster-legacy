@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'templates', 'marionette', 'punycode', 'string_fromcodepoint'], function($, _, JST, Marionette, punycode) {
+  define(['jquery', 'underscore', 'templates', 'marionette', 'js_logger', 'punycode', 'string_fromcodepoint'], function($, _, JST, Marionette, Logger, punycode) {
     'use strict';
     var TypeZoneView, _ref;
     return TypeZoneView = (function(_super) {
@@ -31,16 +31,15 @@
       };
 
       TypeZoneView.prototype.debugEvent = function(evt) {
-        console.group(evt.type);
+        this.logger.debug(evt.type);
         if (evt.originalEvent.constructor.name === 'KeyboardEvent') {
-          console.log('keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')');
-          console.log('charCode=' + evt.charCode + ' (' + String.fromCharCode(evt.charCode) + ')');
-          console.log('which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')');
-          console.log('keyIdentifier=' + evt.originalEvent.keyIdentifier);
+          this.logger.debug('keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')');
+          this.logger.debug('charCode=' + evt.charCode + ' (' + String.fromCharCode(evt.charCode) + ')');
+          this.logger.debug('which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')');
+          return this.logger.debug('keyIdentifier=' + evt.originalEvent.keyIdentifier);
         } else if (evt.originalEvent.constructor.name === 'CompositionEvent') {
-          console.log('data=' + (evt.data || evt.originalEvent.data));
+          return this.logger.debug('data=' + (evt.data || evt.originalEvent.data));
         }
-        return console.groupEnd();
       };
 
       TypeZoneView.prototype.onKeydown = function(evt) {
@@ -84,6 +83,7 @@
       };
 
       TypeZoneView.prototype.initialize = function(options) {
+        this.logger = Logger.get('TypeZoneView');
         this.entries = options.entries;
         return this.gameController = options.gameController;
       };
@@ -162,7 +162,7 @@
       TypeZoneView.prototype.focus = function(evt) {
         this.ui.input.focus();
         if (!(this.focused || this.disabled)) {
-          console.log('focus typezone');
+          this.logger.debug('focus typezone');
           this.focused = true;
           this.$('.current').addClass('focus');
           $('#typezone-container').addClass('focus');
@@ -177,7 +177,7 @@
       TypeZoneView.prototype.blur = function(e) {
         this.ui.input.blur();
         if (this.focused) {
-          console.log('blur typezone');
+          this.logger.debug('blur typezone');
           this.focused = false;
           this.$('.current').removeClass('focus');
           $('#typezone-container').removeClass('focus');

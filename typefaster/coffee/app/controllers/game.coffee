@@ -36,10 +36,11 @@ define [
     'underscore',
     'backbone',
     'marionette',
+    'js_logger'
     'controllers/timer',
     'models/player_human',
     'models/player_ghost'
-    ], ($, _, Backbone, Marionette, TimerController, PlayerHumanModel, PlayerGhostModel) ->
+    ], ($, _, Backbone, Marionette, Logger, TimerController, PlayerHumanModel, PlayerGhostModel) ->
     'use strict'
 
     class GameController extends Marionette.Controller
@@ -49,6 +50,7 @@ define [
         duration: 60 # Seconds
 
         initialize: (options) ->
+            @logger = Logger.get 'GameController'
             @duration = options.duration
             @entries = options.entries
 
@@ -59,7 +61,7 @@ define [
 
         startListen: ->
             unless @listening
-                console.log 'game: bind listen events'
+                @logger.debug 'game: bind listen events'
                 @listening = true
 
                 @.listenTo @, 'entry:typed', (entry) =>
@@ -73,13 +75,13 @@ define [
                     @stop()
 
         stopListen: ->
-            console.log 'game: unbind listen events'
+            @logger.debug 'game: unbind listen events'
             @listening = false
             @stopListening();
 
         start: ->
             unless @running
-                console.log 'Game started'
+                @logger.debug 'Game started'
                 @running = true
 
                 @humanPlayer.play()
@@ -97,7 +99,7 @@ define [
 
         stop: ->
             if @running
-                console.log 'Game stopped'
+                @logger.debug 'Game stopped'
                 @running = false
 
                 clearInterval(@interval)
@@ -110,12 +112,12 @@ define [
         setEntries: (entries) ->
             unless @running
                 @entries = entries if entries
-                console.log 'You have ' + @duration + ' seconds to type :' + @entries
+                @logger.debug 'You have ' + @duration + ' seconds to type :' + @entries
 
         setDuration: (duration) ->
             unless @running
                 @duration = duration if duration
-                console.log 'You have ' + @duration + ' seconds to type :' + @entries
+                @logger.debug 'You have ' + @duration + ' seconds to type :' + @entries
 
         addGhost: (replayLogs) ->
             unless @running

@@ -11,6 +11,7 @@ require.config
         punycode: '../../bower_components/punycode/punycode.min'
         string_at: '../../bower_components/String.prototype.at/at'
         string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
+        js_logger: '../../bower_components/js-logger/src/logger.min'
 
         chai: '../../bower_components/chai/chai'
 

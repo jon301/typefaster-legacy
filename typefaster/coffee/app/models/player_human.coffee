@@ -1,14 +1,23 @@
 #global define
-define ['jquery', 'underscore', 'models/player'], ($, _, PlayerModel) ->
+define [
+    'jquery',
+    'underscore',
+    'js_logger',
+    'models/player'
+    ], ($, _, Logger, PlayerModel) ->
     'use strict'
 
     class PlayerHumanModel extends PlayerModel
 
         replayLogs: [] # For ghost
 
+        initialize: (options) ->
+            super options
+            @logger = Logger.get 'PlayerHumanModel'
+
         stop: () ->
             super()
-            console.log JSON.stringify @replayLogs
+            @logger.debug JSON.stringify @replayLogs
             @gameController.trigger 'human:stop'
 
         typeEntry: (entry) ->

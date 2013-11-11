@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['jquery', 'underscore', 'models/player'], function($, _, PlayerModel) {
+  define(['jquery', 'underscore', 'js_logger', 'models/player'], function($, _, Logger, PlayerModel) {
     'use strict';
     var PlayerHumanModel, _ref;
     return PlayerHumanModel = (function(_super) {
@@ -15,9 +15,14 @@
 
       PlayerHumanModel.prototype.replayLogs = [];
 
+      PlayerHumanModel.prototype.initialize = function(options) {
+        PlayerHumanModel.__super__.initialize.call(this, options);
+        return this.logger = Logger.get('PlayerHumanModel');
+      };
+
       PlayerHumanModel.prototype.stop = function() {
         PlayerHumanModel.__super__.stop.call(this);
-        console.log(JSON.stringify(this.replayLogs));
+        this.logger.debug(JSON.stringify(this.replayLogs));
         return this.gameController.trigger('human:stop');
       };
 

@@ -1,5 +1,5 @@
 (function() {
-  define(['jquery', 'underscore', 'marionette', 'jed', 'bootstrap', 'string_at', 'string_fromcodepoint'], function($, _, Marionette, Jed) {
+  define(['jquery', 'underscore', 'marionette', 'js_logger', 'jed', 'bootstrap'], function($, _, Marionette, Logger, Jed) {
     var app;
     app = null;
     return (function() {
@@ -11,6 +11,10 @@
             domain: 'messages'
           } : {});
           return $._ = $.proxy($.i18n.gettext, $.i18n);
+        });
+        app.addInitializer(function(options) {
+          Logger.useDefaults();
+          return Logger.setLevel(Logger[options.config.JSLOGGER_LEVEL]);
         });
       }
       return app;

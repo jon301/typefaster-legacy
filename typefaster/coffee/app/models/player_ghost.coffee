@@ -1,11 +1,18 @@
 #global define
-define ['jquery', 'underscore', 'models/player', 'controllers/timer'], ($, _, PlayerModel, TimerController) ->
+define [
+    'jquery',
+    'underscore',
+    'js_logger',
+    'models/player',
+    'controllers/timer'
+    ], ($, _, Logger, PlayerModel, TimerController) ->
     'use strict'
 
     class PlayerGhostModel extends PlayerModel
 
         initialize: (options) ->
             super options
+            @logger = Logger.get 'PlayerGhostModel'
             @replayLogs = options.replayLogs
 
         play: () ->

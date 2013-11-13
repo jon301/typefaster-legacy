@@ -48,7 +48,11 @@
         if (this.focused && evt.originalEvent !== undefined) {
           keyCode = evt.which;
           if (keyCode === 8) {
-            return this.gameController.trigger('entry:deleted');
+            this.gameController.trigger('entry:deleted');
+          }
+          if (keyCode === 27) {
+            this.gameController.trigger('human:reset');
+            return this.reset();
           }
         }
       };
@@ -84,7 +88,6 @@
 
       TypeZoneView.prototype.initialize = function(options) {
         this.logger = Logger.get('TypeZoneView');
-        this.entries = options.entries;
         return this.gameController = options.gameController;
       };
 
@@ -92,19 +95,15 @@
         var _this = this;
         this.$el.show();
         this.focus();
-        $('#typezone-container').on('click', $.proxy(this.focus, this));
-        $(window).resize(function() {
+        $('#typezone-container').on('click.typezone', $.proxy(this.focus, this));
+        $(window).on('resize.typezone', function() {
           clearTimeout(_this.resizingTimeout);
           return _this.resizingTimeout = setTimeout(function() {
             return _this.scrollToEntry($('.current'));
           }, 200);
         });
-        $(window).focus(function() {
-          return _this.gameController.startListen();
-        });
-        $(window).blur(function() {
-          _this.blur();
-          return _this.gameController.stopListen();
+        $(window).on('blur.typezone', function() {
+          return _this.blur();
         });
         this.listenTo(this.gameController, 'entry:is_correct', function(index) {
           var $entry, $nextEntry;
@@ -153,9 +152,20 @@
         }
       };
 
+      TypeZoneView.prototype.reset = function() {
+        var firstEntry;
+        this.ui.entries.removeClass('correct incorrect focus current');
+        this.ui.input.val('');
+        this.disabled = false;
+        this.focused = false;
+        firstEntry = this.ui.entries.eq(0);
+        firstEntry.addClass('current');
+        this.scrollToEntry(firstEntry);
+        return this.focus();
+      };
+
       TypeZoneView.prototype.disable = function() {
         this.disabled = true;
-        this.ui.input.prop('disabled', true);
         return this.blur();
       };
 
@@ -164,9 +174,10 @@
         if (!(this.focused || this.disabled)) {
           this.logger.debug('focus typezone');
           this.focused = true;
+          this.gameController.startListen();
           this.$('.current').addClass('focus');
           $('#typezone-container').addClass('focus');
-          $('body').on('click', $.proxy(this.blur, this));
+          $('body').on('click.typezone', $.proxy(this.blur, this));
         }
         if (evt) {
           evt.preventDefault();
@@ -174,22 +185,28 @@
         }
       };
 
-      TypeZoneView.prototype.blur = function(e) {
-        this.ui.input.blur();
+      TypeZoneView.prototype.blur = function(evt) {
         if (this.focused) {
           this.logger.debug('blur typezone');
           this.focused = false;
+          this.gameController.stopListen();
           this.$('.current').removeClass('focus');
           $('#typezone-container').removeClass('focus');
-          return $('body').off('click', $.proxy(this.blur, this));
+          return $('body').off('click.typezone', $.proxy(this.blur, this));
         }
       };
 
       TypeZoneView.prototype.serializeData = function() {
         return {
-          'entries': this.entries,
+          'entries': this.gameController.entries,
           'punycode': punycode
         };
+      };
+
+      TypeZoneView.prototype.onClose = function() {
+        $('#typezone-container').off('.typezone');
+        $(window).off('.typezone');
+        return $('body').off('.typezone');
       };
 
       return TypeZoneView;

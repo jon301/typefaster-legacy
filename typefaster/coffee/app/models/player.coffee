@@ -29,7 +29,6 @@ define [
 
         initialize: (options) ->
             @logger = Logger.get 'PlayerModel'
-            @entries = options.entries
             @gameController = options.gameController
             @timer = new TimerController()
 
@@ -53,24 +52,24 @@ define [
             @entriesMap = []
 
         typeEntry: (entry) ->
-            if entry is @entries.at(@currentIndex)
-                @logger.debug 'entry:is_correct', entry, @entries.at(@currentIndex)
+            if entry is @gameController.entries.at(@currentIndex)
+                @logger.debug 'entry:is_correct', entry, @gameController.entries.at(@currentIndex)
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
                 @gameController.trigger 'entry:is_correct', @currentIndex
             else
-                @logger.debug 'entry:is_incorrect', entry, @entries.at(@currentIndex)
+                @logger.debug 'entry:is_incorrect', entry, @gameController.entries.at(@currentIndex)
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
                 @gameController.trigger 'entry:is_incorrect', @currentIndex
             @currentIndex++
-            @stop() if punycode.ucs2.decode(@entries).length is @currentIndex
+            @stop() if punycode.ucs2.decode(@gameController.entries).length is @currentIndex
 
         deleteEntry: () ->
             if @currentIndex > 0
                 @currentIndex--
-                @logger.debug 'entry:is_reset', @entries.at(@currentIndex)
+                @logger.debug 'entry:is_reset', @gameController.entries.at(@currentIndex)
                 if @entriesMap[@currentIndex] is @ENTRY_INCORRECT
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else

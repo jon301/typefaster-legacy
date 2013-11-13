@@ -35,7 +35,9 @@
     urlArgs: '_=' + (new Date().getTime())
   });
 
-  require(['tests/controllers/game', 'tests/models/player_human'], function() {
+  require(['js_logger', 'tests/controllers/game', 'tests/models/player_human', 'tests/views/item/typezone'], function(Logger) {
+    Logger.useDefaults();
+    Logger.setLevel(Logger.OFF);
     if (window.mochaPhantomJS) {
       return mochaPhantomJS.run();
     } else {

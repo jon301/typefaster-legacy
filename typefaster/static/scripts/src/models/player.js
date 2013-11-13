@@ -35,7 +35,6 @@
 
       PlayerModel.prototype.initialize = function(options) {
         this.logger = Logger.get('PlayerModel');
-        this.entries = options.entries;
         this.gameController = options.gameController;
         return this.timer = new TimerController();
       };
@@ -64,8 +63,8 @@
       };
 
       PlayerModel.prototype.typeEntry = function(entry) {
-        if (entry === this.entries.at(this.currentIndex)) {
-          this.logger.debug('entry:is_correct', entry, this.entries.at(this.currentIndex));
+        if (entry === this.gameController.entries.at(this.currentIndex)) {
+          this.logger.debug('entry:is_correct', entry, this.gameController.entries.at(this.currentIndex));
           this.correctEntries++;
           if (this.entriesMap[this.currentIndex] === this.ENTRY_TO_BE_FIXED) {
             this.fixedMistakes++;
@@ -73,13 +72,13 @@
           this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
           this.gameController.trigger('entry:is_correct', this.currentIndex);
         } else {
-          this.logger.debug('entry:is_incorrect', entry, this.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_incorrect', entry, this.gameController.entries.at(this.currentIndex));
           this.incorrectEntries++;
           this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
           this.gameController.trigger('entry:is_incorrect', this.currentIndex);
         }
         this.currentIndex++;
-        if (punycode.ucs2.decode(this.entries).length === this.currentIndex) {
+        if (punycode.ucs2.decode(this.gameController.entries).length === this.currentIndex) {
           return this.stop();
         }
       };
@@ -87,7 +86,7 @@
       PlayerModel.prototype.deleteEntry = function() {
         if (this.currentIndex > 0) {
           this.currentIndex--;
-          this.logger.debug('entry:is_reset', this.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_reset', this.gameController.entries.at(this.currentIndex));
           if (this.entriesMap[this.currentIndex] === this.ENTRY_INCORRECT) {
             this.entriesMap[this.currentIndex] = this.ENTRY_TO_BE_FIXED;
           } else {

@@ -32,9 +32,16 @@ require.config
     urlArgs: '_=' + (new Date().getTime())
 
 require [
+    'js_logger',
     'tests/controllers/game',
-    'tests/models/player_human'
-    ], () ->
+    'tests/models/player_human',
+    'tests/views/item/typezone'
+    ], (Logger) ->
+
+    Logger.useDefaults()
+    Logger.setLevel(Logger.OFF)
+    # Logger.setLevel(Logger.DEBUG)
+
     if window.mochaPhantomJS
         mochaPhantomJS.run()
     else

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from typefaster import app
-from flask import Blueprint, g, render_template, request, abort
+from flask import Blueprint, current_app, g, render_template, request, abort
 
-bp = Blueprint('frontend', __name__)
+bp = Blueprint('frontend', __name__, )
 
 @bp.url_defaults
 def add_language_code(endpoint, values):
@@ -13,7 +12,7 @@ def add_language_code(endpoint, values):
 
 @bp.url_value_preprocessor
 def pull_lang_code(endpoint, values):
-    accept_languages = app.config['ACCEPT_LANGUAGES'].keys()
+    accept_languages = current_app.config['ACCEPT_LANGUAGES'].keys()
     lang_code = None
     if values:
         lang_code = values.pop('lang_code', None)

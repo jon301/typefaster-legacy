@@ -55,7 +55,6 @@
         this.duration = options.duration;
         this.entries = options.entries;
         this.humanPlayer = new PlayerHumanModel({
-          entries: options.entries,
           gameController: this
         });
         this.ghostPlayers = new Backbone.Collection();
@@ -76,8 +75,12 @@
           this.listenTo(this, 'entry:deleted', function() {
             return _this.humanPlayer.deleteEntry();
           });
-          return this.listenTo(this, 'human:stop', function() {
+          this.listenTo(this, 'human:stop', function() {
             return _this.stop();
+          });
+          return this.listenTo(this, 'human:reset', function() {
+            _this.stop();
+            return _this.startListen();
           });
         }
       };

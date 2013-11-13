@@ -41,6 +41,9 @@ define [
                 keyCode = evt.which
                 if keyCode == 8
                     @gameController.trigger 'entry:deleted'
+                if keyCode == 27
+                    @gameController.trigger 'human:reset'
+                    @reset()
 
         onKeyPress: (evt) ->
             @.debugEvent(evt)
@@ -65,28 +68,22 @@ define [
 
         initialize: (options) ->
             @logger = Logger.get 'TypeZoneView'
-            @entries = options.entries
             @gameController = options.gameController
 
         onRender: () ->
             @.$el.show()
             @.focus()
 
-            $('#typezone-container').on 'click', $.proxy(@focus, @)
+            $('#typezone-container').on 'click.typezone', $.proxy(@focus, @)
 
-            $(window).resize () =>
+            $(window).on 'resize.typezone', () =>
                 clearTimeout @resizingTimeout
-
                 @resizingTimeout = setTimeout () =>
                     @scrollToEntry $('.current')
                 , 200
 
-            $(window).focus () =>
-                @gameController.startListen()
-
-            $(window).blur () =>
+            $(window).on 'blur.typezone', () =>
                 @blur()
-                @gameController.stopListen()
 
             @.listenTo @gameController, 'entry:is_correct', (index) =>
                 $entry = @.ui.entries.eq(index)
@@ -122,9 +119,23 @@ define [
                     @animating = false
                 )
 
+        reset: () ->
+            @.ui.entries.removeClass 'correct incorrect focus current'
+
+            @.ui.input.val ''
+            # @.ui.input.prop 'disabled', false
+            @disabled = false
+            @focused = false
+
+            firstEntry = @.ui.entries.eq(0)
+            firstEntry.addClass 'current'
+            @.scrollToEntry firstEntry
+
+            @focus()
+
         disable: () ->
             @disabled = true
-            @.ui.input.prop 'disabled', true
+            # @.ui.input.prop 'disabled', true
             @blur()
 
         focus: (evt) ->
@@ -132,23 +143,30 @@ define [
             unless @focused or @disabled
                 @logger.debug 'focus typezone'
                 @focused = true
+                @gameController.startListen()
                 @.$('.current').addClass 'focus'
                 $('#typezone-container').addClass 'focus'
-                $('body').on 'click', $.proxy(@blur, @)
+                $('body').on 'click.typezone', $.proxy(@blur, @)
 
             if evt
                 evt.preventDefault()
                 evt.stopPropagation()
 
-        blur: (e) ->
-            @.ui.input.blur()
+        blur: (evt) ->
+            # @.ui.input.blur()
             if @focused
                 @logger.debug 'blur typezone'
                 @focused = false
+                @gameController.stopListen()
                 @.$('.current').removeClass 'focus'
                 $('#typezone-container').removeClass 'focus'
-                $('body').off 'click', $.proxy(@blur, @)
+                $('body').off 'click.typezone', $.proxy(@blur, @)
 
         serializeData: () ->
-            'entries': @entries
+            'entries': @gameController.entries
             'punycode': punycode
+
+        onClose: () ->
+            $('#typezone-container').off '.typezone'
+            $(window).off '.typezone'
+            $('body').off '.typezone'

@@ -28,8 +28,11 @@
       StatsChartView.prototype.initialize = function(options) {
         var _this = this;
         this.gameController = options.gameController;
-        return this.listenTo(this.gameController, 'human:stats', function(stats) {
+        this.listenTo(this.gameController, 'human:stats', function(stats) {
           return _this.model.set('stats', stats);
+        });
+        return this.listenTo(this.gameController, 'human:reset', function() {
+          return this.$el.empty();
         });
       };
 

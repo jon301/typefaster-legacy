@@ -26,4 +26,7 @@ define [
             @listenTo @gameController, 'human:stats', (stats) =>
                 @model.set('stats', stats)
 
+            @listenTo @gameController, 'human:reset', () ->
+                @.$el.empty()
+
         onRender: () ->

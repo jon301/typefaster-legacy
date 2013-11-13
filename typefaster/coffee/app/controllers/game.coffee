@@ -54,7 +54,7 @@ define [
             @duration = options.duration
             @entries = options.entries
 
-            @humanPlayer = new PlayerHumanModel({ entries : options.entries, gameController: @ })
+            @humanPlayer = new PlayerHumanModel({ gameController: @ })
             @ghostPlayers = new Backbone.Collection()
 
             @timer = new TimerController()
@@ -73,6 +73,10 @@ define [
 
                 @.listenTo @, 'human:stop', =>
                     @stop()
+
+                @.listenTo @, 'human:reset', =>
+                    @stop()
+                    @startListen()
 
         stopListen: ->
             @logger.debug 'game: unbind listen events'

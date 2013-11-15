@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, current_app, g, render_template, request, abort
+from ...extensions import mongo
 
 frontend = Blueprint('frontend', __name__)
 

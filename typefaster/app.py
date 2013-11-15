@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 from flask import Flask, request, render_template, g
 from flask.ext.babel import Babel
+
+import os
 
 # from .config import DefaultConfig
 # from .user import User, user
@@ -12,6 +12,7 @@ from flask.ext.babel import Babel
 # from .api import api
 # from .admin import admin
 # from .extensions import db, mail, cache, login_manager, oid
+from .extensions import mongo
 # from .utils import INSTANCE_FOLDER_PATH
 
 
@@ -74,6 +75,9 @@ def configure_app(app, config=None):
 def configure_extensions(app):
     # flask-sqlalchemy
     # db.init_app(app)
+
+    # flask-pymongo
+    mongo.init_app(app)
 
     # flask-mail
     # mail.init_app(app)

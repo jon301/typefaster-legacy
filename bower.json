@@ -2,7 +2,7 @@
   "name": "typefaster",
   "version": "0.0.1",
   "dependencies": {
-    "modernizr": "~2.6.3",
+    "modernizr": "~2.7.0",
     "jquery": "~2.0.3",
     "requirejs": "~2.1.9",
     "jed": "~0.5.4",

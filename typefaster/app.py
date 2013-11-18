@@ -12,7 +12,7 @@ import os
 # from .api import api
 # from .admin import admin
 # from .extensions import db, mail, cache, login_manager, oid
-from .extensions import mongo
+from .extensions import mongo, oauth
 # from .utils import INSTANCE_FOLDER_PATH
 
 
@@ -27,7 +27,7 @@ from .extensions import mongo
 #     admin,
 # )
 
-from typefaster.blueprints import root, frontend
+from typefaster.blueprints import root, frontend, auth
 from datetime import datetime
 
 
@@ -79,6 +79,9 @@ def configure_extensions(app):
     # flask-pymongo
     mongo.init_app(app)
 
+    # flask-oauthlib
+    oauth.init_app(app)
+
     # flask-mail
     # mail.init_app(app)
 
@@ -115,6 +118,8 @@ def configure_blueprints(app, blueprints):
 
     app.register_blueprint(frontend, url_defaults={'lang_code': app.config['BABEL_DEFAULT_LOCALE']})
     app.register_blueprint(frontend, url_prefix='/<lang_code>')
+
+    app.register_blueprint(auth)
 
 
 def configure_template_filters(app):

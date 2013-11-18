@@ -3,6 +3,9 @@
 from flask.ext.pymongo import PyMongo
 mongo = PyMongo()
 
+from flask_oauthlib.client import OAuth
+oauth = OAuth()
+
 # from flask.ext.sqlalchemy import SQLAlchemy
 # db = SQLAlchemy()
 

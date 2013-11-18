@@ -17,3 +17,9 @@ JSLOGGER_LEVEL = 'WARN'
 
 # DB
 MONGO_DBNAME = 'typefaster-dev'
+
+# FACEBOOK
+OAUTH_FACEBOOK = {
+    'consumer_key': '518674384895969',
+    'consumer_secret': '6fbc90c00a3506012a085d65727e61f0',
+}

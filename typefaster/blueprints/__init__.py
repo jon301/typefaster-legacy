@@ -2,3 +2,4 @@
 
 from .root import root
 from .frontend import frontend
+from .auth import auth

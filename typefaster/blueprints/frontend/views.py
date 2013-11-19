@@ -23,9 +23,13 @@ def pull_lang_code(endpoint, values):
 
 @frontend.route('/')
 def home():
-    me = oauth_facebook.get('/me')
-    current_app.logger.debug(me.data)
+    if g.user.is_authenticated():
+        current_app.logger.debug(g.user)
     return render_template('home.html')
+
+@frontend.route('/login/')
+def login():
+    return render_template('login.html')
 
 @frontend.route('/about/')
 def about():

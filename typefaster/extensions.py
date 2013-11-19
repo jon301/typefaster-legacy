@@ -16,8 +16,8 @@ oauth_facebook = oauth.remote_app('facebook', app_key='OAUTH_FACEBOOK')
 # from flask.ext.cache import Cache
 # cache = Cache()
 
-# from flask.ext.login import LoginManager
-# login_manager = LoginManager()
+from flask.ext.login import LoginManager
+login_manager = LoginManager()
 
 # from flask.ext.openid import OpenID
 # oid = OpenID()

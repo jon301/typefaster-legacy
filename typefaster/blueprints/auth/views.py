@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, current_app, url_for, redirect, request, session
-from ...extensions import oauth_facebook
+from flask.ext.login import login_user
+
+from ...extensions import mongo, oauth_facebook
+from ...models.user import User, find_by_email
 
 auth = Blueprint('auth', __name__, url_prefix='/oauth')
 
@@ -10,18 +13,14 @@ def index():
     return redirect(url_for('.login'))
 
 
-@auth.route('/login')
+@auth.route('/login/')
 def login():
     return oauth_facebook.authorize(callback=url_for('.facebook_authorized',
         next=request.args.get('next') or request.referrer or None,
         _external=True))
 
-@auth.route('/logout')
-def logout():
-    session.pop('oauth_token', None)
-    return redirect(url_for('frontend.home'))
 
-@auth.route('/login/authorized')
+@auth.route('/login/authorized/')
 @oauth_facebook.authorized_handler
 def facebook_authorized(resp):
     if resp is None:
@@ -31,8 +30,21 @@ def facebook_authorized(resp):
         )
     session['oauth_token'] = (resp['access_token'], '')
 
+    # Get user information from Facebook
+    me = oauth_facebook.get('/me')
+
+    # Create user if nonexistent
+    data = mongo.db.users.find_and_modify(
+        query={ 'email': me.data['email'] },
+        update={ '$setOnInsert': me.data },
+        upsert=True,
+        new=True
+    )
+
+    user = User(data)
+    login_user(user)
+
     return redirect(url_for('frontend.home'))
-    # me = oauth_facebook.get('/me')
     # return 'Logged in as id=%s name=%s redirect=%s' % \
     #     (me.data['id'], me.data['name'], request.args.get('next'))
 

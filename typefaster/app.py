@@ -2,6 +2,7 @@
 
 from flask import Flask, request, render_template, g
 from flask.ext.babel import Babel
+from flask.ext.login import current_user
 
 import os
 
@@ -12,7 +13,8 @@ import os
 # from .api import api
 # from .admin import admin
 # from .extensions import db, mail, cache, login_manager, oid
-from .extensions import mongo, oauth
+from .extensions import mongo, oauth, login_manager
+from .models.user import find_by_id
 # from .utils import INSTANCE_FOLDER_PATH
 
 
@@ -96,13 +98,13 @@ def configure_extensions(app):
         return g.lang_code if hasattr(g, 'lang_code') else request.accept_languages.best_match(app.config['ACCEPT_LANGUAGES'].keys())
 
     # flask-login
-    # login_manager.login_view = 'frontend.login'
-    # login_manager.refresh_view = 'frontend.reauth'
+    login_manager.login_view = 'frontend.login'
+    login_manager.refresh_view = 'frontend.login'
 
-    # @login_manager.user_loader
-    # def load_user(id):
-    #     return User.query.get(id)
-    # login_manager.setup_app(app)
+    @login_manager.user_loader
+    def load_user(id):
+        return find_by_id(id)
+    login_manager.init_app(app)
 
     # flask-openid
     # oid.init_app(app)
@@ -151,7 +153,7 @@ def configure_logging(app):
 def configure_hook(app):
     @app.before_request
     def before_request():
-        pass
+        g.user = current_user
 
 
 def configure_error_handlers(app):

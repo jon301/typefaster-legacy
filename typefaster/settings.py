@@ -22,4 +22,9 @@ MONGO_DBNAME = 'typefaster-dev'
 OAUTH_FACEBOOK = {
     'consumer_key': '518674384895969',
     'consumer_secret': '6fbc90c00a3506012a085d65727e61f0',
+    'request_token_params': {'scope': 'email'},
+    'base_url': 'https://graph.facebook.com',
+    'request_token_url': None,
+    'access_token_url': '/oauth/access_token',
+    'authorize_url': 'https://www.facebook.com/dialog/oauth',
 }

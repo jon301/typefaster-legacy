@@ -5,6 +5,7 @@ mongo = PyMongo()
 
 from flask_oauthlib.client import OAuth
 oauth = OAuth()
+oauth_facebook = oauth.remote_app('facebook', app_key='OAUTH_FACEBOOK')
 
 # from flask.ext.sqlalchemy import SQLAlchemy
 # db = SQLAlchemy()

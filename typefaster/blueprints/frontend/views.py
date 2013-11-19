@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, current_app, g, render_template, request, abort
-from ...extensions import mongo
+from ...extensions import mongo, oauth_facebook
 
 frontend = Blueprint('frontend', __name__)
 
 @frontend.url_defaults
 def add_language_code(endpoint, values):
-    if 'lang_code' in values or not g.lang_code:
+    if 'lang_code' in values or not hasattr(g, 'lang_code') or not g.lang_code:
         return
     values.setdefault('lang_code', g.lang_code)
 
@@ -23,6 +23,8 @@ def pull_lang_code(endpoint, values):
 
 @frontend.route('/')
 def home():
+    me = oauth_facebook.get('/me')
+    current_app.logger.debug(me.data)
     return render_template('home.html')
 
 @frontend.route('/about/')

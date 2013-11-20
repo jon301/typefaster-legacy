@@ -34,19 +34,22 @@ def facebook_authorized(resp):
     me = oauth_facebook.get('/me')
 
     # Create user if nonexistent
-    data = mongo.db.users.find_and_modify(
+    doc = mongo.db.users.find_and_modify(
         query={ 'email': me.data['email'] },
-        update={ '$setOnInsert': me.data },
+        update={
+            '$setOnInsert': {
+                'email': me.data['email'],
+                'meta': {
+                    'facebook': me.data
+                }
+            }
+        },
         upsert=True,
         new=True
     )
-
-    user = User(data)
+    user = User(doc)
     login_user(user)
-
     return redirect(url_for('frontend.home'))
-    # return 'Logged in as id=%s name=%s redirect=%s' % \
-    #     (me.data['id'], me.data['name'], request.args.get('next'))
 
 @oauth_facebook.tokengetter
 def get_facebook_oauth_token():

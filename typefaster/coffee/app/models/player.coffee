@@ -57,12 +57,12 @@ define [
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
-                @gameController.trigger 'entry:is_correct', @currentIndex
+                @gameController.trigger 'entry:is_correct', @, @currentIndex
             else
                 @logger.debug 'entry:is_incorrect', entry, @gameController.entries.at(@currentIndex)
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
-                @gameController.trigger 'entry:is_incorrect', @currentIndex
+                @gameController.trigger 'entry:is_incorrect', @, @currentIndex
             @currentIndex++
             @stop() if punycode.ucs2.decode(@gameController.entries).length is @currentIndex
 
@@ -74,7 +74,7 @@ define [
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else
                     @entriesMap[@currentIndex] = @ENTRY_DELETED
-                @gameController.trigger 'entry:is_reset', @currentIndex
+                @gameController.trigger 'entry:is_reset', @, @currentIndex
                 return true
             return false
 

@@ -1,1 +1,245 @@
-(function(){var a={}.hasOwnProperty,b=function(b,c){function d(){this.constructor=b}for(var e in c)a.call(c,e)&&(b[e]=c[e]);return d.prototype=c.prototype,b.prototype=new d,b.__super__=c.prototype,b};define(["jquery","underscore","templates","marionette","js_logger","punycode","string_fromcodepoint"],function(a,c,d,e,f,g){"use strict";var h,i;return h=function(c){function e(){return i=e.__super__.constructor.apply(this,arguments)}return b(e,c),e.prototype.el="#typezone-view",e.prototype.template=d["typefaster/static/scripts/templates/typezone.ejs"],e.prototype.ui={entries:".entry",textarea:".typezone-text",input:".typezone-input"},e.prototype.events={"keydown .typezone-input":"onKeydown","keypress .typezone-input":"onKeyPress","compositionstart .typezone-input":"onCompositionStart","compositionend .typezone-input":"onCompositionEnd"},e.prototype.debugEvent=function(a){return this.logger.debug(a.type),"KeyboardEvent"===a.originalEvent.constructor.name?(this.logger.debug("keyCode="+a.keyCode+" ("+String.fromCharCode(a.keyCode)+")"),this.logger.debug("charCode="+a.charCode+" ("+String.fromCharCode(a.charCode)+")"),this.logger.debug("which="+a.which+" ("+String.fromCharCode(a.which)+")"),this.logger.debug("keyIdentifier="+a.originalEvent.keyIdentifier)):"CompositionEvent"===a.originalEvent.constructor.name?this.logger.debug("data="+(a.data||a.originalEvent.data)):void 0},e.prototype.onKeydown=function(a){var b;return this.debugEvent(a),this.focused&&void 0!==a.originalEvent&&(b=a.which,8===b&&this.gameController.trigger("entry:deleted"),27===b)?(this.gameController.trigger("human:reset"),this.reset()):void 0},e.prototype.onKeyPress=function(a){var b,c;return this.debugEvent(a),this.focused&&void 0!==a.originalEvent&&(c=a.which,b=String.fromCodePoint(c))?this.gameController.trigger("entry:typed",b):void 0},e.prototype.onCompositionStart=function(a){return this.debugEvent(a),this.ui.entries.filter(".focus").addClass("composition")},e.prototype.onCompositionEnd=function(a){var b;return this.debugEvent(a),this.ui.entries.filter(".focus").removeClass("composition"),this.focused&&void 0!==a.originalEvent&&(b=a.data||a.originalEvent.data)?this.gameController.trigger("entry:typed",b):void 0},e.prototype.initialize=function(a){return this.logger=f.get("TypeZoneView"),this.gameController=a.gameController},e.prototype.onRender=function(){var b=this;return this.$el.show(),this.focus(),a("#typezone-container").on("click.typezone",a.proxy(this.focus,this)),a(window).on("resize.typezone",function(){return clearTimeout(b.resizingTimeout),b.resizingTimeout=setTimeout(function(){return b.scrollToEntry(a(".current"))},200)}),a(window).on("blur.typezone",function(){return b.blur()}),this.listenTo(this.gameController,"entry:is_correct",function(a){var c,d;return c=b.ui.entries.eq(a),d=b.ui.entries.eq(a+1),c.removeClass("current focus").addClass("correct"),d?(d.addClass("current focus"),b.scrollToEntry(d)):void 0}),this.listenTo(this.gameController,"entry:is_incorrect",function(a){var c,d;return c=b.ui.entries.eq(a),d=b.ui.entries.eq(a+1),c.removeClass("current focus").addClass("incorrect"),d?(d.addClass("current focus"),b.scrollToEntry(d)):void 0}),this.listenTo(this.gameController,"entry:is_reset",function(a){var c,d;return c=b.ui.entries.eq(a),b.ui.entries.removeClass("current focus"),c.removeClass("correct incorrect").addClass("current focus"),0!==a?(d=b.ui.entries.eq(a-1),b.scrollToEntry(d)):void 0}),this.listenTo(this.gameController,"human:stop",function(){return b.disable()})},e.prototype.scrollToEntry=function(a){var b=this;return a.length&&0!==a.parent().position().top&&!this.animating?(this.animating=!0,this.ui.textarea.stop(!0).animate({scrollTop:this.ui.textarea.scrollTop()+a.parent().position().top},function(){return b.animating=!1})):void 0},e.prototype.reset=function(){var a;return this.ui.entries.removeClass("correct incorrect focus current"),this.ui.input.val(""),this.disabled=!1,this.focused=!1,a=this.ui.entries.eq(0),a.addClass("current"),this.scrollToEntry(a),this.focus()},e.prototype.disable=function(){return this.disabled=!0,this.blur()},e.prototype.focus=function(b){return this.ui.input.focus(),this.focused||this.disabled||(this.logger.debug("focus typezone"),this.focused=!0,this.gameController.startListen(),this.$(".current").addClass("focus"),a("#typezone-container").addClass("focus"),a("body").on("click.typezone",a.proxy(this.blur,this))),b?(b.preventDefault(),b.stopPropagation()):void 0},e.prototype.blur=function(){return this.focused?(this.logger.debug("blur typezone"),this.focused=!1,this.gameController.stopListen(),this.$(".current").removeClass("focus"),a("#typezone-container").removeClass("focus"),a("body").off("click.typezone",a.proxy(this.blur,this))):void 0},e.prototype.serializeData=function(){return{entries:this.gameController.entries,punycode:g}},e.prototype.onClose=function(){return a("#typezone-container").off(".typezone"),a(window).off(".typezone"),a("body").off(".typezone")},e}(e.ItemView)})}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define(['jquery', 'underscore', 'templates', 'marionette', 'js_logger', 'punycode', 'string_fromcodepoint'], function($, _, JST, Marionette, Logger, punycode) {
+    'use strict';
+    var TypeZoneView, _ref;
+    return TypeZoneView = (function(_super) {
+      __extends(TypeZoneView, _super);
+
+      function TypeZoneView() {
+        _ref = TypeZoneView.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      TypeZoneView.prototype.el = '#typezone-view';
+
+      TypeZoneView.prototype.template = JST['typefaster/static/scripts/templates/typezone.ejs'];
+
+      TypeZoneView.prototype.ui = {
+        entries: '.entry',
+        textarea: '.typezone-text',
+        input: '.typezone-input'
+      };
+
+      TypeZoneView.prototype.events = {
+        'keydown .typezone-input': 'onKeydown',
+        'keypress .typezone-input': 'onKeyPress',
+        'compositionstart .typezone-input': 'onCompositionStart',
+        'compositionend .typezone-input': 'onCompositionEnd'
+      };
+
+      TypeZoneView.prototype.debugEvent = function(evt) {
+        this.logger.debug(evt.type);
+        if (evt.originalEvent.constructor.name === 'KeyboardEvent') {
+          this.logger.debug('keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')');
+          this.logger.debug('charCode=' + evt.charCode + ' (' + String.fromCharCode(evt.charCode) + ')');
+          this.logger.debug('which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')');
+          return this.logger.debug('keyIdentifier=' + evt.originalEvent.keyIdentifier);
+        } else if (evt.originalEvent.constructor.name === 'CompositionEvent') {
+          return this.logger.debug('data=' + (evt.data || evt.originalEvent.data));
+        }
+      };
+
+      TypeZoneView.prototype.onKeydown = function(evt) {
+        var keyCode;
+        this.debugEvent(evt);
+        if (this.focused && evt.originalEvent !== undefined) {
+          keyCode = evt.which;
+          if (keyCode === 8) {
+            this.gameController.trigger('keyboard:backspace');
+          }
+          if (keyCode === 27) {
+            this.gameController.trigger('keyboard:escape');
+            return this.reset();
+          }
+        }
+      };
+
+      TypeZoneView.prototype.onKeyPress = function(evt) {
+        var entry, keyCode;
+        this.debugEvent(evt);
+        if (this.focused && evt.originalEvent !== undefined) {
+          keyCode = evt.which;
+          entry = String.fromCodePoint(keyCode);
+          if (entry) {
+            return this.gameController.trigger('keyboard:char', entry);
+          }
+        }
+      };
+
+      TypeZoneView.prototype.onCompositionStart = function(evt) {
+        this.debugEvent(evt);
+        return this.ui.entries.filter('.focus').addClass('composition');
+      };
+
+      TypeZoneView.prototype.onCompositionEnd = function(evt) {
+        var entry;
+        this.debugEvent(evt);
+        this.ui.entries.filter('.focus').removeClass('composition');
+        if (this.focused && evt.originalEvent !== undefined) {
+          entry = evt.data || evt.originalEvent.data;
+          if (entry) {
+            return this.gameController.trigger('keyboard:char', entry);
+          }
+        }
+      };
+
+      TypeZoneView.prototype.initialize = function(options) {
+        this.logger = Logger.get('TypeZoneView');
+        return this.gameController = options.gameController;
+      };
+
+      TypeZoneView.prototype.onRender = function() {
+        var _this = this;
+        this.$el.show();
+        $('#typezone-container').on('click.typezone', $.proxy(this.focus, this));
+        $(window).on('resize.typezone', function() {
+          clearTimeout(_this.resizingTimeout);
+          return _this.resizingTimeout = setTimeout(function() {
+            return _this.scrollToEntry($('.current'));
+          }, 200);
+        });
+        $(window).on('blur.typezone', function() {
+          return _this.blur();
+        });
+        this.listenTo(this.gameController, 'entry:is_correct', function(player, index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          if (player.getType() === 'human') {
+            $entry.removeClass('current focus').addClass('correct');
+            if ($nextEntry) {
+              $nextEntry.addClass('current focus');
+              return _this.scrollToEntry($nextEntry);
+            }
+          } else {
+            $entry.css('borderColor', 'transparent');
+            if ($nextEntry) {
+              return $nextEntry.css('borderColor', player.getColor());
+            }
+          }
+        });
+        this.listenTo(this.gameController, 'entry:is_incorrect', function(player, index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          if (player.getType() === 'human') {
+            $entry.removeClass('current focus').addClass('incorrect');
+            if ($nextEntry) {
+              $nextEntry.addClass('current focus');
+              return _this.scrollToEntry($nextEntry);
+            }
+          } else {
+            $entry.css('borderColor', 'transparent');
+            if ($nextEntry) {
+              return $nextEntry.css('borderColor', player.getColor());
+            }
+          }
+        });
+        this.listenTo(this.gameController, 'entry:is_reset', function(player, index) {
+          var $entry, $prevEntry;
+          $entry = _this.ui.entries.eq(index);
+          if (player.getType() === 'human') {
+            _this.ui.entries.removeClass('current focus');
+            $entry.removeClass('correct incorrect').addClass('current focus');
+            if (index !== 0) {
+              $prevEntry = _this.ui.entries.eq(index - 1);
+              return _this.scrollToEntry($prevEntry);
+            }
+          } else {
+            _this.ui.entries.css('borderColor', 'transparent');
+            return $entry.css('borderColor', player.getColor());
+          }
+        });
+        this.listenTo(this.gameController, 'player:add', function(player) {
+          var $entry;
+          $entry = _this.ui.entries.eq(0);
+          if (player.getType() === 'human') {
+            $entry.addClass('current');
+            return _this.focus();
+          } else {
+            return $entry.css('borderColor', player.getColor());
+          }
+        });
+        return this.listenTo(this.gameController, 'human:stop', function() {
+          return _this.disable();
+        });
+      };
+
+      TypeZoneView.prototype.scrollToEntry = function($entry) {
+        var _this = this;
+        if ($entry.length && $entry.parent().position().top !== 0 && !this.animating) {
+          this.animating = true;
+          return this.ui.textarea.stop(true).animate({
+            scrollTop: this.ui.textarea.scrollTop() + $entry.parent().position().top
+          }, function() {
+            return _this.animating = false;
+          });
+        }
+      };
+
+      TypeZoneView.prototype.reset = function() {
+        var firstEntry;
+        this.ui.entries.removeClass('correct incorrect focus current');
+        this.ui.input.val('');
+        this.disabled = false;
+        this.focused = false;
+        firstEntry = this.ui.entries.eq(0);
+        firstEntry.addClass('current');
+        this.scrollToEntry(firstEntry);
+        return this.focus();
+      };
+
+      TypeZoneView.prototype.disable = function() {
+        this.disabled = true;
+        return this.blur();
+      };
+
+      TypeZoneView.prototype.focus = function(evt) {
+        this.ui.input.focus();
+        if (!(this.focused || this.disabled)) {
+          this.logger.debug('focus typezone');
+          this.focused = true;
+          this.gameController.startListen();
+          this.$('.current').addClass('focus');
+          $('#typezone-container').addClass('focus');
+          $('body').on('click.typezone', $.proxy(this.blur, this));
+        }
+        if (evt) {
+          evt.preventDefault();
+          return evt.stopPropagation();
+        }
+      };
+
+      TypeZoneView.prototype.blur = function(evt) {
+        if (this.focused) {
+          this.logger.debug('blur typezone');
+          this.focused = false;
+          this.gameController.stopListen();
+          this.$('.current').removeClass('focus');
+          $('#typezone-container').removeClass('focus');
+          return $('body').off('click.typezone', $.proxy(this.blur, this));
+        }
+      };
+
+      TypeZoneView.prototype.serializeData = function() {
+        return {
+          'entries': this.gameController.entries,
+          'punycode': punycode
+        };
+      };
+
+      TypeZoneView.prototype.onClose = function() {
+        $('#typezone-container').off('.typezone');
+        $(window).off('.typezone');
+        return $('body').off('.typezone');
+      };
+
+      return TypeZoneView;
+
+    })(Marionette.ItemView);
+  });
+
+}).call(this);

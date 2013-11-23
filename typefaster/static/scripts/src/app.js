@@ -1,1 +1,24 @@
-(function(){define(["jquery","underscore","marionette","js_logger","jed","bootstrap"],function(a,b,c,d,e){var f;return f=null,function(){return null===f&&(f=new c.Application,f.addInitializer(function(){return a.i18n=new e("undefined"!=typeof json_locale_data&&null!==json_locale_data?{locale_data:json_locale_data,domain:"messages"}:{}),a._=a.proxy(a.i18n.gettext,a.i18n)}),f.addInitializer(function(a){return d.useDefaults(),d.setLevel(d[a.config.JSLOGGER_LEVEL])})),f}()})}).call(this);
+(function() {
+  define(['jquery', 'underscore', 'marionette', 'js_logger', 'jed', 'bootstrap'], function($, _, Marionette, Logger, Jed) {
+    var app;
+    app = null;
+    return (function() {
+      if (app === null) {
+        app = new Marionette.Application();
+        app.addInitializer(function(options) {
+          $.i18n = new Jed(typeof json_locale_data !== "undefined" && json_locale_data !== null ? {
+            locale_data: json_locale_data,
+            domain: 'messages'
+          } : {});
+          return $._ = $.proxy($.i18n.gettext, $.i18n);
+        });
+        app.addInitializer(function(options) {
+          Logger.useDefaults();
+          return Logger.setLevel(Logger.OFF);
+        });
+      }
+      return app;
+    })();
+  });
+
+}).call(this);

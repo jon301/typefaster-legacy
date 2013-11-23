@@ -15,6 +15,18 @@ define [
             super options
             @logger = Logger.get 'PlayerHumanModel'
 
+            @.listenTo @gameController, 'keyboard:char', (entry) =>
+                @gameController.start() unless @gameController.running
+                @.typeEntry(entry)
+
+            @.listenTo @gameController, 'keyboard:backspace', =>
+                @.deleteEntry()
+
+
+            @.listenTo @gameController, 'keyboard:escape', =>
+                @gameController.stop()
+                @gameController.startListen()
+
         stop: () ->
             super()
             @logger.debug JSON.stringify @replayLogs
@@ -34,3 +46,6 @@ define [
 
         getReplayLogs: ->
             @replayLogs
+
+        getType: ->
+            'human'

@@ -26,7 +26,7 @@ define [
             @listenTo @gameController, 'human:stats', (stats) =>
                 @model.set('stats', stats)
 
-            @listenTo @gameController, 'human:reset', () ->
+            @listenTo @gameController, 'keyboard:escape', () ->
                 @.$el.empty()
 
         onRender: () ->

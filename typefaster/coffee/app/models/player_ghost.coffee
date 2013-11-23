@@ -14,6 +14,7 @@ define [
             super options
             @logger = Logger.get 'PlayerGhostModel'
             @replayLogs = options.replayLogs
+            @color = options.color
 
         play: () ->
             super()
@@ -36,3 +37,9 @@ define [
 
             if @entryLog
                 @timeout = setTimeout($.proxy(@replay, @), 1)
+
+        getType: () ->
+            'ghost'
+
+        getColor: () ->
+            @color

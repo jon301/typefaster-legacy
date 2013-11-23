@@ -39,8 +39,9 @@ define [
     'js_logger'
     'controllers/timer',
     'models/player_human',
-    'models/player_ghost'
-    ], ($, _, Backbone, Marionette, Logger, TimerController, PlayerHumanModel, PlayerGhostModel) ->
+    'models/player_ghost',
+    'views/item/typezone'
+    ], ($, _, Backbone, Marionette, Logger, TimerController, PlayerHumanModel, PlayerGhostModel, TypeZoneView) ->
     'use strict'
 
     class GameController extends Marionette.Controller
@@ -49,34 +50,33 @@ define [
         entries: '' # String
         duration: 60 # Seconds
 
+        ghostColors: ['aqua', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'silver', 'teal', 'yellow', 'orange', 'purple', 'red']
+
         initialize: (options) ->
             @logger = Logger.get 'GameController'
             @duration = options.duration
             @entries = options.entries
 
-            @humanPlayer = new PlayerHumanModel({ gameController: @ })
-            @ghostPlayers = new Backbone.Collection()
+            @players = new Backbone.Collection()
 
             @timer = new TimerController()
+
+            @typeZoneView = new TypeZoneView({ gameController: @ })
+            @typeZoneView.render()
 
         startListen: ->
             unless @listening
                 @logger.debug 'game: bind listen events'
                 @listening = true
 
-                @.listenTo @, 'entry:typed', (entry) =>
-                    @start() unless @running
-                    @humanPlayer.typeEntry(entry)
-
-                @.listenTo @, 'entry:deleted', =>
-                    @humanPlayer.deleteEntry()
-
-                @.listenTo @, 'human:stop', =>
+                @.listenTo @, 'human:stop', () =>
                     @stop()
 
-                @.listenTo @, 'human:reset', =>
-                    @stop()
-                    @startListen()
+                @.listenTo @players, 'add', (playerModel) =>
+                    @.trigger 'player:add', playerModel
+
+                @.listenTo @players, 'remove', (playerModel) =>
+                    @.trigger 'player:remove', playerModel
 
         stopListen: ->
             @logger.debug 'game: unbind listen events'
@@ -88,8 +88,7 @@ define [
                 @logger.debug 'Game started'
                 @running = true
 
-                @humanPlayer.play()
-                @ghostPlayers.invoke 'play'
+                @players.invoke 'play'
 
                 if @duration
                     @timer.start()
@@ -97,8 +96,10 @@ define [
                     @interval = setInterval(=>
                         if @timer.getElapsedTime() >= @duration * 1000
                             @stop()
+
                         # Publish stats every seconds
-                        @trigger 'human:stats', @humanPlayer.getStats()
+                        if typeof @humanPlayer isnt 'undefined'
+                            @trigger 'human:stats', @humanPlayer.getStats()
                     , 1000)
 
         stop: ->
@@ -110,19 +111,27 @@ define [
                 @stopListen()
 
                 @timer.stop()
-                @humanPlayer.stop()
+                @players.invoke 'stop'
 
         # Setters
         setEntries: (entries) ->
             unless @running
                 @entries = entries if entries
-                @logger.debug 'You have ' + @duration + ' seconds to type :' + @entries
 
         setDuration: (duration) ->
             unless @running
                 @duration = duration if duration
-                @logger.debug 'You have ' + @duration + ' seconds to type :' + @entries
+
+
+        addHuman: () ->
+            unless @running and @humanPlayer
+                @humanPlayer = new PlayerHumanModel({ gameController: @ })
+                @players.add @humanPlayer
+
+        removeHuman: () ->
 
         addGhost: (replayLogs) ->
             unless @running
-                @ghostPlayers.add new PlayerGhostModel({ entries: @entries, replayLogs: replayLogs, gameController: @ })
+                @players.add new PlayerGhostModel({ gameController: @, replayLogs: replayLogs, color: @ghostColors.pop() })
+
+        removeGhost: (cid) ->

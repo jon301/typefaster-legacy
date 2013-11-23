@@ -1,1 +1,156 @@
-(function(){var a={}.hasOwnProperty,b=function(b,c){function d(){this.constructor=b}for(var e in c)a.call(c,e)&&(b[e]=c[e]);return d.prototype=c.prototype,b.prototype=new d,b.__super__=c.prototype,b};define(["jquery","underscore","backbone","js_logger","controllers/timer","punycode","string_at"],function(a,c,d,e,f,g){"use strict";var h,i;return h=function(d){function h(){return i=h.__super__.constructor.apply(this,arguments)}return b(h,d),h.prototype.ENTRY_CORRECT=1,h.prototype.ENTRY_INCORRECT=-1,h.prototype.ENTRY_TO_BE_FIXED=0,h.prototype.ENTRY_DELETED=2,h.prototype.entries="",h.prototype.correctEntries=0,h.prototype.incorrectEntries=0,h.prototype.fixedMistakes=0,h.prototype.currentIndex=0,h.prototype.entriesMap=[],h.prototype.initialize=function(a){return this.logger=e.get("PlayerModel"),this.gameController=a.gameController,this.timer=new f},h.prototype.play=function(){return this.reset(),this.timer.start()},h.prototype.stop=function(){return this.timer.stop(),this.hasCheated()?this.logger.debug("You are a cheater"):this.logger.debug("You are not a cheater"),this.logger.debug(JSON.stringify(this.getStats()))},h.prototype.reset=function(){return this.correctEntries=0,this.incorrectEntries=0,this.fixedMistakes=0,this.currentIndex=0,this.entriesMap=[]},h.prototype.typeEntry=function(a){return a===this.gameController.entries.at(this.currentIndex)?(this.logger.debug("entry:is_correct",a,this.gameController.entries.at(this.currentIndex)),this.correctEntries++,this.entriesMap[this.currentIndex]===this.ENTRY_TO_BE_FIXED&&this.fixedMistakes++,this.entriesMap[this.currentIndex]=this.ENTRY_CORRECT,this.gameController.trigger("entry:is_correct",this.currentIndex)):(this.logger.debug("entry:is_incorrect",a,this.gameController.entries.at(this.currentIndex)),this.incorrectEntries++,this.entriesMap[this.currentIndex]=this.ENTRY_INCORRECT,this.gameController.trigger("entry:is_incorrect",this.currentIndex)),this.currentIndex++,g.ucs2.decode(this.gameController.entries).length===this.currentIndex?this.stop():void 0},h.prototype.deleteEntry=function(){return this.currentIndex>0?(this.currentIndex--,this.logger.debug("entry:is_reset",this.gameController.entries.at(this.currentIndex)),this.entriesMap[this.currentIndex]=this.entriesMap[this.currentIndex]===this.ENTRY_INCORRECT?this.ENTRY_TO_BE_FIXED:this.ENTRY_DELETED,this.gameController.trigger("entry:is_reset",this.currentIndex),!0):!1},h.prototype.getStats=function(){var a,b,c,d,e;return a=this.timer.getElapsedTime(),b=a/6e4,e=this.correctEntries+this.incorrectEntries,c=(this.incorrectEntries-this.fixedMistakes)/b,d=e/b/5,{elapsedTime:a,correctEntries:this.correctEntries,incorrectEntries:this.incorrectEntries,fixedMistakes:this.fixedMistakes,totalEntries:e,errorRate:c,rawSpeed:d,keySpeed:e/b,speed:d-c,accuracy:e?this.correctEntries/e*100:0}},h.prototype.hasCheated=function(){var b,d,e,f,g;return this.replayLogs?(e=c.pluck(this.replayLogs,"t"),e=a.map(e,function(a,b){return 0===b?null:a-e[b-1]}),this.logger.debug(e),e=c.uniq(e),e.length?(g=this.correctEntries+this.incorrectEntries,d=100-parseInt(e.length/g*100,10),f=c.reduce(e,function(a,b){return a+b}),b=parseInt(f/e.length,10),this.logger.debug("Intervals equal percentage: "+d),this.logger.debug("Average interval : "+b+"ms")):(d=0,b=0/0),d>70||50>b):void 0},h}(d.Model)})}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define(['jquery', 'underscore', 'backbone', 'js_logger', 'controllers/timer', 'punycode', 'string_at'], function($, _, Backbone, Logger, TimerController, punycode) {
+    'use strict';
+    var PlayerModel, _ref;
+    return PlayerModel = (function(_super) {
+      __extends(PlayerModel, _super);
+
+      function PlayerModel() {
+        _ref = PlayerModel.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      PlayerModel.prototype.ENTRY_CORRECT = 1;
+
+      PlayerModel.prototype.ENTRY_INCORRECT = -1;
+
+      PlayerModel.prototype.ENTRY_TO_BE_FIXED = 0;
+
+      PlayerModel.prototype.ENTRY_DELETED = 2;
+
+      PlayerModel.prototype.entries = '';
+
+      PlayerModel.prototype.correctEntries = 0;
+
+      PlayerModel.prototype.incorrectEntries = 0;
+
+      PlayerModel.prototype.fixedMistakes = 0;
+
+      PlayerModel.prototype.currentIndex = 0;
+
+      PlayerModel.prototype.entriesMap = [];
+
+      PlayerModel.prototype.initialize = function(options) {
+        this.logger = Logger.get('PlayerModel');
+        this.gameController = options.gameController;
+        return this.timer = new TimerController();
+      };
+
+      PlayerModel.prototype.play = function() {
+        this.reset();
+        return this.timer.start();
+      };
+
+      PlayerModel.prototype.stop = function() {
+        this.timer.stop();
+        if (this.hasCheated()) {
+          this.logger.debug('You are a cheater');
+        } else {
+          this.logger.debug('You are not a cheater');
+        }
+        return this.logger.debug(JSON.stringify(this.getStats()));
+      };
+
+      PlayerModel.prototype.reset = function() {
+        this.correctEntries = 0;
+        this.incorrectEntries = 0;
+        this.fixedMistakes = 0;
+        this.currentIndex = 0;
+        return this.entriesMap = [];
+      };
+
+      PlayerModel.prototype.typeEntry = function(entry) {
+        if (entry === this.gameController.entries.at(this.currentIndex)) {
+          this.logger.debug('entry:is_correct', entry, this.gameController.entries.at(this.currentIndex));
+          this.correctEntries++;
+          if (this.entriesMap[this.currentIndex] === this.ENTRY_TO_BE_FIXED) {
+            this.fixedMistakes++;
+          }
+          this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
+          this.gameController.trigger('entry:is_correct', this, this.currentIndex);
+        } else {
+          this.logger.debug('entry:is_incorrect', entry, this.gameController.entries.at(this.currentIndex));
+          this.incorrectEntries++;
+          this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
+          this.gameController.trigger('entry:is_incorrect', this, this.currentIndex);
+        }
+        this.currentIndex++;
+        if (punycode.ucs2.decode(this.gameController.entries).length === this.currentIndex) {
+          return this.stop();
+        }
+      };
+
+      PlayerModel.prototype.deleteEntry = function() {
+        if (this.currentIndex > 0) {
+          this.currentIndex--;
+          this.logger.debug('entry:is_reset', this.gameController.entries.at(this.currentIndex));
+          if (this.entriesMap[this.currentIndex] === this.ENTRY_INCORRECT) {
+            this.entriesMap[this.currentIndex] = this.ENTRY_TO_BE_FIXED;
+          } else {
+            this.entriesMap[this.currentIndex] = this.ENTRY_DELETED;
+          }
+          this.gameController.trigger('entry:is_reset', this, this.currentIndex);
+          return true;
+        }
+        return false;
+      };
+
+      PlayerModel.prototype.getStats = function() {
+        var elapsedTime, elapsedTimeMinutes, errorRate, rawSpeed, totalEntries;
+        elapsedTime = this.timer.getElapsedTime();
+        elapsedTimeMinutes = elapsedTime / 60000;
+        totalEntries = this.correctEntries + this.incorrectEntries;
+        errorRate = (this.incorrectEntries - this.fixedMistakes) / elapsedTimeMinutes;
+        rawSpeed = (totalEntries / elapsedTimeMinutes) / 5;
+        return {
+          elapsedTime: elapsedTime,
+          correctEntries: this.correctEntries,
+          incorrectEntries: this.incorrectEntries,
+          fixedMistakes: this.fixedMistakes,
+          totalEntries: totalEntries,
+          errorRate: errorRate,
+          rawSpeed: rawSpeed,
+          keySpeed: totalEntries / elapsedTimeMinutes,
+          speed: rawSpeed - errorRate,
+          accuracy: (totalEntries ? (this.correctEntries / totalEntries) * 100 : 0)
+        };
+      };
+
+      PlayerModel.prototype.hasCheated = function() {
+        var averageInterval, equalPercent, intervals, sumIntervals, totalKeystrokes;
+        if (this.replayLogs) {
+          intervals = _.pluck(this.replayLogs, 't');
+          intervals = $.map(intervals, function(val, i) {
+            if (i === 0) {
+              return null;
+            }
+            return val - intervals[i - 1];
+          });
+          this.logger.debug(intervals);
+          intervals = _.uniq(intervals);
+          if (intervals.length) {
+            totalKeystrokes = this.correctEntries + this.incorrectEntries;
+            equalPercent = 100 - (parseInt(intervals.length / totalKeystrokes * 100, 10));
+            sumIntervals = _.reduce(intervals, function(memo, num) {
+              return memo + num;
+            });
+            averageInterval = parseInt(sumIntervals / intervals.length, 10);
+            this.logger.debug('Intervals equal percentage: ' + equalPercent);
+            this.logger.debug('Average interval : ' + averageInterval + 'ms');
+          } else {
+            equalPercent = 0;
+            averageInterval = NaN;
+          }
+          return equalPercent > 70 || averageInterval < 50;
+        }
+      };
+
+      return PlayerModel;
+
+    })(Backbone.Model);
+  });
+
+}).call(this);

@@ -1,1 +1,63 @@
-(function(){var a={}.hasOwnProperty,b=function(b,c){function d(){this.constructor=b}for(var e in c)a.call(c,e)&&(b[e]=c[e]);return d.prototype=c.prototype,b.prototype=new d,b.__super__=c.prototype,b};define(["jquery","underscore","js_logger","models/player","controllers/timer"],function(a,c,d,e){"use strict";var f,g;return f=function(c){function e(){return g=e.__super__.constructor.apply(this,arguments)}return b(e,c),e.prototype.initialize=function(a){return e.__super__.initialize.call(this,a),this.logger=d.get("PlayerGhostModel"),this.replayLogs=a.replayLogs},e.prototype.play=function(){return e.__super__.play.call(this),this.replay()},e.prototype.stop=function(){return e.__super__.stop.call(this),clearTimeout(this.timeout)},e.prototype.replay=function(){return this.entryLog||(this.entryLog=this.replayLogs.shift()),this.timer.getElapsedTime()>=this.entryLog.t&&(-1===this.entryLog.v?this.deleteEntry():this.typeEntry(this.entryLog.v),this.entryLog=this.replayLogs.shift()),this.entryLog?this.timeout=setTimeout(a.proxy(this.replay,this),1):void 0},e}(e)})}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define(['jquery', 'underscore', 'js_logger', 'models/player', 'controllers/timer'], function($, _, Logger, PlayerModel, TimerController) {
+    'use strict';
+    var PlayerGhostModel, _ref;
+    return PlayerGhostModel = (function(_super) {
+      __extends(PlayerGhostModel, _super);
+
+      function PlayerGhostModel() {
+        _ref = PlayerGhostModel.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      PlayerGhostModel.prototype.initialize = function(options) {
+        PlayerGhostModel.__super__.initialize.call(this, options);
+        this.logger = Logger.get('PlayerGhostModel');
+        this.replayLogs = options.replayLogs;
+        return this.color = options.color;
+      };
+
+      PlayerGhostModel.prototype.play = function() {
+        PlayerGhostModel.__super__.play.call(this);
+        return this.replay();
+      };
+
+      PlayerGhostModel.prototype.stop = function() {
+        PlayerGhostModel.__super__.stop.call(this);
+        return clearTimeout(this.timeout);
+      };
+
+      PlayerGhostModel.prototype.replay = function() {
+        if (!this.entryLog) {
+          this.entryLog = this.replayLogs.shift();
+        }
+        if (this.timer.getElapsedTime() >= this.entryLog.t) {
+          if (this.entryLog.v === -1) {
+            this.deleteEntry();
+          } else {
+            this.typeEntry(this.entryLog.v);
+          }
+          this.entryLog = this.replayLogs.shift();
+        }
+        if (this.entryLog) {
+          return this.timeout = setTimeout($.proxy(this.replay, this), 1);
+        }
+      };
+
+      PlayerGhostModel.prototype.getType = function() {
+        return 'ghost';
+      };
+
+      PlayerGhostModel.prototype.getColor = function() {
+        return this.color;
+      };
+
+      return PlayerGhostModel;
+
+    })(PlayerModel);
+  });
+
+}).call(this);

@@ -47,6 +47,8 @@ def facebook_authorized(resp):
         upsert=True,
         new=True
     )
+
+    # Authenticate user
     user = User(doc)
     login_user(user)
     return redirect(url_for('frontend.home'))

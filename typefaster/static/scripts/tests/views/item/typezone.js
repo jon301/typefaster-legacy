@@ -1,10 +1,11 @@
 (function() {
   define(['jquery', 'backbone', 'chai', 'controllers/game', 'views/item/typezone'], function($, Backbone, chai, GameController, TypeZoneView) {
     'use strict';
-    var assert, expect, gameController, typeZoneView;
+    var assert, expect, gameController, humanPlayer, typeZoneView;
     expect = chai.expect;
     assert = chai.assert;
     gameController = void 0;
+    humanPlayer = void 0;
     typeZoneView = void 0;
     return describe('TypeZoneView', function() {
       before(function() {
@@ -14,6 +15,8 @@
           entries: entries,
           duration: null
         });
+        gameController.addHuman();
+        humanPlayer = gameController.humanPlayer;
         typeZoneView = new TypeZoneView({
           el: $('<div />'),
           gameController: gameController
@@ -59,13 +62,13 @@
         });
       });
       describe('keypress', function() {
-        it('should trigger `entry:typed` event', function() {
+        it('should trigger `keyboard:char` event', function() {
           var e;
           e = jQuery.Event('keypress');
           e.originalEvent = true;
           e.which = 73;
           typeZoneView.ui.input.trigger(e);
-          return assert.isTrue(gameController.trigger.calledWith('entry:typed', 'I'));
+          return assert.isTrue(gameController.trigger.calledWith('keyboard:char', 'I'));
         });
         return it('should handle unicode characters', function() {
           var e;
@@ -74,32 +77,32 @@
           e.originalEvent = true;
           e.which = 0x1F4A9;
           typeZoneView.ui.input.trigger(e);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', 0));
+          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0));
         });
       });
       describe('keydown', function() {
-        it('should trigger `entry:delete` event on backspace keydown', function() {
+        it('should trigger `keyboard:backspace` event on backspace keydown', function() {
           var e;
           e = jQuery.Event('keydown');
           e.originalEvent = true;
           e.which = 8;
           typeZoneView.ui.input.trigger(e);
-          return assert.isTrue(gameController.trigger.calledWith('entry:deleted'));
+          return assert.isTrue(gameController.trigger.calledWith('keyboard:backspace'));
         });
-        return it('should trigger `human:reset` event on escape keydown', function() {
+        return it('should trigger `keyboard:escape` event on escape keydown', function() {
           var e;
           e = jQuery.Event('keydown');
           e.originalEvent = true;
           e.which = 27;
           typeZoneView.ui.input.trigger(e);
-          return assert.isTrue(gameController.trigger.calledWith('human:reset'));
+          return assert.isTrue(gameController.trigger.calledWith('keyboard:escape'));
         });
       });
       describe('entry:is_correct', function() {
         return it('should add `correct` class to element', function() {
           assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('current'));
           assert.isFalse(typeZoneView.ui.entries.eq(0).hasClass('correct'));
-          gameController.trigger('entry:is_correct', 0);
+          gameController.trigger('entry:is_correct', humanPlayer, 0);
           assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('correct'));
           return assert.isTrue(typeZoneView.ui.entries.eq(1).hasClass('current'));
         });
@@ -108,17 +111,17 @@
         return it('should add `incorrect` class to element', function() {
           assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('current'));
           assert.isFalse(typeZoneView.ui.entries.eq(0).hasClass('incorrect'));
-          gameController.trigger('entry:is_incorrect', 0);
+          gameController.trigger('entry:is_incorrect', humanPlayer, 0);
           assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('incorrect'));
           return assert.isTrue(typeZoneView.ui.entries.eq(1).hasClass('current'));
         });
       });
       describe('entry:is_reset', function() {
         return it('should remove all classes from current element', function() {
-          gameController.trigger('entry:is_correct', 0);
+          gameController.trigger('entry:is_correct', humanPlayer, 0);
           assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('correct'));
           assert.isTrue(typeZoneView.ui.entries.eq(1).hasClass('current'));
-          gameController.trigger('entry:is_reset', 0);
+          gameController.trigger('entry:is_reset', humanPlayer, 0);
           assert.isFalse(typeZoneView.ui.entries.eq(0).hasClass('correct'));
           assert.isFalse(typeZoneView.ui.entries.eq(1).hasClass('current'));
           return assert.isTrue(typeZoneView.ui.entries.eq(0).hasClass('current'));

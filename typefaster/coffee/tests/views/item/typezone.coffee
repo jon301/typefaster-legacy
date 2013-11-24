@@ -12,6 +12,7 @@ define [
     assert = chai.assert
 
     gameController = undefined
+    humanPlayer = undefined
     typeZoneView = undefined
 
     describe 'TypeZoneView', ->
@@ -22,6 +23,8 @@ define [
                 entries: entries
                 duration: null
             )
+            gameController.addHuman()
+            humanPlayer = gameController.humanPlayer
 
             typeZoneView = new TypeZoneView(
                 el: $('<div />')
@@ -64,12 +67,12 @@ define [
                 assert.isTrue gameController.trigger.called
 
         describe 'keypress', ->
-            it 'should trigger `entry:typed` event', ->
+            it 'should trigger `keyboard:char` event', ->
                 e = jQuery.Event 'keypress'
                 e.originalEvent = true
                 e.which = 73
                 typeZoneView.ui.input.trigger e
-                assert.isTrue gameController.trigger.calledWith('entry:typed', 'I')
+                assert.isTrue gameController.trigger.calledWith('keyboard:char', 'I')
 
              it 'should handle unicode characters', ->
                 gameController.setEntries '💩'
@@ -77,28 +80,28 @@ define [
                 e.originalEvent = true
                 e.which = 0x1F4A9
                 typeZoneView.ui.input.trigger e
-                assert.isTrue gameController.trigger.calledWith('entry:is_correct', 0)
+                assert.isTrue gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0)
 
         describe 'keydown', ->
-            it 'should trigger `entry:delete` event on backspace keydown', ->
+            it 'should trigger `keyboard:backspace` event on backspace keydown', ->
                 e = jQuery.Event 'keydown'
                 e.originalEvent = true
                 e.which = 8
                 typeZoneView.ui.input.trigger e
-                assert.isTrue gameController.trigger.calledWith('entry:deleted')
+                assert.isTrue gameController.trigger.calledWith('keyboard:backspace')
 
-            it 'should trigger `human:reset` event on escape keydown', ->
+            it 'should trigger `keyboard:escape` event on escape keydown', ->
                 e = jQuery.Event 'keydown'
                 e.originalEvent = true
                 e.which = 27
                 typeZoneView.ui.input.trigger e
-                assert.isTrue gameController.trigger.calledWith('human:reset')
+                assert.isTrue gameController.trigger.calledWith('keyboard:escape')
 
         describe 'entry:is_correct', ->
             it 'should add `correct` class to element', ->
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('current')
                 assert.isFalse typeZoneView.ui.entries.eq(0).hasClass('correct')
-                gameController.trigger 'entry:is_correct', 0
+                gameController.trigger 'entry:is_correct', humanPlayer, 0
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('correct')
                 assert.isTrue typeZoneView.ui.entries.eq(1).hasClass('current')
 
@@ -106,16 +109,16 @@ define [
             it 'should add `incorrect` class to element', ->
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('current')
                 assert.isFalse typeZoneView.ui.entries.eq(0).hasClass('incorrect')
-                gameController.trigger 'entry:is_incorrect', 0
+                gameController.trigger 'entry:is_incorrect', humanPlayer, 0
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('incorrect')
                 assert.isTrue typeZoneView.ui.entries.eq(1).hasClass('current')
 
         describe 'entry:is_reset', ->
             it 'should remove all classes from current element', ->
-                gameController.trigger 'entry:is_correct', 0
+                gameController.trigger 'entry:is_correct', humanPlayer, 0
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('correct')
                 assert.isTrue typeZoneView.ui.entries.eq(1).hasClass('current')
-                gameController.trigger 'entry:is_reset', 0
+                gameController.trigger 'entry:is_reset', humanPlayer, 0
                 assert.isFalse typeZoneView.ui.entries.eq(0).hasClass('correct')
                 assert.isFalse typeZoneView.ui.entries.eq(1).hasClass('current')
                 assert.isTrue typeZoneView.ui.entries.eq(0).hasClass('current')

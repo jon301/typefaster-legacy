@@ -12,6 +12,7 @@
           entries: 'Iñtërnâtiônàlizætiøn☃💩',
           duration: null
         });
+        gameController.addHuman();
         return humanPlayer = gameController.humanPlayer;
       });
       beforeEach(function() {
@@ -26,25 +27,25 @@
         it('should handle correct entries', function() {
           humanPlayer.typeEntry('I');
           assert.isTrue(humanPlayer.correctEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', 0));
+          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0));
         });
         it('should handle incorrect entries', function() {
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', 0));
+          return assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
         });
         it('should handle fixed mistakes', function() {
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
           assert.isTrue(humanPlayer.fixedMistakes === 0);
           assert.isTrue(humanPlayer.correctEntries === 0);
-          assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', 0));
+          assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
           humanPlayer.deleteEntry();
           humanPlayer.typeEntry('I');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
           assert.isTrue(humanPlayer.fixedMistakes === 1);
           assert.isTrue(humanPlayer.correctEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', 0));
+          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0));
         });
         it('should stop the game if all entries have been typed', function() {
           var i;
@@ -86,7 +87,7 @@
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.currentIndex === 1);
           humanPlayer.deleteEntry();
-          assert.isTrue(gameController.trigger.calledWith('entry:is_reset', 0));
+          assert.isTrue(gameController.trigger.calledWith('entry:is_reset', humanPlayer, 0));
           return assert.isTrue(humanPlayer.currentIndex === 0);
         });
         return it('should not decrement current index if current index is 0', function() {

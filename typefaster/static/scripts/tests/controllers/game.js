@@ -12,10 +12,11 @@
     deleteEntrySpy = void 0;
     return describe('GameController', function() {
       before(function() {
-        return gameController = new GameController({
+        gameController = new GameController({
           entries: 'Hello World',
           duration: null
         });
+        return gameController.addHuman();
       });
       beforeEach(function() {
         timer = sinon.useFakeTimers();
@@ -54,9 +55,9 @@
         });
         return it('should stop event listening', function() {
           gameController.startListen();
-          gameController.trigger('entry:typed', 'a');
+          gameController.trigger('keyboard:char', 'a');
           gameController.stop();
-          gameController.trigger('entry:typed', 'a');
+          gameController.trigger('keyboard:char', 'a');
           return assert.isTrue(typeEntrySpy.calledOnce);
         });
       });
@@ -64,21 +65,21 @@
         beforeEach(function() {
           return gameController.startListen();
         });
-        describe('entry:typed', function() {
-          it('should call `typeEntry` with the entry typed', function() {
-            gameController.trigger('entry:typed', 'a');
+        describe('keyboard:char', function() {
+          it('should call `typeEntry` with the char pressed', function() {
+            gameController.trigger('keyboard:char', 'a');
             return assert.isTrue(typeEntrySpy.calledWith('a'));
           });
-          return it('should start the game on the first entry typed only', function() {
-            gameController.trigger('entry:typed', 'a');
-            gameController.trigger('entry:typed', 'a');
+          return it('should start the game on the first char pressed only', function() {
+            gameController.trigger('keyboard:char', 'a');
+            gameController.trigger('keyboard:char', 'a');
             return assert.isTrue(playSpy.calledOnce);
           });
         });
-        describe('entry:deleted', function() {
+        describe('keyboard:backspace', function() {
           return it('should call `deleteEntry` everytime', function() {
-            gameController.trigger('entry:deleted');
-            gameController.trigger('entry:deleted');
+            gameController.trigger('keyboard:backspace');
+            gameController.trigger('keyboard:backspace');
             return assert.isTrue(deleteEntrySpy.calledTwice);
           });
         });
@@ -96,8 +97,8 @@
         });
         return it('should prevent all callbacks to be triggered', function() {
           gameController.stopListen();
-          gameController.trigger('entry:typed', 'a');
-          gameController.trigger('entry:deleted');
+          gameController.trigger('keyboard:char', 'a');
+          gameController.trigger('keyboard:backspace');
           gameController.trigger('human:stop');
           assert.isTrue(typeEntrySpy.notCalled);
           assert.isTrue(deleteEntrySpy.notCalled);

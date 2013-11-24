@@ -23,6 +23,7 @@ define [
                 entries: 'Hello World'
                 duration: null
             )
+            gameController.addHuman()
 
         beforeEach () ->
             timer = sinon.useFakeTimers()
@@ -59,29 +60,29 @@ define [
 
             it 'should stop event listening', () ->
                 gameController.startListen()
-                gameController.trigger('entry:typed', 'a')
+                gameController.trigger('keyboard:char', 'a')
                 gameController.stop()
-                gameController.trigger('entry:typed', 'a')
+                gameController.trigger('keyboard:char', 'a')
                 assert.isTrue typeEntrySpy.calledOnce
 
         describe 'startListen', ->
             beforeEach () ->
                 gameController.startListen()
 
-            describe 'entry:typed', ->
-                it 'should call `typeEntry` with the entry typed', () ->
-                    gameController.trigger('entry:typed', 'a')
+            describe 'keyboard:char', ->
+                it 'should call `typeEntry` with the char pressed', () ->
+                    gameController.trigger('keyboard:char', 'a')
                     assert.isTrue typeEntrySpy.calledWith('a')
 
-                it 'should start the game on the first entry typed only', () ->
-                    gameController.trigger('entry:typed', 'a')
-                    gameController.trigger('entry:typed', 'a')
+                it 'should start the game on the first char pressed only', () ->
+                    gameController.trigger('keyboard:char', 'a')
+                    gameController.trigger('keyboard:char', 'a')
                     assert.isTrue playSpy.calledOnce
 
-            describe 'entry:deleted', ->
+            describe 'keyboard:backspace', ->
                 it 'should call `deleteEntry` everytime', () ->
-                    gameController.trigger('entry:deleted')
-                    gameController.trigger('entry:deleted')
+                    gameController.trigger('keyboard:backspace')
+                    gameController.trigger('keyboard:backspace')
                     assert.isTrue deleteEntrySpy.calledTwice
 
             describe 'human:stop', ->
@@ -96,8 +97,8 @@ define [
 
             it 'should prevent all callbacks to be triggered', () ->
                 gameController.stopListen()
-                gameController.trigger('entry:typed', 'a')
-                gameController.trigger('entry:deleted')
+                gameController.trigger('keyboard:char', 'a')
+                gameController.trigger('keyboard:backspace')
                 gameController.trigger('human:stop')
                 assert.isTrue typeEntrySpy.notCalled
                 assert.isTrue deleteEntrySpy.notCalled

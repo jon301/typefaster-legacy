@@ -1,20 +1,24 @@
-<div class="typezone-text">
-    <% var wordsArray = entries.split(' ') %>
-    <% _.each(wordsArray, function(word, wordIndex) { %>
-        <span class="word">
-            <% var wordLength = punycode.ucs2.decode(word).length %>
-            <% var entryIndex = 0 %>
-            <% while (entryIndex < wordLength) { %>
-                <!--<span class="entry<% if (wordIndex === 0 && entryIndex === 0) { %> current<% } %>"><%- word.at(entryIndex) %></span>-->
-                <span class="entry"><%- word.at(entryIndex) %></span>
-                <% entryIndex++ %>
-            <% } %>
-            <% if (wordIndex < wordsArray.length - 1) { %>
-                <span class="entry">&nbsp;</span>
-            <% } %>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="typezone-text">
+            <% var wordsArray = entries.split(' ') %>
+            <% _.each(wordsArray, function(word, wordIndex) { %>
+                <span class="word">
+                    <% var wordLength = punycode.ucs2.decode(word).length %>
+                    <% var entryIndex = 0 %>
+                    <% while (entryIndex < wordLength) { %>
+                        <!--<span class="entry<% if (wordIndex === 0 && entryIndex === 0) { %> current<% } %>"><%- word.at(entryIndex) %></span>-->
+                        <span class="entry"><%- word.at(entryIndex) %></span>
+                        <% entryIndex++ %>
+                    <% } %>
+                    <% if (wordIndex < wordsArray.length - 1) { %>
+                        <span class="entry">&nbsp;</span>
+                    <% } %>
+                    <div class="clearfix"></div>
+                </span>
+            <% }) %>
             <div class="clearfix"></div>
-        </span>
-    <% }) %>
-    <div class="clearfix"></div>
+        </div>
+    </div>
 </div>
 <input type="text" class="typezone-input" />

@@ -35,35 +35,35 @@ obj || (obj = {});
 var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
 function print() { __p += __j.call(arguments, '') }
 with (obj) {
-__p += '<div class="typezone-text">\n    ';
+__p += '<div class="panel panel-default">\n    <div class="panel-body">\n        <div class="typezone-text">\n            ';
  var wordsArray = entries.split(' ') ;
-__p += '\n    ';
+__p += '\n            ';
  _.each(wordsArray, function(word, wordIndex) { ;
-__p += '\n        <span class="word">\n            ';
+__p += '\n                <span class="word">\n                    ';
  var wordLength = punycode.ucs2.decode(word).length ;
-__p += '\n            ';
+__p += '\n                    ';
  var entryIndex = 0 ;
-__p += '\n            ';
+__p += '\n                    ';
  while (entryIndex < wordLength) { ;
-__p += '\n                <!--<span class="entry';
+__p += '\n                        <!--<span class="entry';
  if (wordIndex === 0 && entryIndex === 0) { ;
 __p += ' current';
  } ;
 __p += '">' +
 __e( word.at(entryIndex) ) +
-'</span>-->\n                <span class="entry">' +
+'</span>-->\n                        <span class="entry">' +
 __e( word.at(entryIndex) ) +
-'</span>\n                ';
+'</span>\n                        ';
  entryIndex++ ;
-__p += '\n            ';
+__p += '\n                    ';
  } ;
-__p += '\n            ';
+__p += '\n                    ';
  if (wordIndex < wordsArray.length - 1) { ;
-__p += '\n                <span class="entry">&nbsp;</span>\n            ';
+__p += '\n                        <span class="entry">&nbsp;</span>\n                    ';
  } ;
-__p += '\n            <div class="clearfix"></div>\n        </span>\n    ';
+__p += '\n                    <div class="clearfix"></div>\n                </span>\n            ';
  }) ;
-__p += '\n    <div class="clearfix"></div>\n</div>\n<input type="text" class="typezone-input" />\n';
+__p += '\n            <div class="clearfix"></div>\n        </div>\n    </div>\n</div>\n<input type="text" class="typezone-input" />\n';
 
 }
 return __p

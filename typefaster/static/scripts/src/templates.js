@@ -45,13 +45,7 @@ __p += '\n                    ';
  var entryIndex = 0 ;
 __p += '\n                    ';
  while (entryIndex < wordLength) { ;
-__p += '\n                        <!--<span class="entry';
- if (wordIndex === 0 && entryIndex === 0) { ;
-__p += ' current';
- } ;
-__p += '">' +
-__e( word.at(entryIndex) ) +
-'</span>-->\n                        <span class="entry">' +
+__p += '\n                        <span class="entry">' +
 __e( word.at(entryIndex) ) +
 '</span>\n                        ';
  entryIndex++ ;
@@ -63,7 +57,7 @@ __p += '\n                        <span class="entry">&nbsp;</span>\n           
  } ;
 __p += '\n                    <div class="clearfix"></div>\n                </span>\n            ';
  }) ;
-__p += '\n            <div class="clearfix"></div>\n        </div>\n    </div>\n</div>\n<input type="text" class="typezone-input" />\n';
+__p += '\n            <div class="clearfix"></div>\n        </div>\n    </div>\n</div>\n<input type="text" class="typezone-input" style="opacity: 0.5;" />\n';
 
 }
 return __p

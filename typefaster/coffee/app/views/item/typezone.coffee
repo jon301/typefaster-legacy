@@ -55,7 +55,7 @@ define [
             if @focused and evt.originalEvent isnt `undefined`
                 keyCode = evt.which
                 entry = String.fromCodePoint(keyCode);
-                if entry
+                if entry and keyCode and keyCode != 8 and keyCode != 27
                     @gameController.trigger 'keyboard:char', entry
 
 
@@ -143,9 +143,10 @@ define [
 
 
         scrollToEntry: ($entry) ->
-            if $entry.length and $entry.parent().position().top != 0 and not @animating
+            # if $entry.length and $entry.parent().position().top != 0 and not @animating
+            if $entry.length and $entry.position().top != 0 and not @animating
                 @animating = true
-                @.ui.textarea.stop(true).animate({ scrollTop: @.ui.textarea.scrollTop() + $entry.parent().position().top }, () =>
+                @.ui.textarea.stop(true).animate({ scrollTop: @.ui.textarea.scrollTop() + $entry.position().top }, () =>
                     @animating = false
                 )
 
@@ -173,6 +174,7 @@ define [
 
         focus: (evt) ->
             @.ui.input.focus()
+
             unless @focused or @disabled
                 @logger.debug 'focus typezone'
                 @focused = true

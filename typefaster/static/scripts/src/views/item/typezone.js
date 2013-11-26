@@ -63,7 +63,7 @@
         if (this.focused && evt.originalEvent !== undefined) {
           keyCode = evt.which;
           entry = String.fromCodePoint(keyCode);
-          if (entry) {
+          if (entry && keyCode && keyCode !== 8 && keyCode !== 27) {
             return this.gameController.trigger('keyboard:char', entry);
           }
         }
@@ -170,10 +170,10 @@
 
       TypeZoneView.prototype.scrollToEntry = function($entry) {
         var _this = this;
-        if ($entry.length && $entry.parent().position().top !== 0 && !this.animating) {
+        if ($entry.length && $entry.position().top !== 0 && !this.animating) {
           this.animating = true;
           return this.ui.textarea.stop(true).animate({
-            scrollTop: this.ui.textarea.scrollTop() + $entry.parent().position().top
+            scrollTop: this.ui.textarea.scrollTop() + $entry.position().top
           }, function() {
             return _this.animating = false;
           });

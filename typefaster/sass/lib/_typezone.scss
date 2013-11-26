@@ -1,6 +1,6 @@
 $word-line-height: 42px;
 // $lines-visible: 2;
-$lines-visible: 5;
+$lines-visible: 2;
 
 #typezone-container {
     @include user-select(none);
@@ -46,7 +46,7 @@ $lines-visible: 5;
 
         span {
             @include float-left();
-            border: 1px solid transparent;
+            // border: 1px solid transparent;
 
             &.focus {
                 background: black;

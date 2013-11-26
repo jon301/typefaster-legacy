@@ -22,7 +22,6 @@ define [
             @.listenTo @gameController, 'keyboard:backspace', =>
                 @.deleteEntry()
 
-
             @.listenTo @gameController, 'keyboard:escape', =>
                 @gameController.stop()
                 @gameController.startListen()

@@ -7,7 +7,6 @@
                     <% var wordLength = punycode.ucs2.decode(word).length %>
                     <% var entryIndex = 0 %>
                     <% while (entryIndex < wordLength) { %>
-                        <!--<span class="entry<% if (wordIndex === 0 && entryIndex === 0) { %> current<% } %>"><%- word.at(entryIndex) %></span>-->
                         <span class="entry"><%- word.at(entryIndex) %></span>
                         <% entryIndex++ %>
                     <% } %>
@@ -21,4 +20,4 @@
         </div>
     </div>
 </div>
-<input type="text" class="typezone-input" />
+<input type="text" class="typezone-input" style="opacity: 0.5;" />

@@ -23,6 +23,7 @@ define [
                 @.deleteEntry()
 
             @.listenTo @gameController, 'keyboard:escape', =>
+                @.reset()
                 @gameController.stop()
                 @gameController.startListen()
 

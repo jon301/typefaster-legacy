@@ -29,6 +29,7 @@
           return _this.deleteEntry();
         });
         return this.listenTo(this.gameController, 'keyboard:escape', function() {
+          _this.reset();
           _this.gameController.stop();
           return _this.gameController.startListen();
         });

@@ -57,7 +57,7 @@ __p += '\n                        <span class="entry">&nbsp;</span>\n           
  } ;
 __p += '\n                    <div class="clearfix"></div>\n                </span>\n            ';
  }) ;
-__p += '\n            <div class="clearfix"></div>\n        </div>\n    </div>\n</div>\n<input type="text" class="typezone-input" style="opacity: 0.5;" />\n';
+__p += '\n            <div class="clearfix"></div>\n        </div>\n    </div>\n</div>\n<input type="text" class="typezone-input" maxlength="0" />\n';
 
 }
 return __p

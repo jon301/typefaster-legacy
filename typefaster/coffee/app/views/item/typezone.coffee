@@ -143,12 +143,16 @@ define [
 
 
         scrollToEntry: ($entry) ->
+
             # if $entry.length and $entry.parent().position().top != 0 and not @animating
             if $entry.length and $entry.position().top != 0 and not @animating
                 @animating = true
                 @.ui.textarea.stop(true).animate({ scrollTop: @.ui.textarea.scrollTop() + $entry.position().top }, () =>
                     @animating = false
+                    @.ui.input.offset $entry.offset()
                 )
+            else
+                @.ui.input.offset $entry.offset()
 
 
         reset: () ->
@@ -180,7 +184,8 @@ define [
                 @focused = true
                 @gameController.startListen()
                 @.$('.current').addClass 'focus'
-                $('#typezone-container').addClass 'focus'
+                @.$el.addClass 'focus'
+                @.ui.input.offset @.$('.current').offset()
                 $('body').on 'click.typezone', $.proxy(@blur, @)
 
             if evt
@@ -195,7 +200,7 @@ define [
                 @focused = false
                 @gameController.stopListen()
                 @.$('.current').removeClass 'focus'
-                $('#typezone-container').removeClass 'focus'
+                @.$el.removeClass 'focus'
                 $('body').off 'click.typezone', $.proxy(@blur, @)
 
 

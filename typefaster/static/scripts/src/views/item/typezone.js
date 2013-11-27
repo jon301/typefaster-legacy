@@ -175,8 +175,11 @@
           return this.ui.textarea.stop(true).animate({
             scrollTop: this.ui.textarea.scrollTop() + $entry.position().top
           }, function() {
-            return _this.animating = false;
+            _this.animating = false;
+            return _this.ui.input.offset($entry.offset());
           });
+        } else {
+          return this.ui.input.offset($entry.offset());
         }
       };
 
@@ -204,7 +207,8 @@
           this.focused = true;
           this.gameController.startListen();
           this.$('.current').addClass('focus');
-          $('#typezone-container').addClass('focus');
+          this.$el.addClass('focus');
+          this.ui.input.offset(this.$('.current').offset());
           $('body').on('click.typezone', $.proxy(this.blur, this));
         }
         if (evt) {
@@ -219,7 +223,7 @@
           this.focused = false;
           this.gameController.stopListen();
           this.$('.current').removeClass('focus');
-          $('#typezone-container').removeClass('focus');
+          this.$el.removeClass('focus');
           return $('body').off('click.typezone', $.proxy(this.blur, this));
         }
       };

@@ -22,6 +22,7 @@ define [
 
 
         events:
+            'click .typezone-panel': 'focus'
             'keydown .typezone-input': 'onKeydown'
             'keypress .typezone-input': 'onKeyPress'
             'compositionstart .typezone-input': 'onCompositionStart'
@@ -29,19 +30,18 @@ define [
 
 
         debugEvent: (evt) ->
-            @logger.debug evt.type
             if evt.originalEvent.constructor.name == 'KeyboardEvent'
-                @logger.debug 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')'
-                @logger.debug 'charCode=' + evt.charCode+ ' (' + String.fromCharCode(evt.charCode) + ')'
-                @logger.debug 'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')'
-                @logger.debug 'keyIdentifier=' + evt.originalEvent.keyIdentifier
+                @logger.debug evt.type, 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')',
+                    'charCode=' + evt.charCode+ ' (' + String.fromCharCode(evt.charCode) + ')',
+                    'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')',
+                    'keyIdentifier=' + evt.originalEvent.keyIdentifier
             else if evt.originalEvent.constructor.name == 'CompositionEvent'
-                @logger.debug 'data=' + (evt.data || evt.originalEvent.data)
+                @logger.debug evt.type, 'data=' + (evt.data || evt.originalEvent.data)
 
 
         onKeydown: (evt) ->
             @.debugEvent(evt)
-            if @focused and evt.originalEvent isnt `undefined`
+            if @.$el.hasClass('focus') and evt.originalEvent isnt `undefined`
                 keyCode = evt.which
                 if keyCode == 8
                     @gameController.trigger 'keyboard:backspace'
@@ -52,7 +52,7 @@ define [
 
         onKeyPress: (evt) ->
             @.debugEvent(evt)
-            if @focused and evt.originalEvent isnt `undefined`
+            if @.$el.hasClass('focus') and evt.originalEvent isnt `undefined`
                 keyCode = evt.which
                 entry = String.fromCodePoint(keyCode);
                 if entry and keyCode and keyCode != 8 and keyCode != 27
@@ -61,13 +61,13 @@ define [
 
         onCompositionStart: (evt) ->
             @.debugEvent(evt)
-            @.ui.entries.filter('.focus').addClass('composition')
+            @.ui.entries.filter('.current').addClass('composition')
 
 
         onCompositionEnd: (evt) ->
             @.debugEvent(evt)
-            @.ui.entries.filter('.focus').removeClass('composition')
-            if @focused and evt.originalEvent isnt `undefined`
+            @.ui.entries.filter('.current').removeClass('composition')
+            if @.$el.hasClass('focus') and evt.originalEvent isnt `undefined`
                 entry = evt.data || evt.originalEvent.data
                 if entry
                     @gameController.trigger 'keyboard:char', entry
@@ -80,8 +80,6 @@ define [
 
         onRender: () ->
             @.$el.show()
-
-            $('#typezone-container').on 'click.typezone', $.proxy(@focus, @)
 
             $(window).on 'resize.typezone', () =>
                 clearTimeout @resizingTimeout
@@ -96,9 +94,9 @@ define [
                 $entry = @.ui.entries.eq(index)
                 $nextEntry = @.ui.entries.eq(index + 1)
                 if player.getType() == 'human'
-                    $entry.removeClass('current focus').addClass('correct')
+                    $entry.removeClass('current').addClass('correct')
                     if $nextEntry
-                        $nextEntry.addClass('current focus')
+                        $nextEntry.addClass('current')
                         @scrollToEntry $nextEntry
                 else
                     $entry.css 'borderColor', 'transparent'
@@ -109,9 +107,9 @@ define [
                 $entry = @.ui.entries.eq(index)
                 $nextEntry = @.ui.entries.eq(index + 1)
                 if player.getType() == 'human'
-                    $entry.removeClass('current focus').addClass('incorrect')
+                    $entry.removeClass('current').addClass('incorrect')
                     if $nextEntry
-                        $nextEntry.addClass('current focus')
+                        $nextEntry.addClass('current')
                         @scrollToEntry $nextEntry
                 else
                     $entry.css 'borderColor', 'transparent'
@@ -121,11 +119,11 @@ define [
             @.listenTo @gameController, 'entry:is_reset', (player, index) =>
                 $entry = @.ui.entries.eq(index)
                 if player.getType() == 'human'
-                    @.ui.entries.removeClass('current focus')
-                    $entry.removeClass('correct incorrect').addClass('current focus')
+                    @.ui.entries.removeClass('current')
+                    $entry.removeClass('correct incorrect').addClass('current')
                     if index isnt 0
                         $prevEntry = @.ui.entries.eq(index - 1)
-                        @scrollToEntry $prevEntry
+                        @scrollToEntry $prevEntry, $entry
                 else
                     @.ui.entries.css 'borderColor', 'transparent'
                     $entry.css 'borderColor', player.getColor()
@@ -134,56 +132,46 @@ define [
                 $entry = @.ui.entries.eq(0)
                 if player.getType() == 'human'
                     $entry.addClass 'current'
-                    @.focus()
                 else
                     $entry.css 'borderColor', player.getColor()
 
-            @.listenTo @gameController, 'human:stop', () =>
-                @disable()
 
-
-        scrollToEntry: ($entry) ->
+        scrollToEntry: ($entry, $focusEntry) ->
+            if not $focusEntry
+                $focusEntry = $entry
 
             # if $entry.length and $entry.parent().position().top != 0 and not @animating
             if $entry.length and $entry.position().top != 0 and not @animating
                 @animating = true
                 @.ui.textarea.stop(true).animate({ scrollTop: @.ui.textarea.scrollTop() + $entry.position().top }, () =>
                     @animating = false
-                    @.ui.input.offset $entry.offset()
+                    @.ui.input.offset $focusEntry.offset()
                 )
             else
-                @.ui.input.offset $entry.offset()
+                @.ui.input.offset $focusEntry.offset()
 
 
         reset: () ->
-            @.ui.entries.removeClass 'correct incorrect focus current'
+            @.ui.entries.removeClass 'correct incorrect current'
 
             @.ui.input.val ''
-            # @.ui.input.prop 'disabled', false
-            @disabled = false
-            @focused = false
 
             firstEntry = @.ui.entries.eq(0)
             firstEntry.addClass 'current'
             @.scrollToEntry firstEntry
 
+            @.ui.entries.css 'borderColor', 'transparent'
+            firstEntry.css 'borderColor', 'red'
+
             @focus()
 
-
-        disable: () ->
-            @disabled = true
-            # @.ui.input.prop 'disabled', true
-            @blur()
 
 
         focus: (evt) ->
             @.ui.input.focus()
 
-            unless @focused or @disabled
+            unless @.$el.hasClass('focus')
                 @logger.debug 'focus typezone'
-                @focused = true
-                @gameController.startListen()
-                @.$('.current').addClass 'focus'
                 @.$el.addClass 'focus'
                 @.ui.input.offset @.$('.current').offset()
                 $('body').on 'click.typezone', $.proxy(@blur, @)
@@ -194,14 +182,14 @@ define [
 
 
         blur: (evt) ->
-            # @.ui.input.blur()
-            if @focused
+            @.ui.input.blur()
+
+            if @.$el.hasClass('focus')
                 @logger.debug 'blur typezone'
-                @focused = false
-                @gameController.stopListen()
                 @.$('.current').removeClass 'focus'
                 @.$el.removeClass 'focus'
                 $('body').off 'click.typezone', $.proxy(@blur, @)
+
 
 
         serializeData: () ->
@@ -210,6 +198,5 @@ define [
 
 
         onClose: () ->
-            $('#typezone-container').off '.typezone'
             $(window).off '.typezone'
             $('body').off '.typezone'

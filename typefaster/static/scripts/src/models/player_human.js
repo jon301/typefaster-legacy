@@ -25,13 +25,8 @@
           }
           return _this.typeEntry(entry);
         });
-        this.listenTo(this.gameController, 'keyboard:backspace', function() {
+        return this.listenTo(this.gameController, 'keyboard:backspace', function() {
           return _this.deleteEntry();
-        });
-        return this.listenTo(this.gameController, 'keyboard:escape', function() {
-          _this.reset();
-          _this.gameController.stop();
-          return _this.gameController.startListen();
         });
       };
 

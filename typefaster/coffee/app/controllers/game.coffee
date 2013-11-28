@@ -54,34 +54,27 @@ define [
 
         initialize: (options) ->
             @logger = Logger.get 'GameController'
+
             @duration = options.duration
             @entries = options.entries
 
+            # Empty players collection
             @players = new Backbone.Collection()
+            @.listenTo @players, 'add', (playerModel) =>
+                @.trigger 'player:add', playerModel
 
+            @.listenTo @players, 'remove', (playerModel) =>
+                @.trigger 'player:remove', playerModel
+
+            # Timer
             @timer = new TimerController()
 
-            @typeZoneView = new TypeZoneView({ gameController: @ })
-            @typeZoneView.render()
+            @.on 'human:stop', () =>
+                @stop()
 
-        startListen: ->
-            unless @listening
-                @logger.debug 'game: bind listen events'
-                @listening = true
+            @.on 'keyboard:escape', =>
+                @stop()
 
-                @.listenTo @, 'human:stop', () =>
-                    @stop()
-
-                @.listenTo @players, 'add', (playerModel) =>
-                    @.trigger 'player:add', playerModel
-
-                @.listenTo @players, 'remove', (playerModel) =>
-                    @.trigger 'player:remove', playerModel
-
-        stopListen: ->
-            @logger.debug 'game: unbind listen events'
-            @listening = false
-            @stopListening();
 
         start: ->
             unless @running
@@ -108,7 +101,6 @@ define [
                 @running = false
 
                 clearInterval(@interval)
-                @stopListen()
 
                 @timer.stop()
                 @players.invoke 'stop'

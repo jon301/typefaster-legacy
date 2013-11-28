@@ -22,11 +22,6 @@ define [
             @.listenTo @gameController, 'keyboard:backspace', =>
                 @.deleteEntry()
 
-            @.listenTo @gameController, 'keyboard:escape', =>
-                @.reset()
-                @gameController.stop()
-                @gameController.startListen()
-
         stop: () ->
             super()
             @logger.debug JSON.stringify @replayLogs

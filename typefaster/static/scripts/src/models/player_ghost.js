@@ -16,12 +16,14 @@
       PlayerGhostModel.prototype.initialize = function(options) {
         PlayerGhostModel.__super__.initialize.call(this, options);
         this.logger = Logger.get('PlayerGhostModel');
-        this.replayLogs = options.replayLogs;
-        return this.color = options.color;
+        this.color = options.color;
+        return this.replayLogs = options.replayLogs;
       };
 
       PlayerGhostModel.prototype.play = function() {
         PlayerGhostModel.__super__.play.call(this);
+        this.replayLogsTmp = this.replayLogs.slice(0);
+        this.entryLog = null;
         return this.replay();
       };
 
@@ -32,7 +34,7 @@
 
       PlayerGhostModel.prototype.replay = function() {
         if (!this.entryLog) {
-          this.entryLog = this.replayLogs.shift();
+          this.entryLog = this.replayLogsTmp.shift();
         }
         if (this.timer.getElapsedTime() >= this.entryLog.t) {
           if (this.entryLog.v === -1) {
@@ -40,7 +42,7 @@
           } else {
             this.typeEntry(this.entryLog.v);
           }
-          this.entryLog = this.replayLogs.shift();
+          this.entryLog = this.replayLogsTmp.shift();
         }
         if (this.entryLog) {
           return this.timeout = setTimeout($.proxy(this.replay, this), 1);

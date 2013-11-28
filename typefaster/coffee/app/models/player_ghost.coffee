@@ -13,11 +13,13 @@ define [
         initialize: (options) ->
             super options
             @logger = Logger.get 'PlayerGhostModel'
-            @replayLogs = options.replayLogs
             @color = options.color
+            @replayLogs = options.replayLogs
 
         play: () ->
             super()
+            @replayLogsTmp = @replayLogs.slice(0)
+            @entryLog = null
             @replay()
 
         stop: () ->
@@ -26,14 +28,14 @@ define [
 
         replay: () ->
             unless @entryLog
-                @entryLog = @replayLogs.shift()
+                @entryLog = @replayLogsTmp.shift()
 
             if @timer.getElapsedTime() >= @entryLog.t
                 if @entryLog.v == -1
                     @deleteEntry()
                 else
                     @typeEntry @entryLog.v
-                @entryLog = @replayLogs.shift()
+                @entryLog = @replayLogsTmp.shift()
 
             if @entryLog
                 @timeout = setTimeout($.proxy(@replay, @), 1)

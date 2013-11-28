@@ -53,38 +53,24 @@
       GameController.prototype.ghostColors = ['aqua', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'silver', 'teal', 'yellow', 'orange', 'purple', 'red'];
 
       GameController.prototype.initialize = function(options) {
+        var _this = this;
         this.logger = Logger.get('GameController');
         this.duration = options.duration;
         this.entries = options.entries;
         this.players = new Backbone.Collection();
-        this.timer = new TimerController();
-        this.typeZoneView = new TypeZoneView({
-          gameController: this
+        this.listenTo(this.players, 'add', function(playerModel) {
+          return _this.trigger('player:add', playerModel);
         });
-        return this.typeZoneView.render();
-      };
-
-      GameController.prototype.startListen = function() {
-        var _this = this;
-        if (!this.listening) {
-          this.logger.debug('game: bind listen events');
-          this.listening = true;
-          this.listenTo(this, 'human:stop', function() {
-            return _this.stop();
-          });
-          this.listenTo(this.players, 'add', function(playerModel) {
-            return _this.trigger('player:add', playerModel);
-          });
-          return this.listenTo(this.players, 'remove', function(playerModel) {
-            return _this.trigger('player:remove', playerModel);
-          });
-        }
-      };
-
-      GameController.prototype.stopListen = function() {
-        this.logger.debug('game: unbind listen events');
-        this.listening = false;
-        return this.stopListening();
+        this.listenTo(this.players, 'remove', function(playerModel) {
+          return _this.trigger('player:remove', playerModel);
+        });
+        this.timer = new TimerController();
+        this.on('human:stop', function() {
+          return _this.stop();
+        });
+        return this.on('keyboard:escape', function() {
+          return _this.stop();
+        });
       };
 
       GameController.prototype.start = function() {
@@ -112,7 +98,6 @@
           this.logger.debug('Game stopped');
           this.running = false;
           clearInterval(this.interval);
-          this.stopListen();
           this.timer.stop();
           return this.players.invoke('stop');
         }

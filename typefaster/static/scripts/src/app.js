@@ -14,7 +14,7 @@
         });
         app.addInitializer(function(options) {
           Logger.useDefaults();
-          return Logger.setLevel(Logger[options.config.JSLOGGER_LEVEL]);
+          return Logger.setLevel(Logger.OFF);
         });
       }
       return app;

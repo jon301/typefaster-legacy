@@ -44,6 +44,7 @@ $lines-visible: 2;
             border: none;
             background: none;
             position: absolute;
+            z-index: -1;
 
             outline: 0;
             opacity: 0;
@@ -58,13 +59,6 @@ $lines-visible: 2;
                 @include float-left();
                 border: 1px solid transparent;
 
-                &.focus {
-                    background: black;
-                    color: white;
-                    &.composition {
-                        @include opacity(0.5);
-                    }
-                }
                 &.correct {
                     color: green;
                 }
@@ -73,6 +67,16 @@ $lines-visible: 2;
                     color: white;
                 }
 
+            }
+        }
+
+        &.focus .entry {
+            &.current {
+                background: black;
+                color: white;
+            }
+            &.composition {
+                @include opacity(0.5);
             }
         }
 

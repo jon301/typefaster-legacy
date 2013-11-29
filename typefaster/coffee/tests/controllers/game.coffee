@@ -58,16 +58,16 @@ define [
                 timer.tick(1000)
                 assert.isTrue stopSpy.called, 'called at 1000ms'
 
-            it 'should stop event listening', () ->
-                gameController.startListen()
-                gameController.trigger('keyboard:char', 'a')
-                gameController.stop()
-                gameController.trigger('keyboard:char', 'a')
-                assert.isTrue typeEntrySpy.calledOnce
+            # it 'should stop event listening', () ->
+            #     gameController.startListen()
+            #     gameController.trigger('keyboard:char', 'a')
+            #     gameController.stop()
+            #     gameController.trigger('keyboard:char', 'a')
+            #     assert.isTrue typeEntrySpy.calledOnce
 
-        describe 'startListen', ->
-            beforeEach () ->
-                gameController.startListen()
+        describe 'on event', ->
+            # beforeEach () ->
+            #     gameController.startListen()
 
             describe 'keyboard:char', ->
                 it 'should call `typeEntry` with the char pressed', () ->
@@ -91,18 +91,18 @@ define [
                     gameController.trigger('human:stop')
                     assert.isTrue stopSpy.called
 
-        describe 'stopListen', ->
-            beforeEach () ->
-                gameController.startListen()
+        # describe 'stopListen', ->
+        #     beforeEach () ->
+        #         gameController.startListen()
 
-            it 'should prevent all callbacks to be triggered', () ->
-                gameController.stopListen()
-                gameController.trigger('keyboard:char', 'a')
-                gameController.trigger('keyboard:backspace')
-                gameController.trigger('human:stop')
-                assert.isTrue typeEntrySpy.notCalled
-                assert.isTrue deleteEntrySpy.notCalled
-                assert.isTrue stopSpy.notCalled
+        #     it 'should prevent all callbacks to be triggered', () ->
+        #         gameController.stopListen()
+        #         gameController.trigger('keyboard:char', 'a')
+        #         gameController.trigger('keyboard:backspace')
+        #         gameController.trigger('human:stop')
+        #         assert.isTrue typeEntrySpy.notCalled
+        #         assert.isTrue deleteEntrySpy.notCalled
+        #         assert.isTrue stopSpy.notCalled
 
         afterEach () ->
             gameController.stop()

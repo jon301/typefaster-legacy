@@ -102,7 +102,6 @@ define [
                 intervals = $.map intervals, (val, i) ->
                     return null  if i is 0 # Skip first keypress (no interval)
                     val - intervals[i - 1]
-                @logger.debug intervals
                 intervals = _.uniq(intervals)
 
                 if intervals.length

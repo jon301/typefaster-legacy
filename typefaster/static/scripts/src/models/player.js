@@ -129,7 +129,6 @@
             }
             return val - intervals[i - 1];
           });
-          this.logger.debug(intervals);
           intervals = _.uniq(intervals);
           if (intervals.length) {
             totalKeystrokes = this.correctEntries + this.incorrectEntries;

@@ -15,19 +15,18 @@
           entries: entries,
           duration: null
         });
-        gameController.addHuman();
-        humanPlayer = gameController.humanPlayer;
         typeZoneView = new TypeZoneView({
           el: $('<div />'),
           gameController: gameController
         });
-        return typeZoneView.render();
+        typeZoneView.render();
+        gameController.addHuman();
+        return humanPlayer = gameController.humanPlayer;
       });
       beforeEach(function() {
         sinon.spy(gameController, 'trigger');
         $(window).triggerHandler('focus.typezone');
-        typeZoneView.focus();
-        return gameController.startListen();
+        return typeZoneView.focus();
       });
       describe('blur', function() {
         it('should be called on window blur', function() {

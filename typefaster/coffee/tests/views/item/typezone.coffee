@@ -23,8 +23,6 @@ define [
                 entries: entries
                 duration: null
             )
-            gameController.addHuman()
-            humanPlayer = gameController.humanPlayer
 
             typeZoneView = new TypeZoneView(
                 el: $('<div />')
@@ -32,11 +30,13 @@ define [
             )
             typeZoneView.render()
 
+            gameController.addHuman()
+            humanPlayer = gameController.humanPlayer
+
         beforeEach () ->
             sinon.spy(gameController, 'trigger')
             $(window).triggerHandler('focus.typezone')
             typeZoneView.focus()
-            gameController.startListen()
 
         describe 'blur', ->
             it 'should be called on window blur', ->
@@ -74,7 +74,7 @@ define [
                 typeZoneView.ui.input.trigger e
                 assert.isTrue gameController.trigger.calledWith('keyboard:char', 'I')
 
-             it 'should handle unicode characters', ->
+            it 'should handle unicode characters', ->
                 gameController.setEntries '💩'
                 e = jQuery.Event 'keypress'
                 e.originalEvent = true

@@ -4,7 +4,22 @@
         <title>TypeFaster Test Runner</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/mocha/mocha.css') }}" />
         <script type="text/javascript" src="{{ url_for('static', filename='bower_components/mocha/mocha.js') }}"></script>
-        <script type="text/javascript" src="http://sinonjs.org/releases/sinon-1.7.3.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/match.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/spy.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/call.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/stub.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/mock.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/assert.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/event.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_xml_http_request.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_timers.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/xhr_ie.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/timers_ie.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server_with_clock.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/collection.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/sandbox.js') }}"></script>
     </head>
     <body>
         <div id="mocha"></div>

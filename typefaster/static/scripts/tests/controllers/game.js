@@ -43,7 +43,7 @@
           gameController.stop();
           return assert.isTrue(stopSpy.calledOnce);
         });
-        it('should be called after `duration` second(s) : 1 second', function() {
+        return it('should be called after `duration` second(s) : 1 second', function() {
           var duration;
           duration = .0001;
           gameController.setDuration(duration);
@@ -53,18 +53,8 @@
           timer.tick(1000);
           return assert.isTrue(stopSpy.called, 'called at 1000ms');
         });
-        return it('should stop event listening', function() {
-          gameController.startListen();
-          gameController.trigger('keyboard:char', 'a');
-          gameController.stop();
-          gameController.trigger('keyboard:char', 'a');
-          return assert.isTrue(typeEntrySpy.calledOnce);
-        });
       });
-      describe('startListen', function() {
-        beforeEach(function() {
-          return gameController.startListen();
-        });
+      describe('on event', function() {
         describe('keyboard:char', function() {
           it('should call `typeEntry` with the char pressed', function() {
             gameController.trigger('keyboard:char', 'a');
@@ -89,20 +79,6 @@
             gameController.trigger('human:stop');
             return assert.isTrue(stopSpy.called);
           });
-        });
-      });
-      describe('stopListen', function() {
-        beforeEach(function() {
-          return gameController.startListen();
-        });
-        return it('should prevent all callbacks to be triggered', function() {
-          gameController.stopListen();
-          gameController.trigger('keyboard:char', 'a');
-          gameController.trigger('keyboard:backspace');
-          gameController.trigger('human:stop');
-          assert.isTrue(typeEntrySpy.notCalled);
-          assert.isTrue(deleteEntrySpy.notCalled);
-          return assert.isTrue(stopSpy.notCalled);
         });
       });
       afterEach(function() {

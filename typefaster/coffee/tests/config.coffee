@@ -39,8 +39,8 @@ require [
     ], (Logger) ->
 
     Logger.useDefaults()
-    # Logger.setLevel(Logger.OFF)
-    Logger.setLevel(Logger.DEBUG)
+    Logger.setLevel(Logger.OFF)
+    # Logger.setLevel(Logger.DEBUG)
 
     if window.mochaPhantomJS
         mochaPhantomJS.run()

@@ -91,6 +91,7 @@
       TypeZoneView.prototype.onRender = function() {
         var _this = this;
         this.$el.show();
+        this.focus();
         $(window).on('resize.typezone', function() {
           clearTimeout(_this.resizingTimeout);
           return _this.resizingTimeout = setTimeout(function() {
@@ -149,7 +150,7 @@
             return $entry.css('borderColor', player.getColor());
           }
         });
-        return this.listenTo(this.gameController, 'player:add', function(player) {
+        this.listenTo(this.gameController, 'player:add', function(player) {
           var $entry;
           $entry = _this.ui.entries.eq(0);
           if (player.getType() === 'human') {
@@ -157,6 +158,9 @@
           } else {
             return $entry.css('borderColor', player.getColor());
           }
+        });
+        return this.listenTo(this.gameController, 'human:stop', function() {
+          return _this.disable();
         });
       };
 
@@ -178,8 +182,14 @@
         }
       };
 
+      TypeZoneView.prototype.disable = function(evt) {
+        this.undelegateEvents();
+        return this.blur();
+      };
+
       TypeZoneView.prototype.reset = function() {
         var firstEntry;
+        this.delegateEvents();
         this.ui.entries.removeClass('correct incorrect current');
         this.ui.input.val('');
         firstEntry = this.ui.entries.eq(0);
@@ -205,7 +215,6 @@
       };
 
       TypeZoneView.prototype.blur = function(evt) {
-        this.ui.input.blur();
         if (this.$el.hasClass('focus')) {
           this.logger.debug('blur typezone');
           this.$('.current').removeClass('focus');

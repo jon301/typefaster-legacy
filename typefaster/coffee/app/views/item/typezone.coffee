@@ -80,6 +80,7 @@ define [
 
         onRender: () ->
             @.$el.show()
+            @.focus()
 
             $(window).on 'resize.typezone', () =>
                 clearTimeout @resizingTimeout
@@ -135,6 +136,9 @@ define [
                 else
                     $entry.css 'borderColor', player.getColor()
 
+            @.listenTo @gameController, 'human:stop', () =>
+                @.disable()
+
 
         scrollToEntry: ($entry, $focusEntry) ->
             if not $focusEntry
@@ -151,7 +155,13 @@ define [
                 @.ui.input.offset $focusEntry.offset()
 
 
+        disable: (evt) ->
+            @.undelegateEvents()
+            @.blur()
+
+
         reset: () ->
+            @.delegateEvents()
             @.ui.entries.removeClass 'correct incorrect current'
 
             @.ui.input.val ''
@@ -182,14 +192,13 @@ define [
 
 
         blur: (evt) ->
-            @.ui.input.blur()
+            # @.ui.input.blur()
 
             if @.$el.hasClass('focus')
                 @logger.debug 'blur typezone'
                 @.$('.current').removeClass 'focus'
                 @.$el.removeClass 'focus'
                 $('body').off 'click.typezone', $.proxy(@blur, @)
-
 
 
         serializeData: () ->

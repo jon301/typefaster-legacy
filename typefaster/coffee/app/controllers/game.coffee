@@ -50,7 +50,8 @@ define [
         entries: '' # String
         duration: 60 # Seconds
 
-        ghostColors: ['aqua', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'silver', 'teal', 'yellow', 'orange', 'purple', 'red']
+        ghostColors: ['aqua', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy',
+            'olive', 'silver', 'teal', 'yellow', 'orange', 'purple', 'red']
 
         initialize: (options) ->
             @logger = Logger.get 'GameController'

@@ -37,7 +37,7 @@
 
   require(['js_logger', 'tests/controllers/game', 'tests/models/player_human', 'tests/views/item/typezone'], function(Logger) {
     Logger.useDefaults();
-    Logger.setLevel(Logger.DEBUG);
+    Logger.setLevel(Logger.OFF);
     if (window.mochaPhantomJS) {
       return mochaPhantomJS.run();
     } else {

@@ -1,9 +1,7 @@
 (function() {
-  define(['jquery', 'backbone', 'chai', 'controllers/game', 'views/item/typezone'], function($, Backbone, chai, GameController, TypeZoneView) {
+  define(['jquery', 'backbone', 'controllers/game', 'views/item/typezone'], function($, Backbone, GameController, TypeZoneView) {
     'use strict';
-    var assert, expect, gameController, humanPlayer, typeZoneView;
-    expect = chai.expect;
-    assert = chai.assert;
+    var gameController, humanPlayer, typeZoneView;
     gameController = void 0;
     humanPlayer = void 0;
     typeZoneView = void 0;

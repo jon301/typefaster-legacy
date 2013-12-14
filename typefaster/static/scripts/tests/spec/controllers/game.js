@@ -1,9 +1,7 @@
 (function() {
-  define(['jquery', 'backbone', 'chai', 'controllers/game'], function($, Backbone, chai, GameController) {
+  define(['jquery', 'backbone', 'controllers/game'], function($, Backbone, GameController) {
     'use strict';
-    var assert, deleteEntrySpy, expect, gameController, playSpy, stopSpy, timer, typeEntrySpy;
-    expect = chai.expect;
-    assert = chai.assert;
+    var deleteEntrySpy, gameController, playSpy, stopSpy, timer, typeEntrySpy;
     gameController = void 0;
     timer = void 0;
     playSpy = void 0;

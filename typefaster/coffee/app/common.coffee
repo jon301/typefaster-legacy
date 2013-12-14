@@ -23,7 +23,7 @@ requirejs.config
             exports: 'Marionette'
         bootstrap:
             deps: ['jquery']
-    urlArgs: '_=' + (new Date().getTime())
+    urlArgs: '_=' + Math.random()
 
 # Initialize the app
 require ['app', 'config'], (app, config) ->

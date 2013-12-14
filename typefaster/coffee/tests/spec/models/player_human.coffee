@@ -2,13 +2,9 @@
 define [
     'jquery',
     'backbone',
-    'chai',
     'controllers/game'
-    ], ($, Backbone, chai, GameController) ->
+    ], ($, Backbone, GameController) ->
     'use strict'
-
-    expect = chai.expect
-    assert = chai.assert
 
     gameController = undefined
     humanPlayer = undefined

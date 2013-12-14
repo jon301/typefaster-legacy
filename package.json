@@ -1,6 +1,11 @@
 {
   "name": "typefaster",
   "version": "0.0.1",
+  "homepage": "http://github.com/jon301/typefaster",
+  "description": "Type Faster, because speed matters",
+  "scripts": {
+    "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -16,8 +21,14 @@
     "load-grunt-tasks": "~0.1.0",
     "time-grunt": "~0.1.1",
     "phantomjs": "~1.9.2-2",
-    "mocha": "~1.14.0",
-    "mocha-phantomjs": "~3.1.6"
+    "karma-ng-html2js-preprocessor": "~0.1.0",
+    "karma-ng-scenario": "~0.1.0",
+    "grunt-karma": "~0.6.2",
+    "karma-mocha": "~0.1.1",
+    "karma-opera-launcher": "~0.1.0",
+    "karma-safari-launcher": "~0.1.1",
+    "karma-chai": "0.0.2",
+    "karma-sinon": "~1.0.0"
   },
   "engines": {
     "node": ">=0.8.0"

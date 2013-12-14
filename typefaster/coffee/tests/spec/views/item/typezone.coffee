@@ -2,14 +2,10 @@
 define [
     'jquery',
     'backbone',
-    'chai',
     'controllers/game'
     'views/item/typezone'
-    ], ($, Backbone, chai, GameController, TypeZoneView) ->
+    ], ($, Backbone, GameController, TypeZoneView) ->
     'use strict'
-
-    expect = chai.expect
-    assert = chai.assert
 
     gameController = undefined
     humanPlayer = undefined

@@ -1,9 +1,7 @@
 (function() {
-  define(['jquery', 'backbone', 'chai', 'controllers/game'], function($, Backbone, chai, GameController) {
+  define(['jquery', 'backbone', 'controllers/game'], function($, Backbone, GameController) {
     'use strict';
-    var assert, expect, gameController, humanPlayer;
-    expect = chai.expect;
-    assert = chai.assert;
+    var gameController, humanPlayer;
     gameController = void 0;
     humanPlayer = void 0;
     return describe('PlayerHumanModel', function() {

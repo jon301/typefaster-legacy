@@ -1,5 +1,13 @@
-require.config
-    baseUrl: '/static/scripts/src'
+tests = []
+for file of window.__karma__.files
+    if /scripts\/tests\/spec\//.test(file)
+        if window.__karma__.files.hasOwnProperty(file)
+            tests.push file
+
+requirejs.config
+    # Karma serves files from '/base'
+    baseUrl: '/base/scripts/src'
+
     paths:
         jquery: '../../bower_components/jquery/jquery.min'
         backbone: '../../bower_components/backbone/backbone-min'
@@ -13,10 +21,6 @@ require.config
         string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
         js_logger: '../../bower_components/js-logger/src/logger.min'
 
-        chai: '../../bower_components/chai/chai'
-
-        tests: '../tests'
-
     shim:
         backbone:
             deps: ['jquery', 'underscore']
@@ -29,20 +33,8 @@ require.config
         bootstrap:
             deps: ['jquery']
 
-    urlArgs: '_=' + (new Date().getTime())
+    # Ask Require.js to load these files (all our tests)
+    deps: tests
 
-require [
-    'js_logger',
-    'tests/controllers/game',
-    'tests/models/player_human',
-    'tests/views/item/typezone'
-    ], (Logger) ->
-
-    Logger.useDefaults()
-    Logger.setLevel(Logger.OFF)
-    # Logger.setLevel(Logger.DEBUG)
-
-    if window.mochaPhantomJS
-        mochaPhantomJS.run()
-    else
-        mocha.run()
+    #Start test run, once Require.js is done
+    callback: window.__karma__.start

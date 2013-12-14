@@ -1,6 +1,18 @@
 (function() {
-  require.config({
-    baseUrl: '/static/scripts/src',
+  var file, tests;
+
+  tests = [];
+
+  for (file in window.__karma__.files) {
+    if (/scripts\/tests\/spec\//.test(file)) {
+      if (window.__karma__.files.hasOwnProperty(file)) {
+        tests.push(file);
+      }
+    }
+  }
+
+  requirejs.config({
+    baseUrl: '/base/scripts/src',
     paths: {
       jquery: '../../bower_components/jquery/jquery.min',
       backbone: '../../bower_components/backbone/backbone-min',
@@ -12,9 +24,7 @@
       punycode: '../../bower_components/punycode/punycode.min',
       string_at: '../../bower_components/String.prototype.at/at',
       string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint',
-      js_logger: '../../bower_components/js-logger/src/logger.min',
-      chai: '../../bower_components/chai/chai',
-      tests: '../tests'
+      js_logger: '../../bower_components/js-logger/src/logger.min'
     },
     shim: {
       backbone: {
@@ -32,17 +42,8 @@
         deps: ['jquery']
       }
     },
-    urlArgs: '_=' + (new Date().getTime())
-  });
-
-  require(['js_logger', 'tests/controllers/game', 'tests/models/player_human', 'tests/views/item/typezone'], function(Logger) {
-    Logger.useDefaults();
-    Logger.setLevel(Logger.OFF);
-    if (window.mochaPhantomJS) {
-      return mochaPhantomJS.run();
-    } else {
-      return mocha.run();
-    }
+    deps: tests,
+    callback: window.__karma__.start
   });
 
 }).call(this);

@@ -1,31 +1,90 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>TypeFaster Test Runner</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/mocha/mocha.css') }}" />
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/mocha/mocha.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/match.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/spy.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/call.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/stub.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/mock.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/assert.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/event.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_xml_http_request.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_timers.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/xhr_ie.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/timers_ie.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server_with_clock.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/collection.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/sandbox.js') }}"></script>
-    </head>
-    <body>
-        <div id="mocha"></div>
-        <script type="text/javascript">
+<head>
+    <title>Mocha Spec Runner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/mocha/mocha.css') }}" />
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/mocha/mocha.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/chai/chai.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/match.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/spy.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/call.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/stub.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/mock.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/assert.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/event.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_xml_http_request.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_timers.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/xhr_ie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/timers_ie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/util/fake_server_with_clock.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/collection.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='bower_components/sinon/lib/sinon/sandbox.js') }}"></script>
+
+    <script>
+        // Configure RequireJS
+        var require = {
+            baseUrl: "{{ url_for('static', filename='scripts/src') }}",
+            paths: {
+                jquery: "{{ url_for('static', filename='bower_components/jquery/jquery.min') }}",
+                backbone: "{{ url_for('static', filename='bower_components/backbone/backbone-min') }}",
+                underscore: "{{ url_for('static', filename='bower_components/lodash/dist/lodash.min') }}",
+                marionette: "{{ url_for('static', filename='bower_components/marionette/lib/backbone.marionette.min') }}",
+                jed: "{{ url_for('static', filename='bower_components/jed/jed') }}",
+                bootstrap: "{{ url_for('static', filename='bower_components/sass-bootstrap/dist/js/bootstrap.min') }}",
+                highcharts: "{{ url_for('static', filename='bower_components/highcharts.com/js/highcharts.src') }}",
+                punycode: "{{ url_for('static', filename='bower_components/punycode/punycode.min') }}",
+                string_at: "{{ url_for('static', filename='bower_components/String.prototype.at/at') }}",
+                string_fromcodepoint: "{{ url_for('static', filename='bower_components/String.fromCodePoint/fromcodepoint') }}",
+                js_logger: "{{ url_for('static', filename='bower_components/js-logger/src/logger.min') }}",
+
+                spec: "{{ url_for('static', filename='scripts/tests/spec') }}"
+            },
+            shim: {
+                backbone: {
+                    deps: ['jquery', 'underscore'],
+                    exports: 'Backbone'
+                },
+                underscore: {
+                    exports: '_'
+                },
+                marionette: {
+                    deps: ['jquery', 'underscore', 'backbone'],
+                    exports: 'Marionette'
+                },
+                bootstrap: {
+                    deps: ['jquery']
+                }
+            },
+            // Prevent RequireJS from Caching Required Scripts
+            urlArgs: '_=' + Math.random()
+        };
+    </script>
+    <script src="{{ url_for('static', filename='bower_components/requirejs/require.js') }}"></script>
+    <script>
+        require(['require'], function(require) {
+            // Chai
+            assert = chai.assert;
+            should = chai.should();
+            expect = chai.expect;
+
+            // Mocha
             mocha.setup('bdd');
-        </script>
-        <script data-main="{{ url_for('static', filename='scripts/tests/config.js') }}" src="{{ url_for('static', filename='bower_components/requirejs/require.js') }}"></script>
-    </body>
+
+            // Require test specs here
+            require([
+                'spec/controllers/game',
+                'spec/models/player_human',
+                'spec/views/item/typezone'
+            ], function(){
+                // Start runner
+                mocha.run();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="mocha"></div>
+</body>
 </html>

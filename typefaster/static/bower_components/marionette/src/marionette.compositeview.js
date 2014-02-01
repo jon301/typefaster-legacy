@@ -82,6 +82,7 @@ Marionette.CompositeView = Marionette.CollectionView.extend({
 
   _renderChildren: function(){
     if (this.isRendered){
+      this.triggerMethod("composite:collection:before:render");
       Marionette.CollectionView.prototype._renderChildren.call(this);
       this.triggerMethod("composite:collection:rendered");
     }
@@ -113,6 +114,7 @@ Marionette.CompositeView = Marionette.CollectionView.extend({
   appendHtml: function(compositeView, itemView, index){
     if (compositeView.isBuffering) {
       compositeView.elBuffer.appendChild(itemView.el);
+      compositeView._bufferedChildren.push(itemView);
     }
     else {
       // If we've already rendered the main collection, just
@@ -134,7 +136,7 @@ Marionette.CompositeView = Marionette.CollectionView.extend({
     var itemViewContainer = Marionette.getOption(containerView, "itemViewContainer");
     if (itemViewContainer){
 
-      var selector = _.isFunction(itemViewContainer) ? itemViewContainer() : itemViewContainer;
+      var selector = _.isFunction(itemViewContainer) ? itemViewContainer.call(this) : itemViewContainer;
       container = containerView.$(selector);
       if (container.length <= 0) {
         throwError("The specified `itemViewContainer` was not found: " + containerView.itemViewContainer, "ItemViewContainerMissingError");

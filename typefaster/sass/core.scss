@@ -7,15 +7,8 @@
 //@import "compass/reset";
 
 // Bootstrap
-@import "sass-bootstrap/lib/variables";
-@import "bootswatch-scss/readable/variables";
-
-$grid-float-breakpoint: $screen-md;
-$font-size-base: 30px;
-// !! Override bootstrap variables below !!
-
-@import "sass-bootstrap/lib/bootstrap";
-@import "bootswatch-scss/readable/bootswatch";
+@import "lib/variables"; // !! Override bootstrap variables !!
+@import "bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/bootstrap";
 
 // Type Faster
 @import url("//fonts.googleapis.com/css?family=Inconsolata");

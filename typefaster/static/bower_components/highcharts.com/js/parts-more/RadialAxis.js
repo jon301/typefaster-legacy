@@ -105,6 +105,9 @@ var radialAxisMixin = {
 		
 		// Title or label offsets are not counted
 		this.chart.axisOffset[this.side] = 0;
+		
+		// Set the center array
+		this.center = this.pane.center = CenteredSeriesMixin.getCenter.call(this.pane);
 	},
 
 
@@ -155,6 +158,10 @@ var radialAxisMixin = {
 			if (this.isXAxis) {
 				this.minPixelPadding = this.transA * this.minPointOffset +
 					(this.reversed ? (this.endAngleRad - this.startAngleRad) / 4 : 0); // ???
+			} else {
+				// This is a workaround for regression #2593, but categories still don't position correctly.
+				// TODO: Implement true handling of Y axis categories on gauges.
+				this.minPixelPadding = 0; 
 			}
 		}
 	},
@@ -180,7 +187,7 @@ var radialAxisMixin = {
 		if (this.isRadial) {
 
 			// Set the center array
-			this.center = this.pane.center = seriesTypes.pie.prototype.getCenter.call(this.pane);
+			this.center = this.pane.center = Highcharts.CenteredSeriesMixin.getCenter.call(this.pane);
 			
 			this.len = this.width = this.height = this.isCircular ?
 				this.center[2] * (this.endAngleRad - this.startAngleRad) / 2 :
@@ -459,8 +466,7 @@ wrap(tickProto, 'getLabelPosition', function (proceed, x, y, label, horiz, label
 		
 		// Vertically centered
 		} else if (optionsY === null) {
-			optionsY = pInt(label.styles.lineHeight) * 0.9 - label.getBBox().height / 2;
-		
+			optionsY = axis.chart.renderer.fontMetrics(label.styles.fontSize).b - label.getBBox().height / 2;
 		}
 		
 		// Automatic alignment

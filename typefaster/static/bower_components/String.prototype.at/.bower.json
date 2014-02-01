@@ -1,11 +1,11 @@
 {
   "name": "String.prototype.at",
   "homepage": "https://github.com/mathiasbynens/String.prototype.at",
-  "_release": "f04e6f9428",
+  "_release": "b984c9cae8",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "f04e6f9428fa67c53302bf4cade820a5e7bee684"
+    "commit": "b984c9cae8d9fd977d350b74ce977158b4de2acb"
   },
   "_source": "git@github.com:mathiasbynens/String.prototype.at.git",
   "_target": "*",

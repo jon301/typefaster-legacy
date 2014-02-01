@@ -21,9 +21,14 @@ var ScatterSeries = extendClass(Series, {
 	noSharedTooltip: true,
 	trackerGroups: ['markerGroup'],
 	takeOrdinalPosition: false, // #2342
-	drawTracker: ColumnSeries.prototype.drawTracker,
-	
+	drawTracker: TrackerMixin.drawTrackerPoint,
+	drawGraph: function () {
+		if (this.options.lineWidth) {
+			Series.prototype.drawGraph.call(this);
+		}
+	},
 	setTooltipPoints: noop
 });
+
 seriesTypes.scatter = ScatterSeries;
 

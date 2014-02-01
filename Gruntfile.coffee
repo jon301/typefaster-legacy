@@ -110,7 +110,7 @@ module.exports = (grunt) ->
                     stderr: true
 
             js_tests:
-                command: './node_modules/.bin/mocha-phantomjs -R spec http://localhost:5000/scripts/tests/'
+                command: 'npm test'
                 options:
                     stdout: true
                     stderr: true

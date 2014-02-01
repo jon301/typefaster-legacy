@@ -2,14 +2,14 @@
  * The object wrapper for plot lines and plot bands
  * @param {Object} options
  */
-function PlotLineOrBand(axis, options) {
+var PlotLineOrBand = function (axis, options) {
 	this.axis = axis;
 
 	if (options) {
 		this.options = options;
 		this.id = options.id;
 	}
-}
+};
 
 PlotLineOrBand.prototype = {
 	
@@ -177,3 +177,85 @@ PlotLineOrBand.prototype = {
 		destroyObjectProperties(this);
 	}
 };
+
+/**
+ * Object with members for extending the Axis prototype
+ */
+
+AxisPlotLineOrBandExtension = {
+
+	/**
+	 * Create the path for a plot band
+	 */ 
+	getPlotBandPath: function (from, to) {
+		var toPath = this.getPlotLinePath(to),
+			path = this.getPlotLinePath(from);
+
+		if (path && toPath) {
+			path.push(
+				toPath[4],
+				toPath[5],
+				toPath[1],
+				toPath[2]
+			);
+		} else { // outside the axis area
+			path = null;
+		}
+		
+		return path;
+	},
+
+	addPlotBand: function (options) {
+		this.addPlotBandOrLine(options, 'plotBands');
+	},
+	
+	addPlotLine: function (options) {
+			this.addPlotBandOrLine(options, 'plotLines');
+	},
+
+	/**
+	 * Add a plot band or plot line after render time
+	 *
+	 * @param options {Object} The plotBand or plotLine configuration object
+	 */
+	addPlotBandOrLine: function (options, coll) {
+		var obj = new PlotLineOrBand(this, options).render(),
+			userOptions = this.userOptions;
+
+		if (obj) { // #2189
+			// Add it to the user options for exporting and Axis.update
+			if (coll) {
+				userOptions[coll] = userOptions[coll] || [];
+				userOptions[coll].push(options); 
+			}
+			this.plotLinesAndBands.push(obj); 
+		}
+		
+		return obj;
+	},
+
+	/**
+	 * Remove a plot band or plot line from the chart by id
+	 * @param {Object} id
+	 */
+	removePlotBandOrLine: function (id) {
+		var plotLinesAndBands = this.plotLinesAndBands,
+			options = this.options,
+			userOptions = this.userOptions,
+			i = plotLinesAndBands.length;
+		while (i--) {
+			if (plotLinesAndBands[i].id === id) {
+				plotLinesAndBands[i].destroy();
+			}
+		}
+		each([options.plotLines || [], userOptions.plotLines || [], options.plotBands || [], userOptions.plotBands || []], function (arr) {
+			i = arr.length;
+			while (i--) {
+				if (arr[i].id === id) {
+					erase(arr, arr[i]);
+				}
+			}
+		});
+	}
+};
+

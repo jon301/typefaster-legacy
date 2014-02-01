@@ -53,6 +53,7 @@ var UNDEFINED,
 	NONE = 'none',
 	M = 'M',
 	L = 'L',
+	numRegex = /^[0-9]+$/,
 	/*
 	 * Empirical lowest possible opacities for TRACKER_FILL
 	 * IE6: 0.002
@@ -78,6 +79,9 @@ var UNDEFINED,
 	WEEK = 'week',
 	MONTH = 'month',
 	YEAR = 'year',
+	
+	// Object for extending Axis
+	AxisPlotLineOrBandExtension,
 
 	// constants for attributes
 	LINEAR_GRADIENT = 'linearGradient',
@@ -86,6 +90,7 @@ var UNDEFINED,
 
 	// time methods, changed based on whether or not UTC is used
 	makeTime,
+	timezoneOffset,
 	getMinutes,
 	getHours,
 	getDay,

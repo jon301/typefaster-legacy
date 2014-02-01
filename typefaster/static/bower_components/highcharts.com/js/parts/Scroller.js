@@ -9,11 +9,13 @@ var buttonGradient = hash(
 			[1, '#CCC']
 		]
 	),
-	units = [].concat(defaultDataGroupingUnits); // copy
-
+	units = [].concat(defaultDataGroupingUnits), // copy
+	defaultSeriesType;
 // add more resolution to units
 units[4] = [DAY, [1, 2, 3, 4]]; // allow more days
 units[5] = [WEEK, [1, 2, 3]]; // allow more weeks
+
+defaultSeriesType = seriesTypes.areaspline === UNDEFINED ? 'line' : 'areaspline';
 
 extend(defaultOptions, {
 	navigator: {
@@ -28,7 +30,7 @@ extend(defaultOptions, {
 		outlineColor: '#444',
 		outlineWidth: 1,
 		series: {
-			type: 'areaspline',
+			type: defaultSeriesType,
 			color: '#4572A7',
 			compare: null,
 			fillOpacity: 0.4,
@@ -63,6 +65,11 @@ extend(defaultOptions, {
 				align: 'left',
 				x: 3,
 				y: -4
+			},
+			crosshair: {
+				label: {
+					enabled: false
+				}
 			}
 		},
 		yAxis: {
@@ -73,6 +80,12 @@ extend(defaultOptions, {
 			maxPadding: 0.1,
 			labels: {
 				enabled: false
+			},
+			crosshair: {
+				enabled: false,
+				label: {
+					enabled: false
+				}
 			},
 			title: {
 				text: null
@@ -122,11 +135,11 @@ function Scroller(chart) {
 		height = navigatorEnabled ? navigatorOptions.height : 0,
 		scrollbarHeight = scrollbarEnabled ? scrollbarOptions.height : 0;
 
-	
+
 	this.handles = [];
 	this.scrollbarButtons = [];
 	this.elementsToDestroy = []; // Array containing the elements to destroy when Scroller is destroyed
-	
+
 	this.chart = chart;
 	this.setBaseSeries();
 
@@ -193,7 +206,7 @@ Scroller.prototype = {
 
 		// Place it
 		handles[index][chart.isResizing ? 'animate' : 'attr']({
-			translateX: scroller.scrollerLeft + scroller.scrollbarHeight + parseInt(x, 10), 
+			translateX: scroller.scrollerLeft + scroller.scrollbarHeight + parseInt(x, 10),
 			translateY: scroller.top + scroller.height / 2 - 8
 		});
 	},
@@ -327,10 +340,13 @@ Scroller.prototype = {
 		}
 
 		// handles are allowed to cross, but never exceed the plot area
-		scroller.zoomedMax = zoomedMax = mathMin(pInt(mathMax(pxMin, pxMax)), navigatorWidth);
-		scroller.zoomedMin = zoomedMin = 
-			mathMax(scroller.fixedWidth ? zoomedMax - scroller.fixedWidth : pInt(mathMin(pxMin, pxMax)), 0);
-		scroller.range = range = zoomedMax - zoomedMin;
+		scroller.zoomedMax = mathMin(mathMax(pxMin, pxMax), navigatorWidth);
+		scroller.zoomedMin = 
+			mathMax(scroller.fixedWidth ? scroller.zoomedMax - scroller.fixedWidth : mathMin(pxMin, pxMax), 0);
+		scroller.range = scroller.zoomedMax - scroller.zoomedMin;
+		zoomedMax = mathRound(scroller.zoomedMax);
+		zoomedMin = mathRound(scroller.zoomedMin);
+		range = zoomedMax - zoomedMin;
 
 		// on first render, create all elements
 		if (!scroller.rendered) {
@@ -438,7 +454,7 @@ Scroller.prototype = {
 			scroller.drawScrollbarButton(1);
 
 			scrollbarGroup[verb]({
-				translateX: scrollerLeft, 
+				translateX: scrollerLeft,
 				translateY: mathRound(outlineTop + height)
 			});
 
@@ -465,7 +481,7 @@ Scroller.prototype = {
 			scroller.scrollbarRifles
 				.attr({
 					visibility: range > 12 ? VISIBLE : HIDDEN
-				})[verb]({ 
+				})[verb]({
 					d: [
 						M,
 						centerBarX - 3, scrollbarHeight / 4,
@@ -496,14 +512,14 @@ Scroller.prototype = {
 			mouseMoveHandler = this.mouseMoveHandler,
 			mouseUpHandler = this.mouseUpHandler,
 			_events;
-		
+
 		// Mouse events
 		_events = [
 			[container, 'mousedown', mouseDownHandler],
 			[container, 'mousemove', mouseMoveHandler],
 			[document, 'mouseup', mouseUpHandler]
 		];
-		
+
 		// Touch events
 		if (hasTouch) {
 			_events.push(
@@ -512,7 +528,7 @@ Scroller.prototype = {
 				[document, 'touchend', mouseUpHandler]
 			);
 		}
-		
+
 		// Add them all
 		each(_events, function (args) {
 			addEvent.apply(null, args);
@@ -524,7 +540,7 @@ Scroller.prototype = {
 	 * Removes the event handlers attached previously with addEvents.
 	 */
 	removeEvents: function () {
-		
+
 		each(this._events, function (args) {
 			removeEvent.apply(null, args);
 		});
@@ -598,7 +614,7 @@ Scroller.prototype = {
 				} else if (chartX > navigatorLeft + zoomedMin - scrollbarPad && chartX < navigatorLeft + zoomedMax + scrollbarPad) {
 					scroller.grabbedCenter = chartX;
 					scroller.fixedWidth = range;
-						
+
 					// In SVG browsers, change the cursor. IE6 & 7 produce an error on changing the cursor,
 					// and IE8 isn't able to show it while dragging anyway.
 					if (chart.renderer.isSVG) {
@@ -607,20 +623,28 @@ Scroller.prototype = {
 					}
 
 					dragOffset = chartX - zoomedMin;
-					
+
 
 				// shift the range by clicking on shaded areas, scrollbar track or scrollbar buttons
 				} else if (chartX > scrollerLeft && chartX < scrollerLeft + scrollerWidth) {
 
-					if (isOnNavigator) { // center around the clicked point
+					// Center around the clicked point
+					if (isOnNavigator) {
 						left = chartX - navigatorLeft - range / 2;
-					} else { // click on scrollbar
-						if (chartX < navigatorLeft) { // click left scrollbar button
-							left = zoomedMin - mathMax(mathMin(10, range), 1);
+					
+					// Click on scrollbar
+					} else {
+
+						// Click left scrollbar button
+						if (chartX < navigatorLeft) { 
+							left = zoomedMin - range * 0.2;
+
+						// Click right scrollbar button
 						} else if (chartX > scrollerLeft + scrollerWidth - scrollbarHeight) {
-							left = zoomedMin + mathMax(mathMin(10, range), 1);
+							left = zoomedMin + range * 0.2;
+						
+						// Click on scrollbar track, shift the scrollbar by one range
 						} else {
-							// click on scrollbar track, shift the scrollbar by one range
 							left = chartX < navigatorLeft + zoomedMin ? // on the left
 								zoomedMin - range :
 								zoomedMax;
@@ -660,41 +684,41 @@ Scroller.prototype = {
 				scrollerWidth = scroller.scrollerWidth,
 				range = scroller.range,
 				chartX;
-				
+
 			// In iOS, a mousemove event with e.pageX === 0 is fired when holding the finger
 			// down in the center of the scrollbar. This should be ignored.
 			if (e.pageX !== 0) {
-			
+
 				e = chart.pointer.normalize(e);
 				chartX = e.chartX;
-	
+
 				// validation for handle dragging
 				if (chartX < navigatorLeft) {
 					chartX = navigatorLeft;
 				} else if (chartX > scrollerLeft + scrollerWidth - scrollbarHeight) {
 					chartX = scrollerLeft + scrollerWidth - scrollbarHeight;
 				}
-	
+
 				// drag left handle
 				if (scroller.grabbedLeft) {
 					hasDragged = true;
 					scroller.render(0, 0, chartX - navigatorLeft, scroller.otherHandlePos);
-	
+
 				// drag right handle
 				} else if (scroller.grabbedRight) {
 					hasDragged = true;
 					scroller.render(0, 0, scroller.otherHandlePos, chartX - navigatorLeft);
-	
+
 				// drag scrollbar or open area in navigator
 				} else if (scroller.grabbedCenter) {
-					
+
 					hasDragged = true;
 					if (chartX < dragOffset) { // outside left
 						chartX = dragOffset;
 					} else if (chartX > navigatorWidth + dragOffset - range) { // outside right
 						chartX = navigatorWidth + dragOffset - range;
 					}
-	
+
 					scroller.render(0, 0, chartX - dragOffset, chartX - dragOffset + range);
 
 				}
@@ -713,7 +737,7 @@ Scroller.prototype = {
 			var ext,
 				fixedMin,
 				fixedMax;
-			
+
 			if (hasDragged) {
 				// When dragging one handle, make sure the other one doesn't change
 				if (scroller.zoomedMin === scroller.otherHandlePos) {
@@ -731,7 +755,7 @@ Scroller.prototype = {
 					ext.max,
 					true,
 					false,
-					{ 
+					{
 						trigger: 'navigator',
 						triggerOp: 'navigator-drag',
 						DOMEvent: e // #1838
@@ -740,11 +764,11 @@ Scroller.prototype = {
 			}
 
 			if (e.type !== 'mousemove') {
-				scroller.grabbedLeft = scroller.grabbedRight = scroller.grabbedCenter = scroller.fixedWidth = 
+				scroller.grabbedLeft = scroller.grabbedRight = scroller.grabbedCenter = scroller.fixedWidth =
 					scroller.fixedExtreme = scroller.otherHandlePos = hasDragged = dragOffset = null;
 				bodyStyle.cursor = defaultBodyCursor || '';
 			}
-			
+
 		};
 
 
@@ -754,7 +778,7 @@ Scroller.prototype = {
 
 		// make room below the chart
 		chart.extraBottomMargin = scroller.outlineHeight + navigatorOptions.margin;
-		
+
 		if (scroller.navigatorEnabled) {
 			// an x axis is required for scrollbar also
 			scroller.xAxis = xAxis = new Axis(chart, merge({
@@ -768,6 +792,7 @@ Scroller.prototype = {
 				offset: 0,
 				offsetLeft: scrollbarHeight,
 				offsetRight: -scrollbarHeight,
+				keepOrdinalPadding: true, // #2436
 				startOnTick: false,
 				endOnTick: false,
 				minPadding: 0,
@@ -800,7 +825,7 @@ Scroller.prototype = {
 					proceed.call(chart, animation);
 				});
 			}
-			
+
 
 		// in case of scrollbar only, fake an x axis to get translation
 		} else {
@@ -832,11 +857,11 @@ Scroller.prototype = {
 				legendOptions = legend.options;
 
 			proceed.call(this);
-			
+
 			// Compute the top position
-			scroller.top = top = scroller.navigatorOptions.top || 
-				this.chartHeight - scroller.height - scroller.scrollbarHeight - this.spacing[2] - 
-						(legendOptions.verticalAlign === 'bottom' && legendOptions.enabled && !legendOptions.floating ? 
+			scroller.top = top = scroller.navigatorOptions.top ||
+				this.chartHeight - scroller.height - scroller.scrollbarHeight - this.spacing[2] -
+						(legendOptions.verticalAlign === 'bottom' && legendOptions.enabled && !legendOptions.floating ?
 							legend.legendHeight + pick(legendOptions.margin, 10) : 0);
 
 			if (xAxis && yAxis) { // false if navigator is disabled (#904)
@@ -847,7 +872,7 @@ Scroller.prototype = {
 				yAxis.setAxisSize();
 			}
 		});
-		
+
 
 		scroller.addEvents();
 	},
@@ -864,20 +889,20 @@ Scroller.prototype = {
 		if (!returnFalseOnNoBaseSeries || baseAxis.dataMin !== null) {
 			return {
 				dataMin: pick(
-					navAxisOptions && navAxisOptions.min, 
+					navAxisOptions && navAxisOptions.min,
 					((defined(baseAxis.dataMin) && defined(navAxis.dataMin)) ? mathMin : pick)(baseAxis.dataMin, navAxis.dataMin)
 				),
 				dataMax: pick(
-					navAxisOptions && navAxisOptions.max, 
+					navAxisOptions && navAxisOptions.max,
 					((defined(baseAxis.dataMax) && defined(navAxis.dataMax)) ? mathMax : pick)(baseAxis.dataMax, navAxis.dataMax)
 				)
 			};
 		}
-		
+
 	},
 
 	/**
-	 * Set the base series. With a bit of modification we should be able to make 
+	 * Set the base series. With a bit of modification we should be able to make
 	 * this an API method to be called from the outside
 	 */
 	setBaseSeries: function (baseSeriesOption) {
@@ -908,7 +933,7 @@ Scroller.prototype = {
 			mergedNavSeriesOptions,
 			navigatorSeriesOptions = this.navigatorOptions.series,
 			navigatorData;
-			
+
 		// remove it to prevent merging one by one
 		navigatorData = navigatorSeriesOptions.data;
 		this.hasNavigatorData = !!navigatorData;
@@ -939,7 +964,7 @@ Scroller.prototype = {
 			addEvent(baseSeries, 'updatedData', this.updatedDataHandler);
 			// Survive Series.update()
 			baseSeries.userOptions.events = extend(baseSeries.userOptions.event, { updatedData: this.updatedDataHandler });
-      
+
 		}
 	},
 
@@ -994,7 +1019,7 @@ Scroller.prototype = {
 			if (!isNaN(newMin)) {
 				baseXAxis.setExtremes(newMin, newMax, true, false, { trigger: 'updatedData' });
 			}
-			
+
 		// if it is not at any edge, just move the scroller window to reflect the new series data
 		} else {
 			if (doRedraw) {
@@ -1036,8 +1061,8 @@ Highcharts.Scroller = Scroller;
 
 
 /**
- * For Stock charts, override selection zooming with some special features because 
- * X axis zooming is already allowed by the Navigator and Range selector. 
+ * For Stock charts, override selection zooming with some special features because
+ * X axis zooming is already allowed by the Navigator and Range selector.
  */
 wrap(Axis.prototype, 'zoom', function (proceed, newMin, newMax) {
 	var chart = this.chart,
@@ -1047,20 +1072,20 @@ wrap(Axis.prototype, 'zoom', function (proceed, newMin, newMax) {
 		navigator = chartOptions.navigator,
 		rangeSelector = chartOptions.rangeSelector,
 		ret;
-	
-	if (this.isXAxis && ((navigator && navigator.enabled) || 
+
+	if (this.isXAxis && ((navigator && navigator.enabled) ||
 			(rangeSelector && rangeSelector.enabled))) {
-		
-		// For x only zooming, fool the chart.zoom method not to create the zoom button 
+
+		// For x only zooming, fool the chart.zoom method not to create the zoom button
 		// because the property already exists
 		if (zoomType === 'x') {
 			chart.resetZoomButton = 'blocked';
-			
+
 		// For y only zooming, ignore the X axis completely
 		} else if (zoomType === 'y') {
 			ret = false;
-		
-		// For xy zooming, record the state of the zoom before zoom selection, then when 
+
+		// For xy zooming, record the state of the zoom before zoom selection, then when
 		// the reset button is pressed, revert to this state
 		} else if (zoomType === 'xy') {
 			previousZoom = this.previousZoom;
@@ -1072,14 +1097,14 @@ wrap(Axis.prototype, 'zoom', function (proceed, newMin, newMax) {
 				delete this.previousZoom;
 			}
 		}
-		
+
 	}
 	return ret !== UNDEFINED ? ret : proceed.call(this, newMin, newMax);
 });
 
 // Initialize scroller for stock charts
 wrap(Chart.prototype, 'init', function (proceed, options, callback) {
-	
+
 	addEvent(this, 'beforeRender', function () {
 		var options = this.options;
 		if (options.navigator.enabled || options.scrollbar.enabled) {
@@ -1089,6 +1114,15 @@ wrap(Chart.prototype, 'init', function (proceed, options, callback) {
 
 	proceed.call(this, options, callback);
 
+});
+
+// Pick up badly formatted point options to addPoint
+wrap(Series.prototype, 'addPoint', function (proceed, options, redraw, shift, animation) {
+	var turboThreshold = this.options.turboThreshold;
+	if (turboThreshold && this.xData.length > turboThreshold && isObject(options) && !isArray(options) && this.chart.scroller) {
+		error(20, true);
+	}
+	proceed.call(this, options, redraw, shift, animation);
 });
 
 /* ****************************************************************************

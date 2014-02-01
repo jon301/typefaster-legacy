@@ -141,6 +141,126 @@ wrap(Pointer.prototype, 'init', function (proceed, chart, options) {
 	this.pinchY = this.pinchVert = pinchType.indexOf('y') !== -1;
 });
 
+// Wrapper to hide the label
+wrap(Axis.prototype, 'hideCrosshair', function (proceed, e, point) {
+	proceed.call(this, e, point);
+	if (this.crossLabel) {
+		this.crossLabel.hide();
+	}
+});
+
+// Wrapper to draw the label
+wrap(Axis.prototype, 'drawCrosshair', function (proceed, e, point) {
+	// Draw the crosshair
+	proceed.call(this, e, point);
+
+	// Check if the label has to be drawn
+	if (!defined(this.crosshair.label) || !this.crosshair.label.enabled || !defined(point)) { 
+		return; 
+	}
+
+	var chart = this.chart,
+		options = this.options.crosshair.label,		// the label's options
+		axis = this.isXAxis ? 'x' : 'y',			// axis name
+		horiz = this.horiz,							// axis orientation
+		opposite = this.opposite,					// axis position
+		left = this.left,							// left position
+		top = this.top,								// top position
+		crossLabel = this.crossLabel,				// reference to the svgElement
+		posx,
+		posy,
+		crossBox,
+		formatOption = options.format,
+		formatFormat = '',
+		limit;
+
+	// If the label does not exist yet, create it.
+	if (!crossLabel) {
+		crossLabel = this.crossLabel = chart.renderer.label()			
+		.attr({
+			align: options.align || horiz ? 'center' : opposite ? (this.labelAlign === 'right' ? 'right' : 'center') : (this.labelAlign === 'left' ? 'left' : 'center'),
+			zIndex: 12,
+			height: horiz ? 16 : UNDEFINED,
+			fill: options.backgroundColor || (this.series[0] && this.series[0].color) || 'gray',
+			padding: pick(options.padding, 2),
+			stroke: options.borderColor || null,
+			'stroke-width': options.borderWidth || 0
+		})
+		.css(extend({				
+			color: 'white',
+			fontWeight: 'normal',
+			fontSize: '11px',
+			textAlign: 'center'
+		}, options.style))
+		.add();
+	}
+
+	if (horiz) {
+		posx = point.plotX + left;
+		posy = top + (opposite ? 0 : this.height);
+	} else {
+		posx = opposite ? this.width + left : 0;
+		posy = point.plotY + top;
+	}
+
+	// if the crosshair goes out of view (too high or too low, hide it and hide the label)
+	if (posy < top || posy > top + this.height) {
+		this.hideCrosshair();
+		return;
+	}
+
+	// TODO: Dynamic date formats like in Series.tooltipHeaderFormat. 
+	if (!formatOption && !options.formatter) {
+		if (this.isDatetimeAxis) {
+			formatFormat = '%b %d, %Y';
+		}
+		formatOption = '{value' + (formatFormat ? ':' + formatFormat : '') + '}';
+	}
+
+	// show the label
+	crossLabel.attr({
+		x: posx, 
+		y: posy, 
+		text: formatOption ? format(formatOption, {value: point[axis]}) : options.formatter.call(this, point[axis]), 
+		visibility: VISIBLE
+	});
+	crossBox = crossLabel.box;
+
+	// now it is placed we can correct its position
+	if (horiz) {
+		if (((this.options.tickPosition === 'inside') && !opposite) ||
+			((this.options.tickPosition !== 'inside') && opposite)) {
+			posy = crossLabel.y - crossBox.height;
+		}	
+	} else {
+		posy = crossLabel.y - (crossBox.height / 2);
+	}
+
+	// check the edges
+	if (horiz) {
+		limit = {
+			left: left - crossBox.x,
+			right: left + this.width - crossBox.x
+		};
+	} else {
+		limit = {
+			left: this.labelAlign === 'left' ? left : 0,
+			right: this.labelAlign === 'right' ? left + this.width : chart.chartWidth
+		};
+	}
+
+	// left edge
+	if (crossLabel.translateX < limit.left) {
+		posx += limit.left - crossLabel.translateX;
+	}
+	// right edge
+	if (crossLabel.translateX + crossBox.width >= limit.right) {
+		posx -= crossLabel.translateX + crossBox.width - limit.right;
+	}
+
+	// show the crosslabel
+	crossLabel.attr({x: posx, y: posy, visibility: VISIBLE});
+});
 
 /* ****************************************************************************
  * Start value compare logic                                                  *

@@ -28,6 +28,17 @@ define [
             typeEntrySpy = sinon.spy(gameController.humanPlayer, 'typeEntry')
             deleteEntrySpy = sinon.spy(gameController.humanPlayer, 'deleteEntry')
 
+        afterEach () ->
+            gameController.stop()
+            timer.restore()
+            playSpy.restore()
+            stopSpy.restore()
+            typeEntrySpy.restore()
+            deleteEntrySpy.restore()
+
+        after () ->
+            gameController.close()
+
         describe 'start', ->
             it 'can be called only once', () ->
                 gameController.start()
@@ -99,14 +110,3 @@ define [
         #         assert.isTrue typeEntrySpy.notCalled
         #         assert.isTrue deleteEntrySpy.notCalled
         #         assert.isTrue stopSpy.notCalled
-
-        afterEach () ->
-            gameController.stop()
-            timer.restore()
-            playSpy.restore()
-            stopSpy.restore()
-            typeEntrySpy.restore()
-            deleteEntrySpy.restore()
-
-        after () ->
-            gameController.close()

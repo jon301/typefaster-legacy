@@ -37,6 +37,7 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 	sorted: false,
 	noSharedTooltip: true,
 	takeOrdinalPosition: false, // #1074
+	trackerGroups: ['markerGroup'],
 	forceCrop: true,
 	/**
 	 * Inherit the initialization from base Series
@@ -76,11 +77,13 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 			xAxisExt = xAxis.getExtremes(),
 			leftPoint,
 			lastX,
-			rightPoint;
+			rightPoint,
+			currentDataGrouping;
 
 		// relate to a master series
 		if (onSeries && onSeries.visible && i) {
-			lastX = onData[i - 1].x;
+			currentDataGrouping = onSeries.currentDataGrouping;
+			lastX = onData[i - 1].x + (currentDataGrouping ? currentDataGrouping.totalRange : 0); // #2374
 
 			// sort the data points
 			points.sort(function (a, b) {
@@ -91,9 +94,7 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 				point = points[cursor];
 				leftPoint = onData[i];
 				
-				
 				if (leftPoint.x <= point.x && leftPoint.plotY !== UNDEFINED) {
-					
 					if (point.x <= lastX) { // #803
 					
 						point.plotY = leftPoint.plotY;
@@ -158,20 +159,20 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 			options = series.options,
 			optionsY = options.y,
 			shape,
-			box,
-			bBox,
 			i,
 			point,
 			graphic,
 			stackIndex,
 			crisp = (options.lineWidth % 2 / 2),
 			anchorX,
-			anchorY;
+			anchorY,
+			outsideRight;
 
 		i = points.length;
 		while (i--) {
 			point = points[i];
-			plotX = point.plotX + crisp;
+			outsideRight = point.plotX > series.xAxis.len;
+			plotX = point.plotX + (outsideRight ? crisp : -crisp);
 			stackIndex = point.stackIndex;
 			shape = point.options.shape || options.shape;
 			plotY = point.plotY;
@@ -184,7 +185,7 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 			graphic = point.graphic;
 
 			// only draw the point if y is defined and the flag is within the visible area
-			if (plotY !== UNDEFINED && plotX >= 0 && plotX < series.xAxis.len) {
+			if (plotY !== UNDEFINED && plotX >= 0 && !outsideRight) {
 				// shortcuts
 				pointAttr = point.pointAttr[point.selected ? 'select' : ''];
 				if (graphic) { // update
@@ -212,14 +213,10 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 						width: options.width,
 						height: options.height
 					})
-					.add(series.group)
+					.add(series.markerGroup)
 					.shadow(options.shadow);
 
 				}
-
-				// get the bounding box
-				box = graphic.box;
-				bBox = box.getBBox();
 
 				// Set the tooltip anchor position
 				point.tooltipPos = [plotX, plotY];
@@ -239,7 +236,7 @@ seriesTypes.flags = extendClass(seriesTypes.column, {
 		var series = this,
 			points = series.points;
 		
-		seriesTypes.column.prototype.drawTracker.apply(this);
+		TrackerMixin.drawTrackerPoint.apply(this);
 
 		// Bring each stacked flag up on mouse over, this allows readability of vertically
 		// stacked elements as well as tight points on the x axis. #1924.
@@ -318,7 +315,7 @@ each(['circle', 'square'], function (shape) {
 // The symbol callbacks are generated on the SVGRenderer object in all browsers. Even
 // VML browsers need this in order to generate shapes in export. Now share
 // them with the VMLRenderer.
-if (Renderer === VMLRenderer) {
+if (Renderer === Highcharts.VMLRenderer) {
 	each(['flag', 'circlepin', 'squarepin'], function (shape) {
 		VMLRenderer.prototype.symbols[shape] = symbols[shape];
 	});

@@ -21,6 +21,5 @@
   },
   "_source": "git://github.com/bestiejs/punycode.js.git",
   "_target": "~1.2.3",
-  "_originalSource": "punycode",
-  "_direct": true
+  "_originalSource": "punycode"
 }

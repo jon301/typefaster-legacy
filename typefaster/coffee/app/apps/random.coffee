@@ -20,7 +20,7 @@ require [
 
         gameController = new GameController(
             entries: entries
-            duration: 5
+            duration: 60
         )
 
         typeZoneView = new TypeZoneView({ gameController: gameController })

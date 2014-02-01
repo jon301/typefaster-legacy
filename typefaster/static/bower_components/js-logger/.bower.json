@@ -1,11 +1,11 @@
 {
   "name": "js-logger",
   "homepage": "https://github.com/jonnyreeves/js-logger",
-  "_release": "c195c33839",
+  "_release": "7f028981cd",
   "_resolution": {
     "type": "branch",
     "branch": "master",
-    "commit": "c195c3383923d53281db24631f9bb8a8f5f87af4"
+    "commit": "7f028981cde1d5e4129d70032de5e1006506efbd"
   },
   "_source": "git@github.com:jonnyreeves/js-logger.git",
   "_target": "*",

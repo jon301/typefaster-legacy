@@ -6,7 +6,7 @@ requirejs.config
         underscore: '../../bower_components/lodash/dist/lodash.min'
         marionette: '../../bower_components/marionette/lib/backbone.marionette.min'
         jed: '../../bower_components/jed/jed'
-        bootstrap: '../../bower_components/sass-bootstrap/dist/js/bootstrap.min'
+        bootstrap: '../../bower_components/bootstrap/dist/js/bootstrap.min'
         highcharts: '../../bower_components/highcharts.com/js/highcharts.src'
         punycode: '../../bower_components/punycode/punycode.min'
         string_at: '../../bower_components/String.prototype.at/at'

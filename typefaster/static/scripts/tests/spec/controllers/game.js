@@ -23,6 +23,17 @@
         typeEntrySpy = sinon.spy(gameController.humanPlayer, 'typeEntry');
         return deleteEntrySpy = sinon.spy(gameController.humanPlayer, 'deleteEntry');
       });
+      afterEach(function() {
+        gameController.stop();
+        timer.restore();
+        playSpy.restore();
+        stopSpy.restore();
+        typeEntrySpy.restore();
+        return deleteEntrySpy.restore();
+      });
+      after(function() {
+        return gameController.close();
+      });
       describe('start', function() {
         return it('can be called only once', function() {
           gameController.start();
@@ -52,7 +63,7 @@
           return assert.isTrue(stopSpy.called, 'called at 1000ms');
         });
       });
-      describe('on event', function() {
+      return describe('on event', function() {
         describe('keyboard:char', function() {
           it('should call `typeEntry` with the char pressed', function() {
             gameController.trigger('keyboard:char', 'a');
@@ -78,17 +89,6 @@
             return assert.isTrue(stopSpy.called);
           });
         });
-      });
-      afterEach(function() {
-        gameController.stop();
-        timer.restore();
-        playSpy.restore();
-        stopSpy.restore();
-        typeEntrySpy.restore();
-        return deleteEntrySpy.restore();
-      });
-      return after(function() {
-        return gameController.close();
       });
     });
   });

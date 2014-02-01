@@ -1,15 +1,19 @@
 #global define
-define [
-    'jquery',
-    'underscore',
-    'marionette',
-    'js_logger',
-    'jed',
-    'bootstrap'
-    ], ($, _, Marionette, Logger, Jed) ->
+define (require) ->
+    'use strict';
 
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    Marionette = require('marionette');
+    Logger = require('js_logger');
+    Jed = require('jed');
+    require('bootstrap');
+
+    # Singleton pattern
     app = null
 
+    # Module definition
     (->
         if app is null
             app = new Marionette.Application()

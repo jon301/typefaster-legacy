@@ -31,19 +31,21 @@
 ###
 
 #global define
-define [
-    'jquery',
-    'underscore',
-    'backbone',
-    'marionette',
-    'js_logger'
-    'controllers/timer',
-    'models/player_human',
-    'models/player_ghost',
-    'views/item/typezone'
-    ], ($, _, Backbone, Marionette, Logger, TimerController, PlayerHumanModel, PlayerGhostModel, TypeZoneView) ->
-    'use strict'
+define (require) ->
+    'use strict';
 
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    Backbone = require('backbone');
+    Marionette = require('marionette');
+    Logger = require('js_logger');
+    TimerController = require('controllers/timer');
+    PlayerHumanModel = require('models/player_human');
+    PlayerGhostModel = require('models/player_ghost');
+    TypeZoneView = require('views/item/typezone');
+
+    # Module definition
     class GameController extends Marionette.Controller
 
         # Defaults

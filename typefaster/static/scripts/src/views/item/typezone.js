@@ -1,1 +1,250 @@
-(function(){var a={}.hasOwnProperty,b=function(b,c){function d(){this.constructor=b}for(var e in c)a.call(c,e)&&(b[e]=c[e]);return d.prototype=c.prototype,b.prototype=new d,b.__super__=c.prototype,b};define(["jquery","underscore","templates","marionette","js_logger","punycode","string_fromcodepoint"],function(a,c,d,e,f,g){"use strict";var h,i;return h=function(c){function e(){return i=e.__super__.constructor.apply(this,arguments)}return b(e,c),e.prototype.el="#typezone-view",e.prototype.template=d["typefaster/static/scripts/templates/typezone.ejs"],e.prototype.ui={entries:".entry",textarea:".typezone-text",input:".typezone-input"},e.prototype.events={"click .typezone-panel":"focus","keydown .typezone-input":"onKeydown","keypress .typezone-input":"onKeyPress","compositionstart .typezone-input":"onCompositionStart","compositionend .typezone-input":"onCompositionEnd"},e.prototype.debugEvent=function(a){return"KeyboardEvent"===a.originalEvent.constructor.name?this.logger.debug(a.type,"keyCode="+a.keyCode+" ("+String.fromCharCode(a.keyCode)+")","charCode="+a.charCode+" ("+String.fromCharCode(a.charCode)+")","which="+a.which+" ("+String.fromCharCode(a.which)+")","keyIdentifier="+a.originalEvent.keyIdentifier):"CompositionEvent"===a.originalEvent.constructor.name?this.logger.debug(a.type,"data="+(a.data||a.originalEvent.data)):void 0},e.prototype.onKeydown=function(a){var b;return this.debugEvent(a),this.$el.hasClass("focus")&&void 0!==a.originalEvent&&(b=a.which,8===b&&this.gameController.trigger("keyboard:backspace"),27===b)?(this.gameController.trigger("keyboard:escape"),this.reset()):void 0},e.prototype.onKeyPress=function(a){var b,c;return this.debugEvent(a),this.$el.hasClass("focus")&&void 0!==a.originalEvent&&(c=a.which,b=String.fromCodePoint(c),b&&c&&8!==c&&27!==c)?this.gameController.trigger("keyboard:char",b):void 0},e.prototype.onCompositionStart=function(a){return this.debugEvent(a),this.ui.entries.filter(".current").addClass("composition")},e.prototype.onCompositionEnd=function(a){var b;return this.debugEvent(a),this.ui.entries.filter(".current").removeClass("composition"),this.$el.hasClass("focus")&&void 0!==a.originalEvent&&(b=a.data||a.originalEvent.data)?this.gameController.trigger("keyboard:char",b):void 0},e.prototype.initialize=function(a){return this.logger=f.get("TypeZoneView"),this.gameController=a.gameController},e.prototype.onRender=function(){var b=this;return this.$el.show(),this.focus(),a(window).on("resize.typezone",function(){return clearTimeout(b.resizingTimeout),b.resizingTimeout=setTimeout(function(){return b.scrollToEntry(a(".current"))},200)}),a(window).on("blur.typezone",function(){return b.blur()}),this.listenTo(this.gameController,"entry:is_correct",function(a,c){var d,e;if(d=b.ui.entries.eq(c),e=b.ui.entries.eq(c+1),"human"===a.getType()){if(d.removeClass("current").addClass("correct"),e)return e.addClass("current"),b.scrollToEntry(e)}else if(d.css("borderColor","transparent"),e)return e.css("borderColor",a.getColor())}),this.listenTo(this.gameController,"entry:is_incorrect",function(a,c){var d,e;if(d=b.ui.entries.eq(c),e=b.ui.entries.eq(c+1),"human"===a.getType()){if(d.removeClass("current").addClass("incorrect"),e)return e.addClass("current"),b.scrollToEntry(e)}else if(d.css("borderColor","transparent"),e)return e.css("borderColor",a.getColor())}),this.listenTo(this.gameController,"entry:is_reset",function(a,c){var d,e;return d=b.ui.entries.eq(c),"human"!==a.getType()?(b.ui.entries.css("borderColor","transparent"),d.css("borderColor",a.getColor())):(b.ui.entries.removeClass("current"),d.removeClass("correct incorrect").addClass("current"),0!==c?(e=b.ui.entries.eq(c-1),b.scrollToEntry(e,d)):void 0)}),this.listenTo(this.gameController,"player:add",function(a){var c;return c=b.ui.entries.eq(0),"human"===a.getType()?c.addClass("current"):c.css("borderColor",a.getColor())}),this.listenTo(this.gameController,"human:stop",function(){return b.disable()})},e.prototype.scrollToEntry=function(a,b){var c=this;return b||(b=a),a.length&&0!==a.position().top&&!this.animating?(this.animating=!0,this.ui.textarea.stop(!0).animate({scrollTop:this.ui.textarea.scrollTop()+a.position().top},function(){return c.animating=!1,c.ui.input.offset(b.offset())})):this.ui.input.offset(b.offset())},e.prototype.disable=function(){return this.undelegateEvents(),this.blur()},e.prototype.reset=function(){var a;return this.delegateEvents(),this.ui.entries.removeClass("correct incorrect current"),this.ui.input.val(""),a=this.ui.entries.eq(0),a.addClass("current"),this.scrollToEntry(a),this.ui.entries.css("borderColor","transparent"),a.css("borderColor","red"),this.focus()},e.prototype.focus=function(b){return this.ui.input.focus(),this.$el.hasClass("focus")||(this.logger.debug("focus typezone"),this.$el.addClass("focus"),this.ui.input.offset(this.$(".current").offset()),a("body").on("click.typezone",a.proxy(this.blur,this))),b?(b.preventDefault(),b.stopPropagation()):void 0},e.prototype.blur=function(){return this.$el.hasClass("focus")?(this.logger.debug("blur typezone"),this.$(".current").removeClass("focus"),this.$el.removeClass("focus"),a("body").off("click.typezone",a.proxy(this.blur,this))):void 0},e.prototype.serializeData=function(){return{entries:this.gameController.entries,punycode:g}},e.prototype.onClose=function(){return a(window).off(".typezone"),a("body").off(".typezone")},e}(e.ItemView)})}).call(this);
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define(function(require) {
+    'use strict';
+    var $, JST, Logger, Marionette, TypeZoneView, punycode, _, _ref;
+    $ = require('jquery');
+    _ = require('underscore');
+    JST = require('templates');
+    Marionette = require('marionette');
+    Logger = require('js_logger');
+    punycode = require('punycode');
+    require('string_fromcodepoint');
+    return TypeZoneView = (function(_super) {
+      __extends(TypeZoneView, _super);
+
+      function TypeZoneView() {
+        _ref = TypeZoneView.__super__.constructor.apply(this, arguments);
+        return _ref;
+      }
+
+      TypeZoneView.prototype.el = '#typezone-view';
+
+      TypeZoneView.prototype.template = JST['typefaster/static/scripts/templates/typezone.ejs'];
+
+      TypeZoneView.prototype.ui = {
+        entries: '.entry',
+        textarea: '.typezone-text',
+        input: '.typezone-input'
+      };
+
+      TypeZoneView.prototype.events = {
+        'click .typezone-panel': 'focus',
+        'keydown .typezone-input': 'onKeydown',
+        'keypress .typezone-input': 'onKeyPress',
+        'compositionstart .typezone-input': 'onCompositionStart',
+        'compositionend .typezone-input': 'onCompositionEnd'
+      };
+
+      TypeZoneView.prototype.debugEvent = function(evt) {
+        if (evt.originalEvent.constructor.name === 'KeyboardEvent') {
+          return this.logger.debug(evt.type, 'keyCode=' + evt.keyCode + ' (' + String.fromCharCode(evt.keyCode) + ')', 'charCode=' + evt.charCode + ' (' + String.fromCharCode(evt.charCode) + ')', 'which=' + evt.which + ' (' + String.fromCharCode(evt.which) + ')', 'keyIdentifier=' + evt.originalEvent.keyIdentifier);
+        } else if (evt.originalEvent.constructor.name === 'CompositionEvent') {
+          return this.logger.debug(evt.type, 'data=' + (evt.data || evt.originalEvent.data));
+        }
+      };
+
+      TypeZoneView.prototype.onKeydown = function(evt) {
+        var keyCode;
+        this.debugEvent(evt);
+        if (this.$el.hasClass('focus') && evt.originalEvent !== undefined) {
+          keyCode = evt.which;
+          if (keyCode === 8) {
+            this.gameController.trigger('keyboard:backspace');
+          }
+          if (keyCode === 27) {
+            this.gameController.trigger('keyboard:escape');
+            return this.reset();
+          }
+        }
+      };
+
+      TypeZoneView.prototype.onKeyPress = function(evt) {
+        var entry, keyCode;
+        this.debugEvent(evt);
+        if (this.$el.hasClass('focus') && evt.originalEvent !== undefined) {
+          keyCode = evt.which;
+          entry = String.fromCodePoint(keyCode);
+          if (entry && keyCode && keyCode !== 8 && keyCode !== 27) {
+            return this.gameController.trigger('keyboard:char', entry);
+          }
+        }
+      };
+
+      TypeZoneView.prototype.onCompositionStart = function(evt) {
+        this.debugEvent(evt);
+        return this.ui.entries.filter('.current').addClass('composition');
+      };
+
+      TypeZoneView.prototype.onCompositionEnd = function(evt) {
+        var entry;
+        this.debugEvent(evt);
+        this.ui.entries.filter('.current').removeClass('composition');
+        if (this.$el.hasClass('focus') && evt.originalEvent !== undefined) {
+          entry = evt.data || evt.originalEvent.data;
+          if (entry) {
+            return this.gameController.trigger('keyboard:char', entry);
+          }
+        }
+      };
+
+      TypeZoneView.prototype.initialize = function(options) {
+        this.logger = Logger.get('TypeZoneView');
+        return this.gameController = options.gameController;
+      };
+
+      TypeZoneView.prototype.onRender = function() {
+        var _this = this;
+        this.$el.show();
+        this.focus();
+        $(window).on('resize.typezone', function() {
+          clearTimeout(_this.resizingTimeout);
+          return _this.resizingTimeout = setTimeout(function() {
+            return _this.scrollToEntry($('.current'));
+          }, 200);
+        });
+        $(window).on('blur.typezone', function() {
+          return _this.blur();
+        });
+        this.listenTo(this.gameController, 'entry:is_correct', function(player, index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          if (player.getType() === 'human') {
+            $entry.removeClass('current').addClass('correct');
+            if ($nextEntry) {
+              $nextEntry.addClass('current');
+              return _this.scrollToEntry($nextEntry);
+            }
+          } else {
+            $entry.css('borderColor', 'transparent');
+            if ($nextEntry) {
+              return $nextEntry.css('borderColor', player.getColor());
+            }
+          }
+        });
+        this.listenTo(this.gameController, 'entry:is_incorrect', function(player, index) {
+          var $entry, $nextEntry;
+          $entry = _this.ui.entries.eq(index);
+          $nextEntry = _this.ui.entries.eq(index + 1);
+          if (player.getType() === 'human') {
+            $entry.removeClass('current').addClass('incorrect');
+            if ($nextEntry) {
+              $nextEntry.addClass('current');
+              return _this.scrollToEntry($nextEntry);
+            }
+          } else {
+            $entry.css('borderColor', 'transparent');
+            if ($nextEntry) {
+              return $nextEntry.css('borderColor', player.getColor());
+            }
+          }
+        });
+        this.listenTo(this.gameController, 'entry:is_reset', function(player, index) {
+          var $entry, $prevEntry;
+          $entry = _this.ui.entries.eq(index);
+          if (player.getType() === 'human') {
+            _this.ui.entries.removeClass('current');
+            $entry.removeClass('correct incorrect').addClass('current');
+            if (index !== 0) {
+              $prevEntry = _this.ui.entries.eq(index - 1);
+              return _this.scrollToEntry($prevEntry, $entry);
+            }
+          } else {
+            _this.ui.entries.css('borderColor', 'transparent');
+            return $entry.css('borderColor', player.getColor());
+          }
+        });
+        this.listenTo(this.gameController, 'player:add', function(player) {
+          var $entry;
+          $entry = _this.ui.entries.eq(0);
+          if (player.getType() === 'human') {
+            return $entry.addClass('current');
+          } else {
+            return $entry.css('borderColor', player.getColor());
+          }
+        });
+        return this.listenTo(this.gameController, 'human:stop', function() {
+          return _this.disable();
+        });
+      };
+
+      TypeZoneView.prototype.scrollToEntry = function($entry, $focusEntry) {
+        var _this = this;
+        if (!$focusEntry) {
+          $focusEntry = $entry;
+        }
+        if ($entry.length && $entry.position().top !== 0 && !this.animating) {
+          this.animating = true;
+          return this.ui.textarea.stop(true).animate({
+            scrollTop: this.ui.textarea.scrollTop() + $entry.position().top
+          }, function() {
+            _this.animating = false;
+            return _this.ui.input.offset($focusEntry.offset());
+          });
+        } else {
+          return this.ui.input.offset($focusEntry.offset());
+        }
+      };
+
+      TypeZoneView.prototype.disable = function(evt) {
+        this.undelegateEvents();
+        return this.blur();
+      };
+
+      TypeZoneView.prototype.reset = function() {
+        var firstEntry;
+        this.delegateEvents();
+        this.ui.entries.removeClass('correct incorrect current');
+        this.ui.input.val('');
+        firstEntry = this.ui.entries.eq(0);
+        firstEntry.addClass('current');
+        this.scrollToEntry(firstEntry);
+        this.ui.entries.css('borderColor', 'transparent');
+        firstEntry.css('borderColor', 'red');
+        return this.focus();
+      };
+
+      TypeZoneView.prototype.focus = function(evt) {
+        this.ui.input.focus();
+        if (!this.$el.hasClass('focus')) {
+          this.logger.debug('focus typezone');
+          this.$el.addClass('focus');
+          this.ui.input.offset(this.$('.current').offset());
+          $('body').on('click.typezone', $.proxy(this.blur, this));
+        }
+        if (evt) {
+          evt.preventDefault();
+          return evt.stopPropagation();
+        }
+      };
+
+      TypeZoneView.prototype.blur = function(evt) {
+        if (this.$el.hasClass('focus')) {
+          this.logger.debug('blur typezone');
+          this.$('.current').removeClass('focus');
+          this.$el.removeClass('focus');
+          return $('body').off('click.typezone', $.proxy(this.blur, this));
+        }
+      };
+
+      TypeZoneView.prototype.serializeData = function() {
+        return {
+          'entries': this.gameController.entries,
+          'punycode': punycode
+        };
+      };
+
+      TypeZoneView.prototype.onClose = function() {
+        $(window).off('.typezone');
+        return $('body').off('.typezone');
+      };
+
+      return TypeZoneView;
+
+    })(Marionette.ItemView);
+  });
+
+}).call(this);

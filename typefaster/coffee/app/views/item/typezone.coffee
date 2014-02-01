@@ -1,16 +1,17 @@
 #global define
-define [
-    'jquery',
-    'underscore',
-    'templates',
-    'marionette',
-    'js_logger',
-    'punycode',
-    'string_fromcodepoint'
-    ], ($, _, JST, Marionette, Logger, punycode) ->
+define (require) ->
+    'use strict';
 
-    'use strict'
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    JST = require('templates');
+    Marionette = require('marionette');
+    Logger = require('js_logger');
+    punycode = require('punycode');
+    require('string_fromcodepoint');
 
+    # Module definition
     class TypeZoneView extends Marionette.ItemView
         el: '#typezone-view'
         template: JST['typefaster/static/scripts/templates/typezone.ejs']

@@ -1,12 +1,14 @@
 #global define
-define [
-    'jquery',
-    'underscore',
-    'js_logger',
-    'models/player'
-    ], ($, _, Logger, PlayerModel) ->
-    'use strict'
+define (require) ->
+    'use strict';
 
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    Logger = require('js_logger');
+    PlayerModel = require('models/player');
+
+    # Module definition
     class PlayerHumanModel extends PlayerModel
 
         replayLogs: [] # For ghost

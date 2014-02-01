@@ -1,15 +1,16 @@
 #global define
-define [
-    'jquery',
-    'underscore',
-    'templates',
-    'backbone',
-    'marionette'
-    'highcharts'
-    ], ($, _, JST, Backbone, Marionette) ->
+define (require) ->
+    'use strict';
 
-    'use strict'
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    JST = require('templates');
+    Backbone = require('backbone');
+    Marionette = require('marionette');
+    require('highcharts');
 
+    # Module definition
     class StatsChartView extends Marionette.ItemView
         el: '#statschart-view'
         template: JST['typefaster/static/scripts/templates/statschart.ejs']

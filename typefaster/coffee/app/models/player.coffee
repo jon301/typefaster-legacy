@@ -1,15 +1,17 @@
 #global define
-define [
-    'jquery',
-    'underscore',
-    'backbone',
-    'js_logger',
-    'controllers/timer',
-    'punycode',
-    'string_at'
-    ], ($, _, Backbone, Logger, TimerController, punycode) ->
-    'use strict'
+define (require) ->
+    'use strict';
 
+    # Module dependencies
+    $ = require('jquery');
+    _ = require('underscore');
+    Backbone = require('backbone');
+    Logger = require('js_logger');
+    TimerController = require('controllers/timer');
+    punycode = require('punycode');
+    require('string_at');
+
+    # Module definition
     class PlayerModel extends Backbone.Model
 
         ENTRY_CORRECT: 1

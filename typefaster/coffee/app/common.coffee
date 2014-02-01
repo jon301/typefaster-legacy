@@ -1,5 +1,6 @@
 requirejs.config
     baseUrl: '/static/scripts/src'
+
     paths:
         jquery: '../../bower_components/jquery/jquery.min'
         backbone: '../../bower_components/backbone/backbone-min'
@@ -12,6 +13,7 @@ requirejs.config
         string_at: '../../bower_components/String.prototype.at/at'
         string_fromcodepoint: '../../bower_components/String.fromCodePoint/fromcodepoint'
         js_logger: '../../bower_components/js-logger/src/logger.min'
+
     shim:
         backbone:
             deps: ['jquery', 'underscore']
@@ -23,6 +25,7 @@ requirejs.config
             exports: 'Marionette'
         bootstrap:
             deps: ['jquery']
+
     urlArgs: '_=' + Math.random()
 
 # Initialize the app

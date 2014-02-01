@@ -35,6 +35,7 @@ define (require) ->
     'use strict';
 
     # Module dependencies
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');

@@ -37,7 +37,8 @@
 
   define(function(require) {
     'use strict';
-    var $, Backbone, GameController, Logger, Marionette, PlayerGhostModel, PlayerHumanModel, TimerController, TypeZoneView, _, _ref;
+    var $, Backbone, GameController, Logger, Marionette, PlayerGhostModel, PlayerHumanModel, TimerController, TypeZoneView, app, _, _ref;
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');

@@ -4,7 +4,8 @@
 
   define(function(require) {
     'use strict';
-    var $, Backbone, JST, Marionette, StatsChartView, _, _ref;
+    var $, Backbone, JST, Marionette, StatsChartView, app, _, _ref;
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     JST = require('templates');
@@ -32,12 +33,15 @@
       };
 
       StatsChartView.prototype.initialize = function(options) {
+        return this.initEventAggregator();
+      };
+
+      StatsChartView.prototype.initEventAggregator = function() {
         var _this = this;
-        this.gameController = options.gameController;
-        this.listenTo(this.gameController, 'human:stats', function(stats) {
+        this.listenTo(app.vent, 'human:stats', function(stats) {
           return _this.model.set('stats', stats);
         });
-        return this.listenTo(this.gameController, 'keyboard:escape', function() {
+        return this.listenTo(app.vent, 'keyboard:escape', function() {
           return this.$el.empty();
         });
       };

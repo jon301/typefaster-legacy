@@ -3,10 +3,13 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    Logger = require('js_logger');
-    PlayerModel = require('models/player');
+    app = require 'app'
+
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Logger = require 'js_logger'
+
+    PlayerModel = require 'models/player'
 
     # Module definition
     class PlayerHumanModel extends PlayerModel
@@ -17,17 +20,20 @@ define (require) ->
             super options
             @logger = Logger.get 'PlayerHumanModel'
 
-            @.listenTo @gameController, 'keyboard:char', (entry) =>
-                @gameController.start() unless @gameController.running
-                @.typeEntry(entry)
+            @initEventAggregator()
 
-            @.listenTo @gameController, 'keyboard:backspace', =>
-                @.deleteEntry()
+        initEventAggregator: ->
+            @listenTo app.vent, 'keyboard:char', (entry) =>
+                app.vent.trigger 'human:start'
+                @typeEntry(entry)
+
+            @listenTo app.vent, 'keyboard:backspace', =>
+                @deleteEntry()
 
         stop: () ->
             super()
             @logger.debug JSON.stringify @replayLogs
-            @gameController.trigger 'human:stop'
+            app.vent.trigger 'human:stop'
 
         reset: () ->
             super()

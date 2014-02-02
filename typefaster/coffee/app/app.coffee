@@ -3,12 +3,14 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    Marionette = require('marionette');
-    Logger = require('js_logger');
-    Jed = require('jed');
-    require('bootstrap');
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Marionette = require 'marionette'
+    Jed = require 'jed'
+
+    Logger = require 'js_logger'
+
+    require 'bootstrap'
 
     # Singleton pattern
     app = null

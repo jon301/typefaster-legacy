@@ -4,13 +4,14 @@
 
   define(function(require) {
     'use strict';
-    var $, Backbone, Logger, PlayerModel, TimerController, punycode, _, _ref;
+    var $, Backbone, Logger, PlayerModel, TimerController, app, punycode, _, _ref;
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     Backbone = require('backbone');
+    punycode = require('punycode');
     Logger = require('js_logger');
     TimerController = require('controllers/timer');
-    punycode = require('punycode');
     require('string_at');
     return PlayerModel = (function(_super) {
       __extends(PlayerModel, _super);
@@ -42,7 +43,7 @@
 
       PlayerModel.prototype.initialize = function(options) {
         this.logger = Logger.get('PlayerModel');
-        this.gameController = options.gameController;
+        this.entries = options.entries;
         return this.timer = new TimerController();
       };
 
@@ -69,23 +70,27 @@
         return this.entriesMap = [];
       };
 
+      PlayerModel.prototype.setEntries = function(entries) {
+        return this.entries = entries;
+      };
+
       PlayerModel.prototype.typeEntry = function(entry) {
-        if (entry === this.gameController.entries.at(this.currentIndex)) {
-          this.logger.debug('entry:is_correct', entry, this.gameController.entries.at(this.currentIndex));
+        if (entry === this.entries.at(this.currentIndex)) {
+          this.logger.debug('entry:is_correct', entry, this.entries.at(this.currentIndex));
           this.correctEntries++;
           if (this.entriesMap[this.currentIndex] === this.ENTRY_TO_BE_FIXED) {
             this.fixedMistakes++;
           }
           this.entriesMap[this.currentIndex] = this.ENTRY_CORRECT;
-          this.gameController.trigger('entry:is_correct', this, this.currentIndex);
+          app.vent.trigger('entry:is_correct', this, this.currentIndex);
         } else {
-          this.logger.debug('entry:is_incorrect', entry, this.gameController.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_incorrect', entry, this.entries.at(this.currentIndex));
           this.incorrectEntries++;
           this.entriesMap[this.currentIndex] = this.ENTRY_INCORRECT;
-          this.gameController.trigger('entry:is_incorrect', this, this.currentIndex);
+          app.vent.trigger('entry:is_incorrect', this, this.currentIndex);
         }
         this.currentIndex++;
-        if (punycode.ucs2.decode(this.gameController.entries).length === this.currentIndex) {
+        if (punycode.ucs2.decode(this.entries).length === this.currentIndex) {
           return this.stop();
         }
       };
@@ -93,13 +98,13 @@
       PlayerModel.prototype.deleteEntry = function() {
         if (this.currentIndex > 0) {
           this.currentIndex--;
-          this.logger.debug('entry:is_reset', this.gameController.entries.at(this.currentIndex));
+          this.logger.debug('entry:is_reset', this.entries.at(this.currentIndex));
           if (this.entriesMap[this.currentIndex] === this.ENTRY_INCORRECT) {
             this.entriesMap[this.currentIndex] = this.ENTRY_TO_BE_FIXED;
           } else {
             this.entriesMap[this.currentIndex] = this.ENTRY_DELETED;
           }
-          this.gameController.trigger('entry:is_reset', this, this.currentIndex);
+          app.vent.trigger('entry:is_reset', this, this.currentIndex);
           return true;
         }
         return false;

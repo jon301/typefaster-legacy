@@ -5,8 +5,8 @@
     $ = require('jquery');
     _ = require('underscore');
     Marionette = require('marionette');
-    Logger = require('js_logger');
     Jed = require('jed');
+    Logger = require('js_logger');
     require('bootstrap');
     app = null;
     return (function() {

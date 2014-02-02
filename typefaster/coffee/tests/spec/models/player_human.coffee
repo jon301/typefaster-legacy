@@ -2,8 +2,9 @@
 define [
     'jquery',
     'backbone',
+    'app',
     'controllers/game'
-    ], ($, Backbone, GameController) ->
+    ], ($, Backbone, app, GameController) ->
     'use strict'
 
     gameController = undefined
@@ -20,7 +21,7 @@ define [
             humanPlayer = gameController.humanPlayer
 
         beforeEach () ->
-            gameController.trigger = sinon.spy(gameController, 'trigger')
+            app.vent.trigger = sinon.spy(app.vent, 'trigger')
             humanPlayer.play()
 
         describe 'typeEntry', ->
@@ -31,32 +32,32 @@ define [
              it 'should handle correct entries', ->
                 humanPlayer.typeEntry 'I'
                 assert.isTrue humanPlayer.correctEntries == 1
-                assert.isTrue gameController.trigger.calledWith 'entry:is_correct', humanPlayer, 0
+                assert.isTrue app.vent.trigger.calledWith 'entry:is_correct', humanPlayer, 0
 
              it 'should handle incorrect entries', ->
                 humanPlayer.typeEntry 'a'
                 assert.isTrue humanPlayer.incorrectEntries == 1
-                assert.isTrue gameController.trigger.calledWith 'entry:is_incorrect', humanPlayer, 0
+                assert.isTrue app.vent.trigger.calledWith 'entry:is_incorrect', humanPlayer, 0
 
              it 'should handle fixed mistakes', ->
                 humanPlayer.typeEntry 'a'
                 assert.isTrue humanPlayer.incorrectEntries == 1
                 assert.isTrue humanPlayer.fixedMistakes == 0
                 assert.isTrue humanPlayer.correctEntries == 0
-                assert.isTrue gameController.trigger.calledWith 'entry:is_incorrect', humanPlayer, 0
+                assert.isTrue app.vent.trigger.calledWith 'entry:is_incorrect', humanPlayer, 0
                 humanPlayer.deleteEntry()
                 humanPlayer.typeEntry 'I'
                 assert.isTrue humanPlayer.incorrectEntries == 1
                 assert.isTrue humanPlayer.fixedMistakes == 1
                 assert.isTrue humanPlayer.correctEntries == 1
-                assert.isTrue gameController.trigger.calledWith 'entry:is_correct', humanPlayer, 0
+                assert.isTrue app.vent.trigger.calledWith 'entry:is_correct', humanPlayer, 0
 
             it 'should stop the game if all entries have been typed', ->
                 i = 0
                 while i < 22
                     humanPlayer.typeEntry 'a'
                     i++
-                assert.isTrue gameController.trigger.calledWith 'human:stop'
+                assert.isTrue app.vent.trigger.calledWith 'human:stop'
 
             it 'should handle unicode characters', ->
                 humanPlayer.typeEntry 'I'
@@ -88,17 +89,17 @@ define [
                 humanPlayer.typeEntry 'a'
                 assert.isTrue humanPlayer.currentIndex == 1
                 humanPlayer.deleteEntry()
-                assert.isTrue gameController.trigger.calledWith 'entry:is_reset', humanPlayer, 0
+                assert.isTrue app.vent.trigger.calledWith 'entry:is_reset', humanPlayer, 0
                 assert.isTrue humanPlayer.currentIndex == 0
 
             it 'should not decrement current index if current index is 0', ->
                 humanPlayer.deleteEntry()
                 humanPlayer.deleteEntry()
-                assert.isTrue gameController.trigger.notCalled
+                assert.isTrue app.vent.trigger.notCalled
 
 
         afterEach () ->
-            gameController.trigger.restore()
+            app.vent.trigger.restore()
             humanPlayer.stop()
 
         after () ->

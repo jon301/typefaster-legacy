@@ -1,5 +1,14 @@
 (function() {
-  require(['jquery', 'underscore', 'templates', 'globals', 'app', 'views/item/typezone', 'views/item/statschart', 'controllers/game'], function($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) {
+  define(function(require) {
+    var $, GameController, JST, StatsChartView, TypeZoneView, app, globals, _;
+    app = require('app');
+    $ = require('jquery');
+    _ = require('underscore');
+    JST = require('templates');
+    globals = require('globals');
+    TypeZoneView = require('views/item/typezone');
+    StatsChartView = require('views/item/statschart');
+    GameController = require('controllers/game');
     return app.addInitializer(function() {
       var entries, gameController, statsChartView, typeZoneView;
       entries = 'abcdefghijklmnopqrstuvwxyz zyxwvutsrqponmlkjihgfedcba';
@@ -8,16 +17,18 @@
       entries = 'bonjour comment allez vous moi je pense que je vais bien';
       entries = '手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞手畕淼碞';
       entries = 'La grande porte s\'ouvrit lourdement en coulissant sur le côté gauche sans faire le moindre bruit. Derrière la porte, une nouvelle route, éclairée par de multiples projecteurs accrochés de chaque côtés, s\'enfonçait dans les profondeurs de cet ouvrage. Cette route était faite de zigzag incessant, certainement pour empêcher le souffle d\'une bombe atomique pensa David.';
+      typeZoneView = new TypeZoneView({
+        entries: entries
+      });
+      typeZoneView.render();
+      statsChartView = new StatsChartView();
+      statsChartView.render();
       gameController = new GameController({
         entries: entries,
         duration: 60
       });
-      typeZoneView = new TypeZoneView({
-        gameController: gameController
-      });
-      typeZoneView.render();
       gameController.addHuman();
-      gameController.addGhost([
+      return gameController.addGhost([
         {
           "t": 3,
           "v": "L"
@@ -1283,10 +1294,6 @@
           "v": "."
         }
       ]);
-      statsChartView = new StatsChartView({
-        gameController: gameController
-      });
-      return statsChartView.render();
     });
   });
 

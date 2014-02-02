@@ -3,11 +3,12 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    Logger = require('js_logger');
-    PlayerModel = require('models/player');
-    TimerController = require('controllers/timer');
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Logger = require 'js_logger'
+
+    PlayerModel = require 'models/player'
+    TimerController = require 'controllers/timer'
 
     # Module definition
     class PlayerGhostModel extends PlayerModel

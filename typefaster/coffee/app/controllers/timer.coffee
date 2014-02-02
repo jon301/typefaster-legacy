@@ -3,9 +3,9 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    Marionette = require('marionette');
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Marionette = require 'marionette'
 
     # Module definition
     class TimerController extends Marionette.Controller

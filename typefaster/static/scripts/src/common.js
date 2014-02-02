@@ -23,7 +23,7 @@
         exports: '_'
       },
       marionette: {
-        deps: ['jquery', 'underscore', 'backbone'],
+        deps: ['backbone'],
         exports: 'Marionette'
       },
       bootstrap: {

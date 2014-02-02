@@ -4,7 +4,8 @@
 
   define(function(require) {
     'use strict';
-    var $, Logger, PlayerHumanModel, PlayerModel, _, _ref;
+    var $, Logger, PlayerHumanModel, PlayerModel, app, _, _ref;
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     Logger = require('js_logger');
@@ -20,16 +21,18 @@
       PlayerHumanModel.prototype.replayLogs = [];
 
       PlayerHumanModel.prototype.initialize = function(options) {
-        var _this = this;
         PlayerHumanModel.__super__.initialize.call(this, options);
         this.logger = Logger.get('PlayerHumanModel');
-        this.listenTo(this.gameController, 'keyboard:char', function(entry) {
-          if (!_this.gameController.running) {
-            _this.gameController.start();
-          }
+        return this.initEventAggregator();
+      };
+
+      PlayerHumanModel.prototype.initEventAggregator = function() {
+        var _this = this;
+        this.listenTo(app.vent, 'keyboard:char', function(entry) {
+          app.vent.trigger('human:start');
           return _this.typeEntry(entry);
         });
-        return this.listenTo(this.gameController, 'keyboard:backspace', function() {
+        return this.listenTo(app.vent, 'keyboard:backspace', function() {
           return _this.deleteEntry();
         });
       };
@@ -37,7 +40,7 @@
       PlayerHumanModel.prototype.stop = function() {
         PlayerHumanModel.__super__.stop.call(this);
         this.logger.debug(JSON.stringify(this.replayLogs));
-        return this.gameController.trigger('human:stop');
+        return app.vent.trigger('human:stop');
       };
 
       PlayerHumanModel.prototype.reset = function() {

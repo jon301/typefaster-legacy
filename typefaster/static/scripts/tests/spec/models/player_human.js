@@ -1,5 +1,5 @@
 (function() {
-  define(['jquery', 'backbone', 'controllers/game'], function($, Backbone, GameController) {
+  define(['jquery', 'backbone', 'app', 'controllers/game'], function($, Backbone, app, GameController) {
     'use strict';
     var gameController, humanPlayer;
     gameController = void 0;
@@ -14,7 +14,7 @@
         return humanPlayer = gameController.humanPlayer;
       });
       beforeEach(function() {
-        gameController.trigger = sinon.spy(gameController, 'trigger');
+        app.vent.trigger = sinon.spy(app.vent, 'trigger');
         return humanPlayer.play();
       });
       describe('typeEntry', function() {
@@ -25,25 +25,25 @@
         it('should handle correct entries', function() {
           humanPlayer.typeEntry('I');
           assert.isTrue(humanPlayer.correctEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0));
+          return assert.isTrue(app.vent.trigger.calledWith('entry:is_correct', humanPlayer, 0));
         });
         it('should handle incorrect entries', function() {
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
+          return assert.isTrue(app.vent.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
         });
         it('should handle fixed mistakes', function() {
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
           assert.isTrue(humanPlayer.fixedMistakes === 0);
           assert.isTrue(humanPlayer.correctEntries === 0);
-          assert.isTrue(gameController.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
+          assert.isTrue(app.vent.trigger.calledWith('entry:is_incorrect', humanPlayer, 0));
           humanPlayer.deleteEntry();
           humanPlayer.typeEntry('I');
           assert.isTrue(humanPlayer.incorrectEntries === 1);
           assert.isTrue(humanPlayer.fixedMistakes === 1);
           assert.isTrue(humanPlayer.correctEntries === 1);
-          return assert.isTrue(gameController.trigger.calledWith('entry:is_correct', humanPlayer, 0));
+          return assert.isTrue(app.vent.trigger.calledWith('entry:is_correct', humanPlayer, 0));
         });
         it('should stop the game if all entries have been typed', function() {
           var i;
@@ -52,7 +52,7 @@
             humanPlayer.typeEntry('a');
             i++;
           }
-          return assert.isTrue(gameController.trigger.calledWith('human:stop'));
+          return assert.isTrue(app.vent.trigger.calledWith('human:stop'));
         });
         return it('should handle unicode characters', function() {
           humanPlayer.typeEntry('I');
@@ -85,17 +85,17 @@
           humanPlayer.typeEntry('a');
           assert.isTrue(humanPlayer.currentIndex === 1);
           humanPlayer.deleteEntry();
-          assert.isTrue(gameController.trigger.calledWith('entry:is_reset', humanPlayer, 0));
+          assert.isTrue(app.vent.trigger.calledWith('entry:is_reset', humanPlayer, 0));
           return assert.isTrue(humanPlayer.currentIndex === 0);
         });
         return it('should not decrement current index if current index is 0', function() {
           humanPlayer.deleteEntry();
           humanPlayer.deleteEntry();
-          return assert.isTrue(gameController.trigger.notCalled);
+          return assert.isTrue(app.vent.trigger.notCalled);
         });
       });
       afterEach(function() {
-        gameController.trigger.restore();
+        app.vent.trigger.restore();
         return humanPlayer.stop();
       });
       return after(function() {

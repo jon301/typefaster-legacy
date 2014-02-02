@@ -4,7 +4,8 @@
 
   define(function(require) {
     'use strict';
-    var $, JST, Logger, Marionette, TypeZoneView, punycode, _, _ref;
+    var $, JST, Logger, Marionette, TypeZoneView, app, punycode, _, _ref;
+    app = require('app');
     $ = require('jquery');
     _ = require('underscore');
     JST = require('templates');
@@ -52,10 +53,10 @@
         if (this.$el.hasClass('focus') && evt.originalEvent !== undefined) {
           keyCode = evt.which;
           if (keyCode === 8) {
-            this.gameController.trigger('keyboard:backspace');
+            app.vent.trigger('keyboard:backspace');
           }
           if (keyCode === 27) {
-            this.gameController.trigger('keyboard:escape');
+            app.vent.trigger('keyboard:escape');
             return this.reset();
           }
         }
@@ -68,7 +69,7 @@
           keyCode = evt.which;
           entry = String.fromCodePoint(keyCode);
           if (entry && keyCode && keyCode !== 8 && keyCode !== 27) {
-            return this.gameController.trigger('keyboard:char', entry);
+            return app.vent.trigger('keyboard:char', entry);
           }
         }
       };
@@ -85,30 +86,20 @@
         if (this.$el.hasClass('focus') && evt.originalEvent !== undefined) {
           entry = evt.data || evt.originalEvent.data;
           if (entry) {
-            return this.gameController.trigger('keyboard:char', entry);
+            return app.vent.trigger('keyboard:char', entry);
           }
         }
       };
 
       TypeZoneView.prototype.initialize = function(options) {
+        this.entries = options.entries;
         this.logger = Logger.get('TypeZoneView');
-        return this.gameController = options.gameController;
+        return this.initEventAggregator();
       };
 
-      TypeZoneView.prototype.onRender = function() {
+      TypeZoneView.prototype.initEventAggregator = function() {
         var _this = this;
-        this.$el.show();
-        this.focus();
-        $(window).on('resize.typezone', function() {
-          clearTimeout(_this.resizingTimeout);
-          return _this.resizingTimeout = setTimeout(function() {
-            return _this.scrollToEntry($('.current'));
-          }, 200);
-        });
-        $(window).on('blur.typezone', function() {
-          return _this.blur();
-        });
-        this.listenTo(this.gameController, 'entry:is_correct', function(player, index) {
+        this.listenTo(app.vent, 'entry:is_correct', function(player, index) {
           var $entry, $nextEntry;
           $entry = _this.ui.entries.eq(index);
           $nextEntry = _this.ui.entries.eq(index + 1);
@@ -125,7 +116,7 @@
             }
           }
         });
-        this.listenTo(this.gameController, 'entry:is_incorrect', function(player, index) {
+        this.listenTo(app.vent, 'entry:is_incorrect', function(player, index) {
           var $entry, $nextEntry;
           $entry = _this.ui.entries.eq(index);
           $nextEntry = _this.ui.entries.eq(index + 1);
@@ -142,7 +133,7 @@
             }
           }
         });
-        this.listenTo(this.gameController, 'entry:is_reset', function(player, index) {
+        this.listenTo(app.vent, 'entry:is_reset', function(player, index) {
           var $entry, $prevEntry;
           $entry = _this.ui.entries.eq(index);
           if (player.getType() === 'human') {
@@ -157,7 +148,7 @@
             return $entry.css('borderColor', player.getColor());
           }
         });
-        this.listenTo(this.gameController, 'player:add', function(player) {
+        this.listenTo(app.vent, 'player:add', function(player) {
           var $entry;
           $entry = _this.ui.entries.eq(0);
           if (player.getType() === 'human') {
@@ -166,8 +157,23 @@
             return $entry.css('borderColor', player.getColor());
           }
         });
-        return this.listenTo(this.gameController, 'human:stop', function() {
+        return this.listenTo(app.vent, 'human:stop', function() {
           return _this.disable();
+        });
+      };
+
+      TypeZoneView.prototype.onRender = function() {
+        var _this = this;
+        this.$el.show();
+        this.focus();
+        $(window).on('resize.typezone', function() {
+          clearTimeout(_this.resizingTimeout);
+          return _this.resizingTimeout = setTimeout(function() {
+            return _this.scrollToEntry($('.current'));
+          }, 200);
+        });
+        return $(window).on('blur.typezone', function() {
+          return _this.blur();
         });
       };
 
@@ -232,7 +238,7 @@
 
       TypeZoneView.prototype.serializeData = function() {
         return {
-          'entries': this.gameController.entries,
+          'entries': this.entries,
           'punycode': punycode
         };
       };

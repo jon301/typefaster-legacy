@@ -63,22 +63,31 @@
       GameController.prototype.ghostColors = ['aqua', 'blue', 'fuchsia', 'gray', 'green', 'lime', 'maroon', 'navy', 'olive', 'silver', 'teal', 'yellow', 'orange', 'purple', 'red'];
 
       GameController.prototype.initialize = function(options) {
-        var _this = this;
         this.logger = Logger.get('GameController');
         this.duration = options.duration;
         this.entries = options.entries;
         this.players = new Backbone.Collection();
+        this.timer = new TimerController();
+        return this.initEventAggregator();
+      };
+
+      GameController.prototype.initEventAggregator = function() {
+        var _this = this;
         this.listenTo(this.players, 'add', function(playerModel) {
-          return _this.trigger('player:add', playerModel);
+          return app.vent.trigger('player:add', playerModel);
         });
         this.listenTo(this.players, 'remove', function(playerModel) {
-          return _this.trigger('player:remove', playerModel);
+          return app.vent.trigger('player:remove', playerModel);
         });
-        this.timer = new TimerController();
-        this.on('human:stop', function() {
+        this.listenTo(app.vent, 'human:start', function() {
+          if (!_this.running) {
+            return _this.start();
+          }
+        });
+        this.listenTo(app.vent, 'human:stop', function() {
           return _this.stop();
         });
-        return this.on('keyboard:escape', function() {
+        return this.listenTo(app.vent, 'keyboard:escape', function() {
           return _this.stop();
         });
       };
@@ -96,7 +105,7 @@
                 _this.stop();
               }
               if (typeof _this.humanPlayer !== 'undefined') {
-                return _this.trigger('human:stats', _this.humanPlayer.getStats());
+                return app.vent.trigger('human:stats', _this.humanPlayer.getStats());
               }
             }, 1000);
           }
@@ -114,10 +123,9 @@
       };
 
       GameController.prototype.setEntries = function(entries) {
-        if (!this.running) {
-          if (entries) {
-            return this.entries = entries;
-          }
+        if (!this.running && entries) {
+          this.entries = entries;
+          return this.players.invoke('setEntries', this.entries);
         }
       };
 
@@ -132,7 +140,7 @@
       GameController.prototype.addHuman = function() {
         if (!(this.running && this.humanPlayer)) {
           this.humanPlayer = new PlayerHumanModel({
-            gameController: this
+            entries: this.entries
           });
           return this.players.add(this.humanPlayer);
         }
@@ -143,7 +151,7 @@
       GameController.prototype.addGhost = function(replayLogs) {
         if (!this.running) {
           return this.players.add(new PlayerGhostModel({
-            gameController: this,
+            entries: this.entries,
             replayLogs: replayLogs,
             color: this.ghostColors.pop()
           }));

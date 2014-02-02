@@ -21,7 +21,7 @@ requirejs.config
         underscore:
             exports: '_'
         marionette:
-            deps: ['jquery', 'underscore', 'backbone']
+            deps: ['backbone']
             exports: 'Marionette'
         bootstrap:
             deps: ['jquery']

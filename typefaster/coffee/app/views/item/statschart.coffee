@@ -3,12 +3,15 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    JST = require('templates');
-    Backbone = require('backbone');
-    Marionette = require('marionette');
-    require('highcharts');
+    app = require 'app'
+
+    $ = require 'jquery'
+    _ = require 'underscore'
+    JST = require 'templates'
+    Backbone = require 'backbone'
+    Marionette = require 'marionette'
+
+    require 'highcharts'
 
     # Module definition
     class StatsChartView extends Marionette.ItemView
@@ -22,12 +25,13 @@ define (require) ->
                 @render()
 
         initialize: (options) ->
-            @gameController = options.gameController
+            @initEventAggregator()
 
-            @listenTo @gameController, 'human:stats', (stats) =>
+        initEventAggregator: ->
+            @listenTo app.vent, 'human:stats', (stats) =>
                 @model.set('stats', stats)
 
-            @listenTo @gameController, 'keyboard:escape', () ->
-                @.$el.empty()
+            @listenTo app.vent, 'keyboard:escape', () ->
+                @$el.empty()
 
         onRender: () ->

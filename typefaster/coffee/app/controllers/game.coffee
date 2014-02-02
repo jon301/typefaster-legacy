@@ -35,16 +35,18 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    Backbone = require('backbone');
-    Marionette = require('marionette');
-    Logger = require('js_logger');
-    TimerController = require('controllers/timer');
-    PlayerHumanModel = require('models/player_human');
-    PlayerGhostModel = require('models/player_ghost');
-    TypeZoneView = require('views/item/typezone');
+    app = require 'app'
+
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Backbone = require 'backbone'
+    Marionette = require 'marionette'
+    Logger = require 'js_logger'
+
+    TimerController = require 'controllers/timer'
+    PlayerHumanModel = require 'models/player_human'
+    PlayerGhostModel = require 'models/player_ghost'
+    TypeZoneView = require 'views/item/typezone'
 
     # Module definition
     class GameController extends Marionette.Controller
@@ -64,21 +66,27 @@ define (require) ->
 
             # Empty players collection
             @players = new Backbone.Collection()
-            @.listenTo @players, 'add', (playerModel) =>
-                @.trigger 'player:add', playerModel
-
-            @.listenTo @players, 'remove', (playerModel) =>
-                @.trigger 'player:remove', playerModel
 
             # Timer
             @timer = new TimerController()
 
-            @.on 'human:stop', () =>
+            @initEventAggregator()
+
+        initEventAggregator: () ->
+            @listenTo @players, 'add', (playerModel) ->
+                app.vent.trigger 'player:add', playerModel
+
+            @listenTo @players, 'remove', (playerModel) ->
+                app.vent.trigger 'player:remove', playerModel
+
+            @listenTo app.vent, 'human:start', () =>
+                @start() unless @running
+
+            @listenTo app.vent, 'human:stop', () =>
                 @stop()
 
-            @.on 'keyboard:escape', =>
+            @listenTo app.vent, 'keyboard:escape', =>
                 @stop()
-
 
         start: ->
             unless @running
@@ -96,7 +104,7 @@ define (require) ->
 
                         # Publish stats every seconds
                         if typeof @humanPlayer isnt 'undefined'
-                            @trigger 'human:stats', @humanPlayer.getStats()
+                            app.vent.trigger 'human:stats', @humanPlayer.getStats()
                     , 1000)
 
         stop: ->
@@ -111,8 +119,9 @@ define (require) ->
 
         # Setters
         setEntries: (entries) ->
-            unless @running
-                @entries = entries if entries
+            if not @running and entries
+                @entries = entries
+                @players.invoke 'setEntries', @entries
 
         setDuration: (duration) ->
             unless @running
@@ -121,13 +130,13 @@ define (require) ->
 
         addHuman: () ->
             unless @running and @humanPlayer
-                @humanPlayer = new PlayerHumanModel({ gameController: @ })
+                @humanPlayer = new PlayerHumanModel({ entries: @entries })
                 @players.add @humanPlayer
 
         removeHuman: () ->
 
         addGhost: (replayLogs) ->
             unless @running
-                @players.add new PlayerGhostModel({ gameController: @, replayLogs: replayLogs, color: @ghostColors.pop() })
+                @players.add new PlayerGhostModel({ entries: @entries, replayLogs: replayLogs, color: @ghostColors.pop() })
 
         removeGhost: (cid) ->

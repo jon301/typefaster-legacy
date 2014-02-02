@@ -2,8 +2,9 @@
 define [
     'jquery',
     'backbone',
+    'app',
     'controllers/game'
-    ], ($, Backbone, GameController) ->
+    ], ($, Backbone, app, GameController) ->
     'use strict'
 
     gameController = undefined
@@ -65,48 +66,26 @@ define [
                 timer.tick(1000)
                 assert.isTrue stopSpy.called, 'called at 1000ms'
 
-            # it 'should stop event listening', () ->
-            #     gameController.startListen()
-            #     gameController.trigger('keyboard:char', 'a')
-            #     gameController.stop()
-            #     gameController.trigger('keyboard:char', 'a')
-            #     assert.isTrue typeEntrySpy.calledOnce
-
-        describe 'on event', ->
-            # beforeEach () ->
-            #     gameController.startListen()
+        describe 'on app.vent', ->
 
             describe 'keyboard:char', ->
                 it 'should call `typeEntry` with the char pressed', () ->
-                    gameController.trigger('keyboard:char', 'a')
+                    app.vent.trigger('keyboard:char', 'a')
                     assert.isTrue typeEntrySpy.calledWith('a')
 
                 it 'should start the game on the first char pressed only', () ->
-                    gameController.trigger('keyboard:char', 'a')
-                    gameController.trigger('keyboard:char', 'a')
+                    app.vent.trigger('keyboard:char', 'a')
+                    app.vent.trigger('keyboard:char', 'a')
                     assert.isTrue playSpy.calledOnce
 
             describe 'keyboard:backspace', ->
                 it 'should call `deleteEntry` everytime', () ->
-                    gameController.trigger('keyboard:backspace')
-                    gameController.trigger('keyboard:backspace')
+                    app.vent.trigger('keyboard:backspace')
+                    app.vent.trigger('keyboard:backspace')
                     assert.isTrue deleteEntrySpy.calledTwice
 
             describe 'human:stop', ->
                 it 'should stop the game', () ->
                     gameController.start()
-                    gameController.trigger('human:stop')
+                    app.vent.trigger('human:stop')
                     assert.isTrue stopSpy.called
-
-        # describe 'stopListen', ->
-        #     beforeEach () ->
-        #         gameController.startListen()
-
-        #     it 'should prevent all callbacks to be triggered', () ->
-        #         gameController.stopListen()
-        #         gameController.trigger('keyboard:char', 'a')
-        #         gameController.trigger('keyboard:backspace')
-        #         gameController.trigger('human:stop')
-        #         assert.isTrue typeEntrySpy.notCalled
-        #         assert.isTrue deleteEntrySpy.notCalled
-        #         assert.isTrue stopSpy.notCalled

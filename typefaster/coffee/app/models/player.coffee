@@ -3,13 +3,17 @@ define (require) ->
     'use strict';
 
     # Module dependencies
-    $ = require('jquery');
-    _ = require('underscore');
-    Backbone = require('backbone');
-    Logger = require('js_logger');
-    TimerController = require('controllers/timer');
-    punycode = require('punycode');
-    require('string_at');
+    app = require 'app'
+
+    $ = require 'jquery'
+    _ = require 'underscore'
+    Backbone = require 'backbone'
+    punycode = require 'punycode'
+
+    Logger = require 'js_logger'
+    TimerController = require 'controllers/timer'
+
+    require 'string_at'
 
     # Module definition
     class PlayerModel extends Backbone.Model
@@ -31,7 +35,7 @@ define (require) ->
 
         initialize: (options) ->
             @logger = Logger.get 'PlayerModel'
-            @gameController = options.gameController
+            @entries = options.entries
             @timer = new TimerController()
 
         play: () ->
@@ -40,11 +44,11 @@ define (require) ->
 
         stop: () ->
             @timer.stop()
-            if @.hasCheated()
+            if @hasCheated()
                 @logger.debug 'You are a cheater'
             else
                 @logger.debug 'You are not a cheater'
-            @logger.debug JSON.stringify @.getStats()
+            @logger.debug JSON.stringify @getStats()
 
         reset: () ->
             @correctEntries = 0
@@ -53,30 +57,33 @@ define (require) ->
             @currentIndex = 0
             @entriesMap = []
 
+        setEntries: (entries) ->
+            @entries = entries
+
         typeEntry: (entry) ->
-            if entry is @gameController.entries.at(@currentIndex)
-                @logger.debug 'entry:is_correct', entry, @gameController.entries.at(@currentIndex)
+            if entry is @entries.at(@currentIndex)
+                @logger.debug 'entry:is_correct', entry, @entries.at(@currentIndex)
                 @correctEntries++
                 @fixedMistakes++ if @entriesMap[@currentIndex] is @ENTRY_TO_BE_FIXED
                 @entriesMap[@currentIndex] = @ENTRY_CORRECT
-                @gameController.trigger 'entry:is_correct', @, @currentIndex
+                app.vent.trigger 'entry:is_correct', @, @currentIndex
             else
-                @logger.debug 'entry:is_incorrect', entry, @gameController.entries.at(@currentIndex)
+                @logger.debug 'entry:is_incorrect', entry, @entries.at(@currentIndex)
                 @incorrectEntries++
                 @entriesMap[@currentIndex] = @ENTRY_INCORRECT
-                @gameController.trigger 'entry:is_incorrect', @, @currentIndex
+                app.vent.trigger 'entry:is_incorrect', @, @currentIndex
             @currentIndex++
-            @stop() if punycode.ucs2.decode(@gameController.entries).length is @currentIndex
+            @stop() if punycode.ucs2.decode(@entries).length is @currentIndex
 
         deleteEntry: () ->
             if @currentIndex > 0
                 @currentIndex--
-                @logger.debug 'entry:is_reset', @gameController.entries.at(@currentIndex)
+                @logger.debug 'entry:is_reset', @entries.at(@currentIndex)
                 if @entriesMap[@currentIndex] is @ENTRY_INCORRECT
                     @entriesMap[@currentIndex] = @ENTRY_TO_BE_FIXED
                 else
                     @entriesMap[@currentIndex] = @ENTRY_DELETED
-                @gameController.trigger 'entry:is_reset', @, @currentIndex
+                app.vent.trigger 'entry:is_reset', @, @currentIndex
                 return true
             return false
 

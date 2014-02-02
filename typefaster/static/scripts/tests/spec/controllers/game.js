@@ -1,5 +1,5 @@
 (function() {
-  define(['jquery', 'backbone', 'controllers/game'], function($, Backbone, GameController) {
+  define(['jquery', 'backbone', 'app', 'controllers/game'], function($, Backbone, app, GameController) {
     'use strict';
     var deleteEntrySpy, gameController, playSpy, stopSpy, timer, typeEntrySpy;
     gameController = void 0;
@@ -63,29 +63,29 @@
           return assert.isTrue(stopSpy.called, 'called at 1000ms');
         });
       });
-      return describe('on event', function() {
+      return describe('on app.vent', function() {
         describe('keyboard:char', function() {
           it('should call `typeEntry` with the char pressed', function() {
-            gameController.trigger('keyboard:char', 'a');
+            app.vent.trigger('keyboard:char', 'a');
             return assert.isTrue(typeEntrySpy.calledWith('a'));
           });
           return it('should start the game on the first char pressed only', function() {
-            gameController.trigger('keyboard:char', 'a');
-            gameController.trigger('keyboard:char', 'a');
+            app.vent.trigger('keyboard:char', 'a');
+            app.vent.trigger('keyboard:char', 'a');
             return assert.isTrue(playSpy.calledOnce);
           });
         });
         describe('keyboard:backspace', function() {
           return it('should call `deleteEntry` everytime', function() {
-            gameController.trigger('keyboard:backspace');
-            gameController.trigger('keyboard:backspace');
+            app.vent.trigger('keyboard:backspace');
+            app.vent.trigger('keyboard:backspace');
             return assert.isTrue(deleteEntrySpy.calledTwice);
           });
         });
         return describe('human:stop', function() {
           return it('should stop the game', function() {
             gameController.start();
-            gameController.trigger('human:stop');
+            app.vent.trigger('human:stop');
             return assert.isTrue(stopSpy.called);
           });
         });

@@ -78,8 +78,8 @@
                                 </li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
-                                <li><a href="#">{% trans %}Log in{% endtrans %}</a></li>
-                                <li><a href="#">{% trans %}Register{% endtrans %}</a></li>
+                                <li><a href="{{ url_for('frontend.login') }}">{% trans %}Log in{% endtrans %}</a></li>
+                                <li><a href="{{ url_for('root.logout') }}">{% trans %}Register{% endtrans %}</a></li>
                             </ul>
                         </div><!-- /.navbar-collapse -->
                     </div>

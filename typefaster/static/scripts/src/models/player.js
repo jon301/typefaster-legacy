@@ -2,17 +2,9 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(function(require) {
+  define(['jquery', 'underscore', 'backbone', 'js_logger', 'app', 'controllers/timer', 'punycode', 'string_at'], function($, _, Backbone, Logger, app, TimerController, punycode) {
     'use strict';
-    var $, Backbone, Logger, PlayerModel, TimerController, app, punycode, _, _ref;
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    Backbone = require('backbone');
-    punycode = require('punycode');
-    Logger = require('js_logger');
-    TimerController = require('controllers/timer');
-    require('string_at');
+    var PlayerModel, _ref;
     return PlayerModel = (function(_super) {
       __extends(PlayerModel, _super);
 
@@ -53,7 +45,6 @@
       };
 
       PlayerModel.prototype.stop = function() {
-        this.reset();
         this.timer.stop();
         if (this.hasCheated()) {
           this.logger.debug('You are a cheater');

@@ -1,17 +1,14 @@
 #global define
-define (require) ->
-    'use strict';
-
-    # Module dependencies
-    app = require 'app'
-
-    $ = require 'jquery'
-    _ = require 'underscore'
-    JST = require 'templates'
-    Backbone = require 'backbone'
-    Marionette = require 'marionette'
-
-    require 'highcharts'
+define [
+    'jquery',
+    'underscore',
+    'templates',
+    'backbone',
+    'marionette'
+    'app',
+    'highcharts'
+    ], ($, _, JST, Backbone, Marionette, app) ->
+    'use strict'
 
     # Module definition
     class StatsChartView extends Marionette.ItemView

@@ -1,18 +1,16 @@
 #global define
-define (require) ->
-    'use strict';
+define [
+    'jquery',
+    'underscore',
+    'templates',
+    'marionette',
+    'js_logger',
+    'punycode',
+    'app',
+    'string_fromcodepoint'
+    ], ($, _, JST, Marionette, Logger, punycode, app) ->
 
-    # Module dependencies
-    app = require 'app'
-
-    $ = require 'jquery'
-    _ = require 'underscore'
-    JST = require 'templates'
-    Marionette = require 'marionette'
-    Logger = require 'js_logger'
-    punycode = require 'punycode'
-
-    require 'string_fromcodepoint'
+    'use strict'
 
     # Module definition
     class TypeZoneView extends Marionette.ItemView

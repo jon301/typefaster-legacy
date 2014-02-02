@@ -1,15 +1,13 @@
-define (require) ->
-
-    app = require 'app'
-
-    $ = require 'jquery'
-    _ = require 'underscore'
-    JST = require 'templates'
-    globals = require 'globals'
-
-    TypeZoneView = require 'views/item/typezone'
-    StatsChartView = require 'views/item/statschart'
-    GameController = require 'controllers/game'
+require [
+    'jquery',
+    'underscore'
+    'templates',
+    'globals',
+    'app',
+    'views/item/typezone',
+    'views/item/statschart',
+    'controllers/game'
+    ], ($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) ->
 
     app.addInitializer () ->
 

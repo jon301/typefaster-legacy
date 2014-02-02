@@ -1,15 +1,12 @@
 #global define
-define (require) ->
-    'use strict';
-
-    # Module dependencies
-    app = require 'app'
-
-    $ = require 'jquery'
-    _ = require 'underscore'
-    Logger = require 'js_logger'
-
-    PlayerModel = require 'models/player'
+define [
+    'jquery',
+    'underscore',
+    'js_logger',
+    'app',
+    'models/player'
+    ], ($, _, Logger, app, PlayerModel) ->
+    'use strict'
 
     # Module definition
     class PlayerHumanModel extends PlayerModel

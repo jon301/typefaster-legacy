@@ -1,16 +1,12 @@
 #global define
-define (require) ->
-    'use strict';
-
-    # Module dependencies
-    $ = require 'jquery'
-    _ = require 'underscore'
-    Marionette = require 'marionette'
-    Jed = require 'jed'
-
-    Logger = require 'js_logger'
-
-    require 'bootstrap'
+define [
+    'jquery',
+    'underscore',
+    'marionette',
+    'js_logger',
+    'jed',
+    'bootstrap'
+    ], ($, _, Marionette, Logger, Jed) ->
 
     # Singleton pattern
     app = null

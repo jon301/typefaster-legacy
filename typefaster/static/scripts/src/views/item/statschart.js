@@ -2,16 +2,9 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(function(require) {
+  define(['jquery', 'underscore', 'templates', 'backbone', 'marionette', 'app', 'highcharts'], function($, _, JST, Backbone, Marionette, app) {
     'use strict';
-    var $, Backbone, JST, Marionette, StatsChartView, app, _, _ref;
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    JST = require('templates');
-    Backbone = require('backbone');
-    Marionette = require('marionette');
-    require('highcharts');
+    var StatsChartView, _ref;
     return StatsChartView = (function(_super) {
       __extends(StatsChartView, _super);
 

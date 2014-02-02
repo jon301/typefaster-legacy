@@ -1,14 +1,12 @@
 #global define
-define (require) ->
-    'use strict';
-
-    # Module dependencies
-    $ = require 'jquery'
-    _ = require 'underscore'
-    Logger = require 'js_logger'
-
-    PlayerModel = require 'models/player'
-    TimerController = require 'controllers/timer'
+define [
+    'jquery',
+    'underscore',
+    'js_logger',
+    'models/player',
+    'controllers/timer'
+    ], ($, _, Logger, PlayerModel, TimerController) ->
+    'use strict'
 
     # Module definition
     class PlayerGhostModel extends PlayerModel

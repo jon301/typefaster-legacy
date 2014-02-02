@@ -2,17 +2,9 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(function(require) {
+  define(['jquery', 'underscore', 'templates', 'marionette', 'js_logger', 'punycode', 'app', 'string_fromcodepoint'], function($, _, JST, Marionette, Logger, punycode, app) {
     'use strict';
-    var $, JST, Logger, Marionette, TypeZoneView, app, punycode, _, _ref;
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    JST = require('templates');
-    Marionette = require('marionette');
-    Logger = require('js_logger');
-    punycode = require('punycode');
-    require('string_fromcodepoint');
+    var TypeZoneView, _ref;
     return TypeZoneView = (function(_super) {
       __extends(TypeZoneView, _super);
 

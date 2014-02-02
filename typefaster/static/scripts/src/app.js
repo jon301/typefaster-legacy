@@ -1,13 +1,6 @@
 (function() {
-  define(function(require) {
-    'use strict';
-    var $, Jed, Logger, Marionette, app, _;
-    $ = require('jquery');
-    _ = require('underscore');
-    Marionette = require('marionette');
-    Jed = require('jed');
-    Logger = require('js_logger');
-    require('bootstrap');
+  define(['jquery', 'underscore', 'marionette', 'js_logger', 'jed', 'bootstrap'], function($, _, Marionette, Logger, Jed) {
+    var app;
     app = null;
     return (function() {
       if (app === null) {

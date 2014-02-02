@@ -35,19 +35,9 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(function(require) {
+  define(['jquery', 'underscore', 'backbone', 'marionette', 'js_logger', 'app', 'controllers/timer', 'models/player_human', 'models/player_ghost', 'views/item/typezone'], function($, _, Backbone, Marionette, Logger, app, TimerController, PlayerHumanModel, PlayerGhostModel, TypeZoneView) {
     'use strict';
-    var $, Backbone, GameController, Logger, Marionette, PlayerGhostModel, PlayerHumanModel, TimerController, TypeZoneView, app, _, _ref;
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    Backbone = require('backbone');
-    Marionette = require('marionette');
-    Logger = require('js_logger');
-    TimerController = require('controllers/timer');
-    PlayerHumanModel = require('models/player_human');
-    PlayerGhostModel = require('models/player_ghost');
-    TypeZoneView = require('views/item/typezone');
+    var GameController, _ref;
     return GameController = (function(_super) {
       __extends(GameController, _super);
 

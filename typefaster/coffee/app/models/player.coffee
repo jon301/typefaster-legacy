@@ -1,19 +1,15 @@
 #global define
-define (require) ->
-    'use strict';
-
-    # Module dependencies
-    app = require 'app'
-
-    $ = require 'jquery'
-    _ = require 'underscore'
-    Backbone = require 'backbone'
-    punycode = require 'punycode'
-
-    Logger = require 'js_logger'
-    TimerController = require 'controllers/timer'
-
-    require 'string_at'
+define [
+    'jquery',
+    'underscore',
+    'backbone',
+    'js_logger',
+    'app',
+    'controllers/timer',
+    'punycode',
+    'string_at'
+    ], ($, _, Backbone, Logger, app, TimerController, punycode) ->
+    'use strict'
 
     # Module definition
     class PlayerModel extends Backbone.Model
@@ -43,7 +39,6 @@ define (require) ->
             @timer.start()
 
         stop: () ->
-            @reset()
             @timer.stop()
             if @hasCheated()
                 @logger.debug 'You are a cheater'

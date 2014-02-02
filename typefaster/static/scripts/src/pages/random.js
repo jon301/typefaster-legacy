@@ -1,14 +1,5 @@
 (function() {
-  define(function(require) {
-    var $, GameController, JST, StatsChartView, TypeZoneView, app, globals, _;
-    app = require('app');
-    $ = require('jquery');
-    _ = require('underscore');
-    JST = require('templates');
-    globals = require('globals');
-    TypeZoneView = require('views/item/typezone');
-    StatsChartView = require('views/item/statschart');
-    GameController = require('controllers/game');
+  require(['jquery', 'underscore', 'templates', 'globals', 'app', 'views/item/typezone', 'views/item/statschart', 'controllers/game'], function($, _, JST, globals, app, TypeZoneView, StatsChartView, GameController) {
     return app.addInitializer(function() {
       var entries, gameController, statsChartView, typeZoneView;
       entries = 'abcdefghijklmnopqrstuvwxyz zyxwvutsrqponmlkjihgfedcba';

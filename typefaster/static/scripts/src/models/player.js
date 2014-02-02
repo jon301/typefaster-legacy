@@ -53,6 +53,7 @@
       };
 
       PlayerModel.prototype.stop = function() {
+        this.reset();
         this.timer.stop();
         if (this.hasCheated()) {
           this.logger.debug('You are a cheater');

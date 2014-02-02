@@ -43,6 +43,7 @@ define (require) ->
             @timer.start()
 
         stop: () ->
+            @reset()
             @timer.stop()
             if @hasCheated()
                 @logger.debug 'You are a cheater'

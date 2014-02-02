@@ -34,6 +34,7 @@ define (require) ->
             app.addInitializer (options) ->
                 Logger.useDefaults()
                 # Logger.setLevel(Logger[options.config.JSLOGGER_LEVEL])
+                # Logger.get('').setLevel(Logger[options.config.JSLOGGER_LEVEL]);
                 Logger.setLevel(Logger.OFF)
 
         app
